@@ -1,0 +1,28 @@
+.DS_Store
+
+# Dependencies
+node_modules/
+underwater/node_modules/
+
+# Next.js build output
+.next/
+underwater/.next/
+out/
+underwater/out/
+
+# Local environment
+.env
+.env.local
+.env.*.local
+underwater/.env
+underwater/.env.local
+underwater/.env.*.local
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# TypeScript incremental cache
+*.tsbuildinfo
