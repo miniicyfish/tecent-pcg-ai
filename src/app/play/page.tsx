@@ -31,6 +31,12 @@ interface EpilogueData {
   shareText: string;
 }
 
+interface DepthResult {
+  depth: DepthData;
+  toolId: string;
+  sceneIndex: number;
+}
+
 const contextualTools: Record<string, string[]> = {
   teahouse_01: [],
   teahouse_02: ['listen', 'observe'],
@@ -109,6 +115,32 @@ function summarizeDepth(depth: DepthData, maxLength = 120) {
   return `${text.slice(0, maxLength)}${text.length > maxLength ? '……' : ''}`;
 }
 
+function buildDepthEcho(
+  currentNode: StoryNode,
+  priorDepthResult: DepthResult | undefined
+) {
+  if (!priorDepthResult) return null;
+
+  const { depth, toolId } = priorDepthResult;
+  const tool = tools.find((item) => item.id === toolId);
+  const toolName = tool?.name || '那次探索';
+  const depthTag = depth.depthTag || '水下细节';
+  const summary = summarizeDepth(depth, 70);
+
+  if (!summary) return null;
+
+  const sceneHook =
+    currentNode.sceneTag === '风暴'
+      ? '眼前的混乱'
+      : currentNode.sceneTag === '余波'
+        ? '此刻的余波'
+        : currentNode.sceneTag === '暗流'
+          ? '眼前的暗流'
+          : '此刻的寻常';
+
+  return `方才「${toolName}」照见的${depthTag}，让${sceneHook}多了一层意味：${summary}`;
+}
+
 function PlayContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
@@ -121,9 +153,7 @@ function PlayContent() {
   const [beatIndex, setBeatIndex] = useState(0);
   const [autoPlay, setAutoPlay] = useState(true);
   const [depthHistory, setDepthHistory] = useState<string[]>([]);
-  const [depthResults, setDepthResults] = useState<
-    { depth: DepthData; toolId: string; sceneIndex: number }[]
-  >([]);
+  const [depthResults, setDepthResults] = useState<DepthResult[]>([]);
   const [activeDepth, setActiveDepth] = useState<{
     depth: DepthData;
     toolId: string;
@@ -137,16 +167,18 @@ function PlayContent() {
   const currentNode = storyNodes[sceneIndex];
 
   const depthEcho = useMemo(() => {
+    const previousSceneIndex = sceneIndex - 1;
+    if (previousSceneIndex < 0) return null;
+
     const priorDepth = [...depthResults]
       .reverse()
-      .find((item) => item.depth.hasDepth && item.sceneIndex < sceneIndex);
+      .find(
+        (item) =>
+          item.depth.hasDepth && item.sceneIndex === previousSceneIndex
+      );
 
-    if (!priorDepth) return null;
-    const tool = tools.find((item) => item.id === priorDepth.toolId);
-    const source = tool ? `方才「${tool.name}」照见的细节` : '方才照见的细节';
-    const summary = summarizeDepth(priorDepth.depth, 120);
-    return summary ? `${source}，让此刻多了一层意味：${summary}` : null;
-  }, [depthResults, sceneIndex]);
+    return buildDepthEcho(currentNode, priorDepth);
+  }, [currentNode, depthResults, sceneIndex]);
 
   const beats = useMemo(
     () => buildBeats(currentNode, depthEcho),
