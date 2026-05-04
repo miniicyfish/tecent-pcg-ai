@@ -16,6 +16,12 @@ interface DepthData {
   hasDepth: boolean;
   content: string;
   depthTag: string | null;
+  beats?: {
+    kind: 'narration' | 'dialogue' | 'perception' | 'thought';
+    speaker?: string;
+    mood?: string;
+    text: string;
+  }[];
   innerThoughts: { character: string; thought: string }[];
 }
 
@@ -87,6 +93,22 @@ function buildBeats(node: StoryNode, depthEcho: string | null): SceneBeat[] {
   ];
 }
 
+function summarizeDepth(depth: DepthData, maxLength = 120) {
+  const text =
+    depth.content ||
+    depth.beats
+      ?.map((beat) => {
+        if (beat.kind === 'dialogue' && beat.speaker) {
+          return `${beat.speaker}说：“${beat.text}”`;
+        }
+        return beat.text;
+      })
+      .join(' ');
+
+  if (!text) return '';
+  return `${text.slice(0, maxLength)}${text.length > maxLength ? '……' : ''}`;
+}
+
 function PlayContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
@@ -121,7 +143,8 @@ function PlayContent() {
     if (!priorDepth) return null;
     const tool = tools.find((item) => item.id === priorDepth.toolId);
     const source = tool ? `方才「${tool.name}」照见的细节` : '方才照见的细节';
-    return `${source}，让此刻多了一层意味：${priorDepth.depth.content.slice(0, 120)}${priorDepth.depth.content.length > 120 ? '……' : ''}`;
+    const summary = summarizeDepth(priorDepth.depth, 120);
+    return summary ? `${source}，让此刻多了一层意味：${summary}` : null;
   }, [depthResults, sceneIndex]);
 
   const beats = useMemo(
@@ -154,14 +177,15 @@ function PlayContent() {
   }, [beatIndex, beats.length, sceneIndex, storyNodes.length]);
 
   useEffect(() => {
-    if (!autoPlay || loading || epilogue) return;
+    if (!autoPlay || activeDepth || loading || epilogue) return;
     if (isLastScene && isLastBeat) return;
 
-    const delay = activeDepth
-      ? 9000
-      : currentBeat.kind === 'dialogue'
-        ? 5200
-        : 7200;
+    const delay =
+      currentBeat.kind === 'dialogue'
+        ? 3800
+        : currentBeat.kind === 'perception'
+          ? 6200
+          : 7200;
     const timer = window.setTimeout(advance, delay);
     return () => window.clearTimeout(timer);
   }, [
@@ -217,9 +241,10 @@ function PlayContent() {
         setDepthResults((prev) => [...prev, { depth, toolId, sceneIndex }]);
 
         if (depth.hasDepth && depth.depthTag) {
+          const summary = summarizeDepth(depth, 80);
           setDepthHistory((prev) => [
             ...prev,
-            `[${depth.depthTag}] ${depth.content.slice(0, 80)}`,
+            `[${depth.depthTag}] ${summary}`,
           ]);
         }
       } catch (err) {
@@ -277,8 +302,11 @@ function PlayContent() {
       <div className="flex flex-1 flex-col items-center justify-center px-6 py-12">
         <Epilogue
           data={epilogue}
-          identityName={identity.name}
+          identity={identity}
+          identityId={identityId}
           depthCount={depthCount}
+          storyNodes={storyNodes}
+          depthResults={depthResults}
           onRestart={() => router.push('/')}
         />
       </div>
@@ -334,11 +362,12 @@ function PlayContent() {
         />
 
         {activeDepth && (
-          <div className="absolute bottom-44 left-4 right-4 z-20">
+          <div className="absolute bottom-44 left-4 right-4 z-20 md:bottom-40">
             <DepthReveal
               depth={activeDepth.depth}
               toolName={tools.find((tool) => tool.id === activeDepth.toolId)?.name || ''}
               toolIcon={tools.find((tool) => tool.id === activeDepth.toolId)?.icon || ''}
+              onClose={() => setActiveDepth(null)}
             />
           </div>
         )}

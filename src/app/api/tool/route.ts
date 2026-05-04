@@ -6,6 +6,8 @@ import { buildToolSystemPrompt } from '@/lib/prompts';
 import { identities, tools } from '@/lib/worldbuilding';
 import { storyNodesByIdentity } from '@/lib/storyNodes';
 
+const isToolDebugEnabled = process.env.TOOL_DEBUG === '1';
+
 function emptyDepthResult() {
   return {
     hasDepth: false,
@@ -85,10 +87,49 @@ ${historyText}${depthText}
 
 请直接输出JSON。`;
 
-    const result = await callAI(systemPrompt, userPrompt, [], 0.8, 1500, 15000);
+    const result = await callAI(systemPrompt, userPrompt, [], 0.8, 1500, 45000);
+
+    if (isToolDebugEnabled) {
+      const parsed = result.parsed as
+        | {
+            hasDepth?: unknown;
+            depthTag?: unknown;
+            content?: unknown;
+            beats?: unknown;
+          }
+        | null;
+
+      console.log('[tool-debug]', {
+        identityId,
+        storyNodeId,
+        sceneTitle: currentNode?.title || null,
+        toolId,
+        toolName: tool.name,
+        isContextualTool,
+        contextualTools,
+        parsed: Boolean(result.parsed),
+        hasDepth: parsed?.hasDepth ?? null,
+        depthTag: parsed?.depthTag ?? null,
+        contentPreview:
+          typeof parsed?.content === 'string'
+            ? parsed.content.slice(0, 120)
+            : null,
+        beatsCount: Array.isArray(parsed?.beats) ? parsed.beats.length : null,
+        rawPreview: result.content.slice(0, 300),
+      });
+    }
 
     if (result.parsed) {
       return Response.json(result.parsed);
+    }
+
+    if (isToolDebugEnabled) {
+      console.warn('[tool-debug] falling back because AI response was not parseable', {
+        identityId,
+        storyNodeId,
+        toolId,
+        rawPreview: result.content.slice(0, 500),
+      });
     }
 
     return Response.json(emptyDepthResult());
