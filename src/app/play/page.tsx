@@ -351,8 +351,8 @@ function PlayContent() {
   }
 
   return (
-    <div className="mx-auto flex min-h-full w-full max-w-3xl flex-1 flex-col">
-      <header className="z-10 flex items-center justify-between border-b border-border bg-bg-deep/95 px-4 py-3">
+    <div className="mx-auto flex h-screen w-full max-w-6xl flex-col overflow-hidden">
+      <header className="z-10 flex h-14 shrink-0 items-center justify-between border-b border-border bg-bg-deep/95 px-4 py-3">
         <div className="flex items-center gap-3">
           <div className="relative h-8 w-8 overflow-hidden border border-border bg-bg-card">
             <Image
@@ -381,7 +381,7 @@ function PlayContent() {
         </button>
       </header>
 
-      <main className="relative flex-1">
+      <main className="relative min-h-0 flex-1">
         <SceneDisplay
           backgroundSrc={getSceneBackground(
             identityId,
@@ -399,7 +399,7 @@ function PlayContent() {
         />
 
         {activeDepth && (
-          <div className="absolute bottom-44 left-4 right-4 z-20 md:bottom-40">
+          <div className="absolute bottom-32 left-4 right-4 z-20 md:bottom-28">
             <DepthReveal
               depth={activeDepth.depth}
               toolName={tools.find((tool) => tool.id === activeDepth.toolId)?.name || ''}
@@ -436,7 +436,7 @@ function PlayContent() {
         )}
       </main>
 
-      <footer className="border-t border-border bg-bg-deep/95 px-4 py-3">
+      <footer className="shrink-0 border-t border-border bg-bg-deep/95 px-4 py-2">
         <ToolBar
           onUseTool={useTool}
           disabled={loading}
@@ -445,16 +445,16 @@ function PlayContent() {
           usedToolIds={usedToolIds}
         />
 
-        <div className="mt-3 flex justify-center">
+        <div className="mt-2 flex justify-center">
           {isLastScene && isLastBeat ? (
-            <div className="space-y-2 text-center">
+            <div className="space-y-1.5 text-center">
               <p className="text-xs leading-5 text-accent-gold/80">
                 水下旅程已走到尽头，点击下方生成你的结语和分享卡。
               </p>
               <button
                 onClick={generateEpilogue}
                 disabled={loading}
-                className="border border-accent-gold bg-accent-gold/20 px-6 py-2 text-sm text-accent-gold transition-colors hover:bg-accent-gold/30 disabled:opacity-50 pixel-text"
+                className="border border-accent-gold bg-accent-gold/20 px-6 py-1.5 text-sm text-accent-gold transition-colors hover:bg-accent-gold/30 disabled:opacity-50 pixel-text"
               >
                 结束旅程
               </button>
@@ -463,7 +463,7 @@ function PlayContent() {
             <button
               onClick={advance}
               disabled={loading}
-              className="border border-border px-8 py-2 text-sm text-text-secondary transition-colors hover:border-text-dim hover:text-text-primary disabled:opacity-50 pixel-text"
+              className="border border-border px-8 py-1.5 text-sm text-text-secondary transition-colors hover:border-text-dim hover:text-text-primary disabled:opacity-50 pixel-text"
             >
               继续
             </button>

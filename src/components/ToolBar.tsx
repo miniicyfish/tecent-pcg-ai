@@ -18,7 +18,7 @@ export default function ToolBar({
   usedToolIds,
 }: Props) {
   return (
-    <div className="flex gap-3 justify-center">
+    <div className="flex justify-center gap-2 md:gap-3">
       {tools.map((tool) => {
         const used = usedToolIds.includes(tool.id);
         const highlighted = highlightedToolIds.includes(tool.id);
@@ -28,7 +28,7 @@ export default function ToolBar({
             key={tool.id}
             onClick={() => onUseTool(tool.id)}
             disabled={isDisabled}
-            className={`flex flex-col items-center gap-1.5 px-4 py-3 border transition-all ${
+            className={`flex min-w-16 flex-col items-center gap-1 border px-3 py-2 transition-all md:min-w-24 md:flex-row md:justify-center md:gap-2 md:px-4 ${
               activeToolId === tool.id
                 ? 'border-accent-gold bg-accent-gold/10 text-accent-gold'
                 : isDisabled
@@ -39,7 +39,7 @@ export default function ToolBar({
             }`}
             title={highlighted ? '此刻似乎值得一试' : '也可以试试，但未必有发现'}
           >
-            <span className="text-xl">{tool.icon}</span>
+            <span className="text-lg md:text-xl">{tool.icon}</span>
             <span className="text-xs pixel-text">{used ? '已看过' : tool.name}</span>
           </button>
         );
