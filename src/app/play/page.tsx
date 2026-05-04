@@ -129,6 +129,7 @@ function PlayContent() {
     toolId: string;
   } | null>(null);
   const [loading, setLoading] = useState(false);
+  const [loadingElapsedSeconds, setLoadingElapsedSeconds] = useState(0);
   const [activeToolId, setActiveToolId] = useState<string | null>(null);
   const [epilogue, setEpilogue] = useState<EpilogueData | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -160,6 +161,42 @@ function PlayContent() {
     .filter((item) => item.sceneIndex === sceneIndex)
     .map((item) => item.toolId);
   const depthCount = depthResults.filter((item) => item.depth.hasDepth).length;
+
+  const loadingCopy = useMemo(() => {
+    if (loadingElapsedSeconds >= 30) {
+      return {
+        text: '水下仍在回应，快到本次打捞边界',
+        detail: '如果 45 秒内没有浮上来，这次探索会自然回到当前场景。',
+      };
+    }
+
+    if (loadingElapsedSeconds >= 15) {
+      return {
+        text: '线索还在水下，模型正在判断能否看见',
+        detail: '有些场景需要更久，尤其是要分辨“有发现”和“只是寻常”。',
+      };
+    }
+
+    return {
+      text: '你屏住呼吸，等那点声响浮上来',
+      detail: '有些事不会改变，但看见它的角度会变。',
+    };
+  }, [loadingElapsedSeconds]);
+
+  useEffect(() => {
+    if (!loading) {
+      setLoadingElapsedSeconds(0);
+      return;
+    }
+
+    const startedAt = Date.now();
+    setLoadingElapsedSeconds(0);
+    const timer = window.setInterval(() => {
+      setLoadingElapsedSeconds(Math.floor((Date.now() - startedAt) / 1000));
+    }, 1000);
+
+    return () => window.clearInterval(timer);
+  }, [loading]);
 
   const advance = useCallback(() => {
     setActiveDepth(null);
@@ -375,9 +412,12 @@ function PlayContent() {
         {loading && (
           <div className="absolute inset-0 z-30 flex items-center justify-center bg-bg-deep/45 backdrop-blur-sm">
             <div className="border border-accent-gold/30 bg-bg-card px-6 py-5 text-center shadow-2xl">
-              <LoadingIndicator text="你屏住呼吸，等那点声响浮上来" />
+              <LoadingIndicator text={loadingCopy.text} />
               <p className="mt-1 text-xs text-text-dim">
-                有些事不会改变，但看见它的角度会变。
+                {loadingCopy.detail}
+              </p>
+              <p className="mt-3 text-xs text-accent-blue/70 pixel-text">
+                {Math.min(loadingElapsedSeconds, 45)} / 45 秒
               </p>
             </div>
           </div>
@@ -407,13 +447,18 @@ function PlayContent() {
 
         <div className="mt-3 flex justify-center">
           {isLastScene && isLastBeat ? (
-            <button
-              onClick={generateEpilogue}
-              disabled={loading}
-              className="border border-accent-gold bg-accent-gold/20 px-6 py-2 text-sm text-accent-gold transition-colors hover:bg-accent-gold/30 disabled:opacity-50 pixel-text"
-            >
-              结束旅程
-            </button>
+            <div className="space-y-2 text-center">
+              <p className="text-xs leading-5 text-accent-gold/80">
+                水下旅程已走到尽头，点击下方生成你的结语和分享卡。
+              </p>
+              <button
+                onClick={generateEpilogue}
+                disabled={loading}
+                className="border border-accent-gold bg-accent-gold/20 px-6 py-2 text-sm text-accent-gold transition-colors hover:bg-accent-gold/30 disabled:opacity-50 pixel-text"
+              >
+                结束旅程
+              </button>
+            </div>
           ) : (
             <button
               onClick={advance}
