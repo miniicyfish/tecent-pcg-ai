@@ -135,14 +135,14 @@ export default function SceneDisplay({
           )}
 
           <p
-            className={`max-h-28 overflow-y-auto text-sm leading-7 md:max-h-32 ${
+            className={`overflow-y-auto text-sm leading-7 ${
               isNarration
-                ? 'text-text-secondary'
+                ? 'max-h-28 text-text-secondary md:max-h-32'
                 : isEcho
-                  ? 'text-text-primary'
+                  ? 'max-h-40 text-text-primary md:max-h-48'
                   : isPerception
-                    ? 'text-text-secondary italic'
-                    : 'text-text-primary'
+                    ? 'max-h-28 text-text-secondary italic md:max-h-32'
+                    : 'max-h-28 text-text-primary md:max-h-32'
             }`}
           >
             {beat.kind === 'dialogue' ? `“${beat.text}”` : beat.text}

@@ -115,6 +115,48 @@ function summarizeDepth(depth: DepthData, maxLength = 120) {
   return `${text.slice(0, maxLength)}${text.length > maxLength ? '……' : ''}`;
 }
 
+function getDepthText(depth: DepthData) {
+  return (
+    depth.content ||
+    depth.beats
+      ?.map((beat) => {
+        if (beat.kind === 'dialogue' && beat.speaker) {
+          return `${beat.speaker}说：“${beat.text}”`;
+        }
+        return beat.text;
+      })
+      .join(' ') ||
+    ''
+  ).replace(/\s+/g, ' ').trim();
+}
+
+function buildEchoSummary(depth: DepthData, maxLength = 180) {
+  const text = getDepthText(depth);
+  if (!text) return '';
+  if (text.length <= maxLength) return text;
+
+  const sentences = text.match(/[^。！？]+[。！？]/g);
+  if (sentences?.length) {
+    let summary = '';
+    for (const sentence of sentences) {
+      if ((summary + sentence).length > maxLength) break;
+      summary += sentence;
+    }
+    if (summary) return summary;
+  }
+
+  const clauses = text.split(/(?<=[，；、])/);
+  let summary = '';
+  for (const clause of clauses) {
+    if (!clause) continue;
+    if ((summary + clause).length > maxLength) break;
+    summary += clause;
+  }
+
+  const fallback = summary || text.slice(0, maxLength - 1);
+  return /[。！？]$/.test(fallback) ? fallback : `${fallback.replace(/[，；、：]$/, '')}。`;
+}
+
 function buildDepthEcho(
   currentNode: StoryNode,
   priorDepthResult: DepthResult | undefined
@@ -125,7 +167,7 @@ function buildDepthEcho(
   const tool = tools.find((item) => item.id === toolId);
   const toolName = tool?.name || '那次探索';
   const depthTag = depth.depthTag || '水下细节';
-  const summary = summarizeDepth(depth, 70);
+  const summary = buildEchoSummary(depth);
 
   if (!summary) return null;
 
