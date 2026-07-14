@@ -69,6 +69,17 @@ body {
   mask-composite: intersect;
 }
 
+.epilogue-standee {
+  -webkit-mask-image:
+    linear-gradient(to bottom, transparent 0%, black 10%, black 72%, transparent 100%),
+    radial-gradient(ellipse at 50% 46%, black 0%, black 56%, transparent 77%);
+  -webkit-mask-composite: source-in;
+  mask-image:
+    linear-gradient(to bottom, transparent 0%, black 10%, black 72%, transparent 100%),
+    radial-gradient(ellipse at 50% 46%, black 0%, black 56%, transparent 77%);
+  mask-composite: intersect;
+}
+
 /* 滚动条 */
 ::-webkit-scrollbar {
   width: 4px;

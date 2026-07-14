@@ -84,8 +84,16 @@ ${toolPromptHint}
 \`\`\`json
 {
   "hasDepth": true或false,
-  "content": "纵深内容（如果hasDepth为true，150-300字的具体发现；如果为false，30-50字的自然空结果）",
+  "content": "纵深内容摘要（如果hasDepth为true，80-140字概括beats里的关键发现；如果为false，30-50字的自然空结果）",
   "depthTag": "纵深标签（如果有发现，给一个标签如'鉴查院暗流''长公主暗手'；如果没有则为null）",
+  "beats": [
+    {
+      "kind": "narration、dialogue、perception 或 thought",
+      "speaker": "说话者或感知主体；narration可省略",
+      "mood": "语气，可选",
+      "text": "这一小段的具体内容"
+    }
+  ],
   "innerThoughts": [
     {
       "character": "角色名（如果通过这个工具看到了某个角色的内心，可选）",
@@ -103,7 +111,11 @@ ${toolPromptHint}
 5. 纵深内容必须与庆余年世界观一致，不能编造不存在的角色或事件。
 6. 如果用户之前已经有过发现（见场景历史），新发现可以与之关联，但不要强行制造连续线索。
 7. 小人物的发现要符合其身份权限——茶馆掌柜不会知道皇宫密事，文书不会看到绝密文件内容。
-8. 请直接输出JSON，不要添加任何多余文字。`;
+8. hasDepth=true 时，beats 必须有 2-4 段，用不同 kind 拆开阅读节奏；不要把所有内容塞进一个长段落。
+9. 每个 beat 的 text 控制在 35-90 个中文字符；如果信息较多，拆成下一段 beat，而不是写成长段。
+10. dialogue 只用于角色真的说出口的话；thought 只用于通过工具合理窥见的短暂内心；perception 用于"你"的判断、迟疑、反应。
+11. hasDepth=false 时，beats 可以为空数组，content 给一条自然空结果即可。
+12. 请直接输出JSON，不要添加任何多余文字。`;
 }
 
 // ── 结语 Prompt ──────────────────────────────────

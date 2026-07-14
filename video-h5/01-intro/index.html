@@ -1,0 +1,998 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>腾讯视频·水下模式｜复赛视频 01 引入 H5</title>
+    <style>
+      :root {
+        --bg: #060606;
+        --panel: #11100e;
+        --text: #f5efe5;
+        --muted: #9f968a;
+        --gold: #f4bf5b;
+        --gold-2: #9d7132;
+        --line: rgba(244, 191, 91, 0.72);
+        --blue: #8abec7;
+        --t: 22s;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        min-height: 100vh;
+        overflow: hidden;
+        background:
+          radial-gradient(circle at 18% 20%, rgba(244, 191, 91, 0.12), transparent 30%),
+          radial-gradient(circle at 78% 76%, rgba(138, 190, 199, 0.1), transparent 28%),
+          #040404;
+        color: var(--text);
+        font-family: "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", system-ui, sans-serif;
+      }
+
+      .wrap {
+        display: grid;
+        min-height: 100vh;
+        place-items: center;
+        padding: min(4vh, 36px);
+      }
+
+      .stage {
+        position: relative;
+        aspect-ratio: 16 / 9;
+        width: min(100vw - 48px, calc((100vh - 48px) * 16 / 9));
+        max-width: 1920px;
+        overflow: hidden;
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        border-radius: 28px;
+        background: #050505;
+        box-shadow: 0 28px 90px rgba(0, 0, 0, 0.54);
+        isolation: isolate;
+      }
+
+      .stage::after {
+        content: "";
+        position: absolute;
+        inset: 0;
+        pointer-events: none;
+        z-index: 80;
+        background:
+          linear-gradient(rgba(255,255,255,.03) 1px, transparent 1px) 0 0 / 100% 3px,
+          radial-gradient(circle at 50% 38%, transparent 58%, rgba(0, 0, 0, 0.42));
+        mix-blend-mode: screen;
+        opacity: 0.26;
+      }
+
+      .scene {
+        position: absolute;
+        inset: 0;
+      }
+
+      .cover-scene {
+        display: grid;
+        z-index: 60;
+        place-items: center;
+        overflow: hidden;
+        background:
+          linear-gradient(90deg, rgba(3, 3, 3, 0.9), rgba(3, 3, 3, 0.52), rgba(3, 3, 3, 0.88)),
+          url("assets/cover-bg.png") center / cover;
+        animation: coverScene var(--t) cubic-bezier(.2,.8,.2,1) both;
+      }
+
+      .cover-scene::before {
+        content: "";
+        position: absolute;
+        inset: 8% 8%;
+        border: 1px solid rgba(244, 191, 91, 0.22);
+        border-radius: 28px;
+      }
+
+      .cover-content {
+        position: relative;
+        z-index: 2;
+        width: min(1220px, 78%);
+      }
+
+      .cover-kicker {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        color: var(--gold);
+        font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+        font-size: 15px;
+        font-weight: 900;
+        letter-spacing: .22em;
+      }
+
+      .cover-kicker::before {
+        content: "";
+        width: 54px;
+        height: 2px;
+        border-radius: 999px;
+        background: var(--gold);
+      }
+
+      .cover-title {
+        margin: 30px 0 0;
+        font-size: clamp(58px, 7vw, 128px);
+        font-weight: 950;
+        line-height: 1.02;
+        letter-spacing: 0;
+      }
+
+      .cover-title span {
+        color: var(--gold);
+      }
+
+      .cover-subtitle {
+        margin-top: 26px;
+        max-width: 860px;
+        color: rgba(245, 239, 229, 0.72);
+        font-size: clamp(21px, 2vw, 34px);
+        font-weight: 800;
+      }
+
+      .cover-meta {
+        position: absolute;
+        bottom: 10.5%;
+        right: 10.5%;
+        z-index: 2;
+        text-align: right;
+        color: rgba(245, 239, 229, 0.58);
+        font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+        font-size: 13px;
+        font-weight: 800;
+        letter-spacing: .12em;
+      }
+
+      .player-scene {
+        animation: playerScene var(--t) linear both;
+      }
+
+      .player {
+        position: absolute;
+        inset: 5% 6%;
+        overflow: hidden;
+        border-radius: 22px;
+        background: #080807;
+        box-shadow: 0 26px 70px rgba(0, 0, 0, 0.55);
+      }
+
+      .appbar {
+        position: absolute;
+        left: 0;
+        right: 0;
+        top: 0;
+        z-index: 4;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        height: 76px;
+        padding: 0 30px;
+        background: linear-gradient(to bottom, rgba(0, 0, 0, 0.72), transparent);
+      }
+
+      .brand {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        font-size: 23px;
+        font-weight: 900;
+        letter-spacing: 0.02em;
+      }
+
+      .play-dot {
+        display: grid;
+        height: 38px;
+        width: 38px;
+        place-items: center;
+        border-radius: 999px;
+        background: var(--gold);
+        color: #090705;
+      }
+
+      .play-dot::before {
+        content: "";
+        width: 0;
+        height: 0;
+        margin-left: 3px;
+        border-bottom: 8px solid transparent;
+        border-left: 12px solid currentColor;
+        border-top: 8px solid transparent;
+      }
+
+      .nav {
+        display: flex;
+        gap: 22px;
+        color: rgba(245, 239, 229, 0.62);
+        font-size: 16px;
+        font-weight: 700;
+      }
+
+      .film-frame {
+        position: absolute;
+        inset: 0;
+        background-image:
+          linear-gradient(to right, rgba(0,0,0,.72), rgba(0,0,0,.2) 42%, rgba(0,0,0,.78)),
+          url("assets/ending-frame.jpg");
+        background-position: center;
+        background-size: cover;
+        filter: saturate(0.88) brightness(0.86);
+        animation: filmBreath var(--t) ease both;
+      }
+
+      .end-copy {
+        position: absolute;
+        left: 52px;
+        top: 170px;
+        z-index: 5;
+      }
+
+      .pill {
+        display: inline-flex;
+        align-items: center;
+        border: 1px solid rgba(244, 191, 91, 0.44);
+        border-radius: 999px;
+        background: rgba(244, 191, 91, 0.1);
+        padding: 9px 17px;
+        color: var(--gold);
+        font-size: 14px;
+        font-weight: 900;
+      }
+
+      .end-copy h1 {
+        margin: 28px 0 0;
+        max-width: 760px;
+        font-size: clamp(38px, 5.5vw, 88px);
+        line-height: 1.02;
+        letter-spacing: 0;
+      }
+
+      .end-copy p {
+        margin: 22px 0 0;
+        color: rgba(245, 239, 229, 0.72);
+        font-size: clamp(17px, 1.4vw, 26px);
+        font-weight: 700;
+      }
+
+      .progress {
+        position: absolute;
+        bottom: 42px;
+        left: 50px;
+        right: 50px;
+        z-index: 5;
+        display: grid;
+        grid-template-columns: 1fr auto;
+        gap: 18px;
+        align-items: center;
+        color: rgba(245, 239, 229, 0.68);
+        font-size: 15px;
+      }
+
+      .bar {
+        position: relative;
+        height: 6px;
+        overflow: hidden;
+        border-radius: 999px;
+        background: rgba(255, 255, 255, 0.2);
+      }
+
+      .bar::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        border-radius: inherit;
+        background: var(--gold);
+        transform-origin: left;
+        animation: progressFill 5s cubic-bezier(.2,.8,.3,1) both;
+      }
+
+      .phone-scene {
+        pointer-events: none;
+        animation: phoneScene var(--t) linear both;
+      }
+
+      .phone {
+        position: absolute;
+        left: 62%;
+        top: 51%;
+        z-index: 20;
+        width: min(25.5vw, 320px);
+        aspect-ratio: 9 / 19.4;
+        transform: translate(-50%, -50%);
+        overflow: hidden;
+        border: 10px solid #151412;
+        border-radius: 42px;
+        background: #0d0d0b;
+        box-shadow: 0 34px 88px rgba(0, 0, 0, 0.6);
+        animation: phoneMove var(--t) cubic-bezier(.2,.8,.2,1) both;
+      }
+
+      .phone::before {
+        content: "";
+        position: absolute;
+        left: 35%;
+        right: 35%;
+        top: 10px;
+        z-index: 10;
+        height: 5px;
+        border-radius: 999px;
+        background: #25231f;
+      }
+
+      .phone-track {
+        display: flex;
+        height: 100%;
+        width: 400%;
+        animation: phoneSwipe var(--t) cubic-bezier(.2,.8,.2,1) both;
+      }
+
+      .phone-page {
+        position: relative;
+        width: 25%;
+        height: 100%;
+        padding: 28px 18px;
+        background: #090909;
+      }
+
+      .phone-video {
+        background:
+          linear-gradient(to bottom, rgba(0,0,0,.15), rgba(0,0,0,.76)),
+          url("assets/ending-frame.jpg") center / cover;
+      }
+
+      .phone-video .mini-brand {
+        position: absolute;
+        left: 18px;
+        top: 32px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 17px;
+        font-weight: 900;
+      }
+
+      .phone-video .phone-ended {
+        position: absolute;
+        left: 20px;
+        right: 20px;
+        bottom: 92px;
+        border: 1px solid rgba(244, 191, 91, 0.32);
+        border-radius: 18px;
+        background: rgba(0, 0, 0, 0.58);
+        padding: 16px;
+      }
+
+      .phone-ended strong {
+        display: block;
+        font-size: 22px;
+      }
+
+      .phone-ended span {
+        display: block;
+        margin-top: 8px;
+        color: rgba(245, 239, 229, 0.65);
+        font-size: 12px;
+        line-height: 1.45;
+      }
+
+      .app-page {
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        overflow: hidden;
+        padding: 82px 28px 86px;
+        color: #11100d;
+      }
+
+      .douban {
+        background: linear-gradient(145deg, #f8f5e9, #ebe6d5);
+        --app-color: #1f8b54;
+      }
+
+      .xhs {
+        background: linear-gradient(145deg, #fff4f2, #f4dfdc);
+        --app-color: #d8423a;
+      }
+
+      .bili {
+        background: linear-gradient(145deg, #ecf9ff, #d8ebf5);
+        --app-color: #189bd6;
+      }
+
+      .app-minimal-top {
+        display: grid;
+        gap: 18px;
+        min-height: 132px;
+      }
+
+      .app-name {
+        color: var(--app-color);
+        font-size: 46px;
+        font-weight: 950;
+        line-height: 1.06;
+        letter-spacing: 0;
+      }
+
+      .xhs .app-name {
+        font-size: 39px;
+      }
+
+      .bili .app-name {
+        font-size: 36px;
+      }
+
+      .app-keyword {
+        width: fit-content;
+        max-width: 100%;
+        border-radius: 999px;
+        background: rgba(0, 0, 0, 0.07);
+        padding: 9px 12px;
+        color: rgba(0, 0, 0, 0.62);
+        font-size: 12px;
+        font-weight: 900;
+        white-space: nowrap;
+      }
+
+      .app-minimal-bottom {
+        display: grid;
+        gap: 13px;
+        padding-bottom: 8px;
+      }
+
+      .content-label {
+        color: rgba(0, 0, 0, 0.38);
+        font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+        font-size: 10px;
+        font-weight: 900;
+        letter-spacing: .13em;
+      }
+
+      .content-question {
+        margin: 0;
+        font-size: 22px;
+        font-weight: 950;
+        line-height: 1.22;
+        letter-spacing: 0;
+        overflow-wrap: anywhere;
+      }
+
+      .content-meta {
+        color: rgba(0, 0, 0, 0.45);
+        font-size: 11px;
+        font-weight: 800;
+      }
+
+      .voiceover {
+        position: absolute;
+        left: 8%;
+        top: 24%;
+        z-index: 22;
+        width: min(570px, 34%);
+        border-left: 3px solid rgba(244, 191, 91, 0.8);
+        padding-left: 22px;
+        text-align: left;
+        font-size: clamp(24px, 2.35vw, 42px);
+        font-weight: 950;
+        line-height: 1.18;
+        text-shadow: 0 14px 44px rgba(0, 0, 0, 0.58);
+        animation: questionLine var(--t) linear both;
+      }
+
+      .escape-scene {
+        animation: escapeScene var(--t) linear both;
+      }
+
+      .logo-node {
+        position: absolute;
+        left: 13%;
+        top: 48%;
+        z-index: 25;
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        transform: translateY(-50%);
+        color: var(--text);
+        font-size: 28px;
+        font-weight: 950;
+      }
+
+      .gold-line {
+        position: absolute;
+        left: 22%;
+        top: 49.5%;
+        z-index: 23;
+        height: 3px;
+        width: 58%;
+        border-radius: 999px;
+        background: linear-gradient(90deg, rgba(244,191,91,0), var(--gold), rgba(244,191,91,0));
+        box-shadow: 0 0 24px rgba(244, 191, 91, 0.62);
+        transform-origin: left;
+        animation: goldLine var(--t) linear both;
+      }
+
+      .social-stack {
+        position: absolute;
+        right: 10%;
+        top: 48%;
+        z-index: 30;
+        width: 36%;
+        height: 42%;
+        transform: translateY(-50%);
+      }
+
+      .social-card {
+        position: absolute;
+        width: 56%;
+        overflow: hidden;
+        border: 1px solid rgba(255, 255, 255, 0.11);
+        border-radius: 18px;
+        background: rgba(255, 255, 255, 0.06);
+        box-shadow: 0 22px 68px rgba(0, 0, 0, 0.44);
+        backdrop-filter: blur(14px);
+        animation: gatherCard var(--t) cubic-bezier(.2,.8,.2,1) both;
+      }
+
+      .social-card:nth-child(1) {
+        left: 0;
+        top: 4%;
+        --rx: -7deg;
+      }
+
+      .social-card:nth-child(2) {
+        right: 0;
+        top: 22%;
+        --rx: 5deg;
+        animation-delay: .1s;
+      }
+
+      .social-card:nth-child(3) {
+        left: 17%;
+        bottom: 0;
+        --rx: -2deg;
+        animation-delay: .2s;
+      }
+
+      .social-card img {
+        width: 100%;
+        aspect-ratio: 16 / 9;
+        display: block;
+        object-fit: cover;
+      }
+
+      .social-card b {
+        display: block;
+        padding: 13px 14px 2px;
+        color: var(--text);
+        font-size: 14px;
+      }
+
+      .social-card span {
+        display: block;
+        padding: 0 14px 13px;
+        color: rgba(245, 239, 229, 0.58);
+        font-size: 11px;
+      }
+
+      .lost-line {
+        position: absolute;
+        left: 50%;
+        bottom: 10%;
+        z-index: 44;
+        width: min(980px, 74%);
+        transform: translateX(-50%);
+        text-align: center;
+        color: rgba(245, 239, 229, 0.9);
+        font-size: clamp(24px, 3vw, 50px);
+        font-weight: 950;
+        line-height: 1.18;
+        animation: lostLine var(--t) linear both;
+      }
+
+      .final-scene {
+        display: grid;
+        z-index: 70;
+        place-items: center;
+        background: #030303;
+        animation: finalScene var(--t) linear both;
+      }
+
+      .final-copy {
+        width: min(1120px, 78%);
+        text-align: center;
+      }
+
+      .final-copy .small {
+        margin-bottom: 24px;
+        color: var(--gold);
+        font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+        font-size: 16px;
+        font-weight: 800;
+        letter-spacing: .18em;
+        opacity: .88;
+      }
+
+      .final-copy h2 {
+        margin: 0;
+        font-size: clamp(38px, 5vw, 86px);
+        line-height: 1.12;
+        letter-spacing: 0;
+      }
+
+      .final-copy h2 span {
+        color: var(--gold);
+      }
+
+      .waterline {
+        position: absolute;
+        left: 18%;
+        right: 18%;
+        bottom: 29%;
+        height: 1px;
+        background: linear-gradient(90deg, transparent, rgba(244, 191, 91, .72), transparent);
+        opacity: 0;
+        animation: waterline var(--t) linear both;
+      }
+
+      .controls {
+        position: fixed;
+        right: 22px;
+        bottom: 18px;
+        z-index: 100;
+        display: flex;
+        gap: 10px;
+      }
+
+      .controls button {
+        border: 1px solid rgba(255, 255, 255, 0.13);
+        border-radius: 999px;
+        background: rgba(12, 12, 11, 0.78);
+        color: var(--text);
+        cursor: pointer;
+        padding: 10px 14px;
+        font-weight: 800;
+        backdrop-filter: blur(14px);
+      }
+
+      .stage.paused * {
+        animation-play-state: paused !important;
+      }
+
+      body.clean .controls {
+        display: none;
+      }
+
+      body.shot * {
+        animation: none !important;
+      }
+
+      body.shot .cover-scene,
+      body.shot .player-scene,
+      body.shot .phone-scene,
+      body.shot .escape-scene,
+      body.shot .final-scene {
+        opacity: 0;
+      }
+
+      body.shot-cover .cover-scene,
+      body.shot-start .player-scene,
+      body.shot-phone .phone-scene,
+      body.shot-douban .phone-scene,
+      body.shot-xhs .phone-scene,
+      body.shot-bili .phone-scene,
+      body.shot-social .escape-scene,
+      body.shot-final .final-scene {
+        opacity: 1;
+      }
+
+      body.shot-phone .phone,
+      body.shot-douban .phone,
+      body.shot-xhs .phone,
+      body.shot-bili .phone {
+        opacity: 1;
+        transform: translate(-50%, -50%) scale(1);
+      }
+
+      body.shot-phone .phone-track,
+      body.shot-douban .phone-track {
+        transform: translateX(-25%);
+      }
+
+      body.shot-xhs .phone-track {
+        transform: translateX(-50%);
+      }
+
+      body.shot-bili .phone-track {
+        transform: translateX(-75%);
+      }
+
+      body.shot-phone .voiceover,
+      body.shot-douban .voiceover,
+      body.shot-xhs .voiceover,
+      body.shot-bili .voiceover {
+        opacity: 1;
+        transform: translateY(0);
+      }
+
+      body.shot-social .gold-line {
+        opacity: 1;
+        transform: scaleX(1);
+      }
+
+      body.shot-social .social-card {
+        opacity: 1;
+        transform: translate(0, 0) rotate(var(--rx)) scale(1);
+      }
+
+      body.shot-social .lost-line {
+        opacity: 1;
+        transform: translateX(-50%);
+      }
+
+      body.shot-final .waterline {
+        opacity: 1;
+        transform: scaleX(1);
+      }
+
+      @keyframes coverScene {
+        0%, 8% { opacity: 1; transform: scale(1); filter: blur(0); }
+        11%, 100% { opacity: 0; transform: scale(1.04); filter: blur(10px); }
+      }
+
+      @keyframes playerScene {
+        0%, 8% { opacity: 0; transform: scale(1.04); filter: blur(8px); }
+        11%, 27% { opacity: 1; transform: scale(1); filter: blur(0); }
+        31%, 100% { opacity: 0; transform: scale(.94); filter: blur(8px); }
+      }
+
+      @keyframes filmBreath {
+        0% { transform: scale(1.02); }
+        22% { transform: scale(1.055); }
+        100% { transform: scale(1.055); }
+      }
+
+      @keyframes progressFill {
+        from { transform: scaleX(.86); }
+        to { transform: scaleX(1); }
+      }
+
+      @keyframes phoneScene {
+        0%, 29% { opacity: 0; }
+        32%, 55% { opacity: 1; }
+        59%, 100% { opacity: 0; }
+      }
+
+      @keyframes phoneMove {
+        0%, 29% { transform: translate(-50%, -50%) scale(.7); opacity: 0; }
+        32%, 37% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+        55% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+        59%, 100% { transform: translate(-50%, -50%) scale(.8); opacity: 0; }
+      }
+
+      @keyframes phoneSwipe {
+        0%, 34% { transform: translateX(0); }
+        39%, 42% { transform: translateX(-25%); }
+        47%, 50% { transform: translateX(-50%); }
+        54%, 100% { transform: translateX(-75%); }
+      }
+
+      @keyframes questionLine {
+        0%, 31% { opacity: 0; transform: translateY(14px); }
+        34%, 53% { opacity: 1; transform: translateY(0); }
+        58%, 100% { opacity: 0; transform: translateY(-8px); }
+      }
+
+      @keyframes escapeScene {
+        0%, 55% { opacity: 0; }
+        59%, 82% { opacity: 1; }
+        86%, 100% { opacity: 0; }
+      }
+
+      @keyframes goldLine {
+        0%, 58% { transform: scaleX(0); opacity: 0; }
+        63%, 78% { transform: scaleX(1); opacity: 1; }
+        84%, 100% { transform: scaleX(1); opacity: 0; }
+      }
+
+      @keyframes gatherCard {
+        0%, 58% { transform: translate(30px, 18px) rotate(var(--rx)) scale(.72); opacity: 0; }
+        63%, 76% { transform: translate(0, 0) rotate(var(--rx)) scale(1); opacity: 1; }
+        82%, 100% { transform: translate(-260px, -4px) rotate(0deg) scale(.16); opacity: 0; }
+      }
+
+      @keyframes lostLine {
+        0%, 60% { opacity: 0; transform: translate(-50%, 16px); }
+        65%, 80% { opacity: 1; transform: translate(-50%, 0); }
+        84%, 100% { opacity: 0; transform: translate(-50%, -8px); }
+      }
+
+      @keyframes finalScene {
+        0%, 81% { opacity: 0; }
+        86%, 100% { opacity: 1; }
+      }
+
+      @keyframes waterline {
+        0%, 83% { opacity: 0; transform: scaleX(.2); }
+        89%, 100% { opacity: 1; transform: scaleX(1); }
+      }
+
+      @media (max-width: 900px) {
+        .stage {
+          width: 100vw;
+          border-radius: 0;
+        }
+
+        .phone {
+          width: 42vw;
+        }
+
+        .social-stack {
+          right: 4%;
+          width: 44%;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="wrap">
+      <main class="stage" id="stage" aria-label="复赛视频 01 引入动画">
+        <section class="scene cover-scene">
+          <div class="cover-content">
+            <div class="cover-kicker">TENCENT VIDEO · UNDERWATER MODE</div>
+            <h1 class="cover-title">腾讯视频<span>·水下模式</span></h1>
+            <p class="cover-subtitle">正片讲完故事，水下让用户继续住在故事里。</p>
+          </div>
+          <div class="cover-meta">01 INTRO / NARRATIVE AFTERGLOW</div>
+        </section>
+
+        <section class="scene player-scene">
+          <div class="player">
+            <div class="film-frame"></div>
+            <div class="appbar">
+              <div class="brand">
+                <span class="play-dot"></span>
+                腾讯视频
+              </div>
+              <div class="nav">
+                <span>会员专区</span>
+                <span>历史</span>
+                <span>创作</span>
+              </div>
+            </div>
+            <div class="end-copy">
+              <span class="pill">播放结束</span>
+              <h1>《好东西》<br />正片已播完</h1>
+              <p>第二次饭桌结束，进度条走到底。</p>
+            </div>
+            <div class="progress">
+              <div class="bar"></div>
+              <span>54:12 / 54:12</span>
+            </div>
+          </div>
+        </section>
+
+        <section class="scene phone-scene">
+          <div class="phone">
+            <div class="phone-track">
+              <article class="phone-page phone-video">
+                <div class="mini-brand"><span class="play-dot"></span>腾讯视频</div>
+                <div class="phone-ended">
+                  <strong>播放结束</strong>
+                  <span>你刚看完的饭桌，仍然有人想继续解释。</span>
+                </div>
+              </article>
+
+              <article class="phone-page app-page douban">
+                <div class="app-minimal-top">
+                  <div class="app-name">豆瓣</div>
+                  <div class="app-keyword">好东西 茉莉</div>
+                </div>
+                <div class="app-minimal-bottom">
+                  <div class="content-label">SEARCH AFTER WATCHING</div>
+                  <p class="content-question">为什么茉莉听完饭桌会沉默？</p>
+                  <div class="content-meta">短评 · 刚刚更新 · 1.2 万人在看</div>
+                </div>
+              </article>
+
+              <article class="phone-page app-page xhs">
+                <div class="app-minimal-top">
+                  <div class="app-name">小红书</div>
+                  <div class="app-keyword">小叶为什么泼水</div>
+                </div>
+                <div class="app-minimal-bottom">
+                  <div class="content-label">DISCUSSION KEEPS GOING</div>
+                  <p class="content-question">那杯水，真的只是开玩笑吗？</p>
+                  <div class="content-meta">饭桌细节 · 二刷才懂 · 赞 3.6w</div>
+                </div>
+              </article>
+
+              <article class="phone-page app-page bili">
+                <div class="app-minimal-top">
+                  <div class="app-name">bilibili</div>
+                  <div class="app-keyword">好东西 二刷分析</div>
+                </div>
+                <div class="app-minimal-bottom">
+                  <div class="content-label">LONG ANALYSIS</div>
+                  <p class="content-question">第二次饭桌：五个人各自在争什么</p>
+                  <div class="content-meta">长视频解析 · 弹幕热议 · 37 分钟</div>
+                </div>
+              </article>
+            </div>
+          </div>
+          <div class="voiceover">一部剧播完了，用户真的离开故事了吗？</div>
+        </section>
+
+        <section class="scene escape-scene">
+          <div class="logo-node">
+            <span class="play-dot"></span>
+            腾讯视频
+          </div>
+          <div class="gold-line"></div>
+          <div class="social-stack">
+            <article class="social-card">
+              <img src="assets/thumb-moli.jpg" alt="" />
+              <b>好东西 茉莉</b>
+              <span>用户还在追问角色为什么这样说</span>
+            </article>
+            <article class="social-card">
+              <img src="assets/thumb-xiaoye.jpg" alt="" />
+              <b>小叶为什么泼水</b>
+              <span>情绪余波流向站外讨论</span>
+            </article>
+            <article class="social-card">
+              <img src="assets/thumb-analysis.jpg" alt="" />
+              <b>二刷分析</b>
+              <span>故事厚度被站外重新组织</span>
+            </article>
+          </div>
+          <div class="lost-line">他们只是离开了腾讯视频。</div>
+        </section>
+
+        <section class="scene final-scene">
+          <div class="final-copy">
+            <div class="small">UNHELD NARRATIVE AFTERGLOW</div>
+            <h2>这不是流失的注意力，<br />是没被接住的<span>叙事余韵</span>。</h2>
+          </div>
+          <div class="waterline"></div>
+        </section>
+      </main>
+    </div>
+
+    <div class="controls">
+      <button id="pauseBtn" type="button">暂停</button>
+      <button id="replayBtn" type="button">重播</button>
+    </div>
+
+    <script>
+      const params = new URLSearchParams(window.location.search);
+      const shot = params.get('shot');
+      if (params.get('clean') === '1') document.body.classList.add('clean');
+      if (shot) document.body.classList.add('shot', `shot-${shot}`);
+
+      const stage = document.getElementById('stage');
+      const replayBtn = document.getElementById('replayBtn');
+      const pauseBtn = document.getElementById('pauseBtn');
+
+      replayBtn.addEventListener('click', () => {
+        stage.style.animation = 'none';
+        stage.classList.remove('paused');
+        pauseBtn.textContent = '暂停';
+        void stage.offsetWidth;
+        stage.style.animation = '';
+        for (const node of stage.querySelectorAll('*')) {
+          node.style.animation = 'none';
+          void node.offsetWidth;
+          node.style.animation = '';
+        }
+      });
+
+      pauseBtn.addEventListener('click', () => {
+        const paused = stage.classList.toggle('paused');
+        pauseBtn.textContent = paused ? '继续' : '暂停';
+      });
+    </script>
+  </body>
+</html>

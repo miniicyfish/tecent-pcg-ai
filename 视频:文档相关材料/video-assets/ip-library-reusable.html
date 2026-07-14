@@ -1,0 +1,670 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>腾讯视频·水下模式｜IP 可迁移框架</title>
+    <style>
+      :root {
+        --bg: #050504;
+        --ink: #080807;
+        --panel: rgba(17, 16, 14, .76);
+        --panel-soft: rgba(247, 239, 227, .055);
+        --text: #f7efe3;
+        --muted: rgba(247, 239, 227, .62);
+        --dim: rgba(247, 239, 227, .38);
+        --gold: #f2bd59;
+        --gold-dim: rgba(242, 189, 89, .18);
+        --water: #8cc7cf;
+        --water-dim: rgba(140, 199, 207, .18);
+        --stroke: rgba(255, 255, 255, .1);
+        --line: rgba(242, 189, 89, .52);
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      html,
+      body {
+        width: 100%;
+        height: 100%;
+        margin: 0;
+        overflow: hidden;
+        background: #030303;
+        color: var(--text);
+        font-family: "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", system-ui, sans-serif;
+      }
+
+      .stage {
+        position: relative;
+        width: 100vw;
+        height: 100vh;
+        min-width: 1280px;
+        min-height: 720px;
+        overflow: hidden;
+        background:
+          radial-gradient(circle at 21% 20%, rgba(242, 189, 89, .12), transparent 28%),
+          radial-gradient(circle at 70% 72%, rgba(140, 199, 207, .13), transparent 34%),
+          linear-gradient(180deg, #070706 0%, #050504 54%, #030303 100%);
+        isolation: isolate;
+      }
+
+      .stage::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        z-index: -2;
+        background:
+          linear-gradient(90deg, rgba(255,255,255,.032) 1px, transparent 1px) 0 0 / 74px 74px,
+          linear-gradient(rgba(255,255,255,.024) 1px, transparent 1px) 0 0 / 74px 74px;
+        mask-image: radial-gradient(circle at 50% 50%, black 0%, transparent 74%);
+        opacity: .7;
+      }
+
+      .stage::after {
+        content: "";
+        position: absolute;
+        inset: 0;
+        pointer-events: none;
+        z-index: 80;
+        background:
+          linear-gradient(rgba(255,255,255,.03) 1px, transparent 1px) 0 0 / 100% 3px,
+          radial-gradient(circle at 50% 50%, transparent 58%, rgba(0,0,0,.5));
+        mix-blend-mode: screen;
+        opacity: .25;
+      }
+
+      .frame {
+        position: absolute;
+        inset: 46px 58px;
+        border: 1px solid rgba(242, 189, 89, .18);
+        border-radius: 30px;
+      }
+
+      .frame::before,
+      .frame::after {
+        content: "";
+        position: absolute;
+        top: 92px;
+        width: 180px;
+        height: 1px;
+        background: linear-gradient(90deg, transparent, rgba(242,189,89,.62), transparent);
+      }
+
+      .frame::before {
+        left: 62px;
+      }
+
+      .frame::after {
+        right: 62px;
+      }
+
+      .header {
+        position: absolute;
+        left: 8.8%;
+        right: 8.8%;
+        top: 9.6%;
+        z-index: 10;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+      }
+
+      .kicker {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        color: var(--gold);
+        font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+        font-size: 14px;
+        font-weight: 900;
+        letter-spacing: .18em;
+        text-transform: uppercase;
+      }
+
+      .kicker::before {
+        content: "";
+        width: 52px;
+        height: 2px;
+        border-radius: 999px;
+        background: var(--gold);
+      }
+
+      .package-id {
+        border: 1px solid rgba(255,255,255,.1);
+        border-radius: 999px;
+        background: rgba(17,16,14,.54);
+        padding: 10px 16px;
+        color: rgba(247,239,227,.52);
+        font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+        font-size: 12px;
+        font-weight: 850;
+        letter-spacing: .14em;
+      }
+
+      .hero {
+        position: absolute;
+        left: 8.8%;
+        top: 21%;
+        width: 37%;
+        z-index: 8;
+      }
+
+      .hero .label {
+        color: var(--gold);
+        font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+        font-size: 13px;
+        font-weight: 900;
+        letter-spacing: .18em;
+        text-transform: uppercase;
+      }
+
+      .hero h1 {
+        margin: 24px 0 0;
+        font-size: clamp(64px, 6.4vw, 124px);
+        line-height: 1.02;
+        font-weight: 950;
+        letter-spacing: 0;
+      }
+
+      .hero h1 span {
+        color: var(--gold);
+      }
+
+      .hero p {
+        margin: 24px 0 0;
+        max-width: 720px;
+        color: var(--muted);
+        font-size: clamp(18px, 1.35vw, 26px);
+        line-height: 1.55;
+        font-weight: 780;
+      }
+
+      .hero-tags {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        margin-top: 24px;
+      }
+
+      .hero-tags span {
+        border: 1px solid rgba(255,255,255,.1);
+        border-radius: 999px;
+        background: rgba(255,255,255,.05);
+        padding: 8px 12px;
+        color: rgba(247,239,227,.64);
+        font-size: 13px;
+        font-weight: 820;
+      }
+
+      .pilot-card {
+        position: absolute;
+        left: 8.8%;
+        bottom: 12.2%;
+        z-index: 12;
+        display: grid;
+        grid-template-columns: 104px 1fr;
+        align-items: center;
+        width: 500px;
+        border: 1px solid rgba(242,189,89,.24);
+        border-radius: 28px;
+        background: linear-gradient(135deg, rgba(242,189,89,.12), rgba(140,199,207,.06)), var(--panel);
+        padding: 20px 22px;
+        box-shadow: 0 28px 80px rgba(0,0,0,.38);
+        backdrop-filter: blur(18px);
+      }
+
+      .pilot-emblem {
+        position: relative;
+        width: 82px;
+        height: 82px;
+      }
+
+      .pilot-emblem::before {
+        content: "";
+        position: absolute;
+        left: 18px;
+        top: 5px;
+        width: 38px;
+        height: 38px;
+        clip-path: polygon(24% 100%, 50% 0, 67% 66%, 100% 78%, 80% 100%);
+        background: linear-gradient(135deg, #fff3dd, var(--gold));
+        filter: drop-shadow(0 0 20px rgba(242,189,89,.28));
+      }
+
+      .pilot-emblem::after {
+        content: "";
+        position: absolute;
+        left: 8px;
+        right: 8px;
+        top: 46px;
+        height: 30px;
+        border-radius: 0 0 999px 999px;
+        border-bottom: 1px solid rgba(140,199,207,.58);
+        background: radial-gradient(ellipse at top, rgba(140,199,207,.38), transparent 68%);
+      }
+
+      .pilot-copy small {
+        display: block;
+        color: var(--gold);
+        font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+        font-size: 12px;
+        font-weight: 900;
+        letter-spacing: .14em;
+      }
+
+      .pilot-copy strong {
+        display: block;
+        margin-top: 9px;
+        font-size: 31px;
+        line-height: 1.1;
+      }
+
+      .pilot-copy span {
+        display: block;
+        margin-top: 9px;
+        color: var(--muted);
+        font-size: 15px;
+        font-weight: 760;
+      }
+
+      .migration-symbol {
+        position: absolute;
+        left: 48%;
+        top: 31%;
+        z-index: 14;
+        width: 19%;
+        height: 38%;
+      }
+
+      .migration-symbol::before {
+        content: "";
+        position: absolute;
+        left: -8%;
+        right: -10%;
+        top: 50%;
+        height: 1px;
+        background: linear-gradient(90deg, transparent, rgba(242,189,89,.62), rgba(140,199,207,.58), transparent);
+        box-shadow: 0 0 34px rgba(140,199,207,.22);
+      }
+
+      .core {
+        position: absolute;
+        left: 50%;
+        top: 50%;
+        display: grid;
+        width: 164px;
+        height: 164px;
+        place-items: center;
+        transform: translate(-50%, -50%);
+        border: 1px solid rgba(140,199,207,.42);
+        border-radius: 999px;
+        background:
+          radial-gradient(circle, rgba(140,199,207,.24), transparent 64%),
+          rgba(5,5,4,.72);
+        color: var(--text);
+        box-shadow: 0 0 60px rgba(140,199,207,.12);
+      }
+
+      .core::before,
+      .core::after {
+        content: "";
+        position: absolute;
+        inset: -16px;
+        border: 1px solid rgba(242,189,89,.12);
+        border-radius: inherit;
+      }
+
+      .core::after {
+        inset: -34px;
+        border-color: rgba(140,199,207,.1);
+      }
+
+      .core strong {
+        font-size: 26px;
+        font-weight: 950;
+        letter-spacing: .06em;
+      }
+
+      .orbit {
+        position: absolute;
+        left: 50%;
+        top: 50%;
+        width: 330px;
+        height: 330px;
+        transform: translate(-50%, -50%);
+        border: 1px solid rgba(140,199,207,.14);
+        border-radius: 999px;
+      }
+
+      .orbit::before,
+      .orbit::after {
+        content: "";
+        position: absolute;
+        inset: 42px;
+        border: 1px solid rgba(242,189,89,.1);
+        border-radius: inherit;
+      }
+
+      .orbit::after {
+        inset: 88px;
+        border-color: rgba(255,255,255,.08);
+      }
+
+      .packet,
+      .library-node {
+        position: absolute;
+        top: 50%;
+        min-width: 128px;
+        border: 1px solid rgba(255,255,255,.1);
+        border-radius: 999px;
+        background: rgba(17,16,14,.72);
+        padding: 10px 14px;
+        color: rgba(247,239,227,.68);
+        font-size: 13px;
+        font-weight: 850;
+        text-align: center;
+        backdrop-filter: blur(14px);
+      }
+
+      .packet {
+        left: -14%;
+        transform: translate(-100%, -50%);
+      }
+
+      .library-node {
+        right: -14%;
+        transform: translate(100%, -50%);
+      }
+
+      .migration {
+        position: absolute;
+        right: 9.2%;
+        top: 23.2%;
+        z-index: 16;
+        width: 26%;
+      }
+
+      .migration-title {
+        display: flex;
+        align-items: end;
+        justify-content: space-between;
+        margin-bottom: 16px;
+      }
+
+      .migration-title h2 {
+        margin: 0;
+        font-size: 34px;
+        line-height: 1.1;
+      }
+
+      .migration-title span {
+        color: var(--dim);
+        font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+        font-size: 12px;
+        font-weight: 850;
+        letter-spacing: .12em;
+      }
+
+      .ip-list {
+        display: grid;
+        gap: 10px;
+      }
+
+      .ip-item {
+        position: relative;
+        display: grid;
+        grid-template-columns: 16px 1fr auto;
+        gap: 13px;
+        align-items: start;
+        border: 1px solid rgba(255,255,255,.1);
+        border-radius: 19px;
+        background: linear-gradient(135deg, rgba(255,255,255,.045), rgba(255,255,255,.02)), rgba(17,16,14,.54);
+        padding: 13px 15px;
+        box-shadow: 0 16px 42px rgba(0,0,0,.22);
+        opacity: 0;
+        transform: translateX(20px);
+        animation: sideIn .75s cubic-bezier(.2,.8,.2,1) forwards;
+        animation-delay: var(--d);
+      }
+
+      .ip-item i {
+        width: 12px;
+        height: 12px;
+        margin-top: 7px;
+        border-radius: 999px;
+        background: var(--gold);
+        box-shadow: 0 0 0 7px rgba(242,189,89,.08), 0 0 24px rgba(242,189,89,.38);
+      }
+
+      .ip-item strong {
+        display: block;
+        font-size: 20px;
+        line-height: 1.1;
+      }
+
+      .ip-item p {
+        margin: 7px 0 0;
+        color: var(--muted);
+        font-size: 12px;
+        line-height: 1.32;
+        font-weight: 740;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+
+      .ip-item small {
+        display: inline-flex;
+        align-self: center;
+        margin-top: 4px;
+        border: 1px solid rgba(140,199,207,.28);
+        border-radius: 999px;
+        background: rgba(140,199,207,.08);
+        padding: 5px 8px;
+        color: rgba(140,199,207,.78);
+        font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+        font-size: 9px;
+        font-weight: 900;
+        letter-spacing: .1em;
+        white-space: nowrap;
+      }
+
+      .bottom {
+        position: absolute;
+        left: 8.8%;
+        right: 8.8%;
+        bottom: 6.4%;
+        z-index: 22;
+        display: grid;
+        grid-template-columns: 1fr auto;
+        gap: 26px;
+        align-items: center;
+      }
+
+      .rule {
+        height: 1px;
+        background: linear-gradient(90deg, transparent, rgba(242,189,89,.64), rgba(140,199,207,.46), transparent);
+      }
+
+      .statement {
+        border: 1px solid rgba(242,189,89,.24);
+        border-radius: 999px;
+        background: rgba(17,16,14,.82);
+        padding: 13px 20px;
+        color: rgba(247,239,227,.76);
+        font-size: 18px;
+        font-weight: 850;
+        white-space: nowrap;
+      }
+
+      .statement strong {
+        color: var(--gold);
+        font-weight: 950;
+      }
+
+      .waterline {
+        position: absolute;
+        left: 8.8%;
+        right: 8.8%;
+        top: 49.2%;
+        z-index: 6;
+        height: 1px;
+        background: linear-gradient(90deg, transparent, rgba(140,199,207,.72), rgba(242,189,89,.46), transparent);
+        box-shadow: 0 0 28px rgba(140,199,207,.18);
+      }
+
+      .waterline::before,
+      .waterline::after {
+        position: absolute;
+        top: -26px;
+        color: rgba(247,239,227,.34);
+        font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+        font-size: 11px;
+        font-weight: 900;
+        letter-spacing: .14em;
+      }
+
+      .waterline::before {
+        content: "VISIBLE IP";
+        left: 0;
+      }
+
+      .waterline::after {
+        content: "UNDERWATER ASSETS";
+        right: 0;
+      }
+
+      .grain {
+        position: absolute;
+        inset: 0;
+        pointer-events: none;
+        opacity: .1;
+        background-image: radial-gradient(circle, rgba(255,255,255,.58) 0 1px, transparent 1px);
+        background-size: 19px 21px;
+        mix-blend-mode: overlay;
+      }
+
+      @keyframes rise {
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      @keyframes sideIn {
+        to {
+          opacity: 1;
+          transform: translateX(0);
+        }
+      }
+
+      body.final .ip-item {
+        animation: none;
+        opacity: 1;
+        transform: none;
+      }
+    </style>
+  </head>
+  <body>
+    <main class="stage">
+      <div class="frame"></div>
+      <div class="waterline"></div>
+      <header class="header">
+        <div class="kicker" data-bind="kicker">IP UNDERWATER FRAMEWORK</div>
+        <div class="package-id" data-bind="packageId">CONTENT PACKAGE / HAODONGXI</div>
+      </header>
+
+      <section class="hero">
+        <div class="label" data-bind="status">LANDED PILOT</div>
+        <h1><span data-bind="pilot">好东西</span><br />水下模式</h1>
+        <p data-bind="heroText">不是为一部剧做一次 demo，而是把每个 IP 正片之外的叙事厚度，沉淀成可探索、可分享、可复用的官方水下空间。</p>
+        <div class="hero-tags" data-list="tags"></div>
+      </section>
+
+      <section class="pilot-card">
+        <div class="pilot-emblem" aria-hidden="true"></div>
+        <div class="pilot-copy">
+          <small data-bind="pilotMeta">CURRENT SAMPLE</small>
+          <strong data-bind="sampleTitle">饭桌线 · 多视角样章</strong>
+          <span data-bind="sampleDesc">用一场饭桌，把人物关系、台词停顿、身体记忆和观众讨论重新打开。</span>
+        </div>
+      </section>
+
+      <section class="migration-symbol" aria-hidden="true">
+        <div class="orbit"></div>
+        <div class="packet">IP 内容包</div>
+        <div class="core"><strong>AI</strong></div>
+        <div class="library-node">IP 库</div>
+      </section>
+
+      <aside class="migration">
+        <div class="migration-title">
+          <h2>可迁移到<br />整个 IP 库</h2>
+          <span>REUSE</span>
+        </div>
+        <div class="ip-list" data-list="ips"></div>
+      </aside>
+
+      <footer class="bottom">
+        <div class="rule"></div>
+        <div class="statement">固定的是<strong>产品框架</strong>，替换的是<strong>IP 内容包</strong></div>
+      </footer>
+      <div class="grain"></div>
+    </main>
+
+    <script>
+      const IP_PACKAGES = {
+        haodongxi: {
+          kicker: "IP UNDERWATER FRAMEWORK",
+          packageId: "CONTENT PACKAGE / HAODONGXI",
+          status: "LANDED PILOT",
+          pilot: "好东西",
+          heroText:
+            "不是为一部剧做一次 demo，而是把每个 IP 正片之外的叙事厚度，沉淀成可探索、可分享、可复用的官方水下空间。",
+          pilotMeta: "CURRENT SAMPLE",
+          sampleTitle: "饭桌线 · 多视角样章",
+          sampleDesc: "用一场饭桌，把人物关系、台词停顿、身体记忆和观众讨论重新打开。",
+          tags: ["饭桌事件", "小叶视角", "关系暗流", "水下卡", "官方档案"],
+          ips: [
+            { name: "庆余年 · 水下", lens: "权力结构、立场博弈、人物旧账", type: "COSTUME STRATEGY", d: ".35s" },
+            { name: "繁花 · 水下", lens: "时代记忆、商业关系、未说出口的情感", type: "URBAN MEMORY", d: ".7s" },
+            { name: "三体 · 水下", lens: "科学设定、文明选择、隐藏因果链", type: "SCI-FI WORLD", d: "1.05s" },
+            { name: "玫瑰的故事 · 水下", lens: "亲密关系、自我选择、人生阶段回响", type: "INTIMATE ARC", d: "1.4s" },
+            { name: "桃花坞 · 水下", lens: "真人关系场、群体位置、社交微表情", type: "REALITY FIELD", d: "1.75s" }
+          ]
+        }
+      };
+
+      const params = new URLSearchParams(window.location.search);
+      const packageKey = params.get("ip") || "haodongxi";
+      const data = IP_PACKAGES[packageKey] || IP_PACKAGES.haodongxi;
+      if (params.has("final")) document.body.classList.add("final");
+
+      for (const node of document.querySelectorAll("[data-bind]")) {
+        const key = node.dataset.bind;
+        if (data[key]) node.textContent = data[key];
+      }
+
+      const tagHost = document.querySelector('[data-list="tags"]');
+      tagHost.innerHTML = data.tags.map((tag) => `<span>${tag}</span>`).join("");
+
+      const ipHost = document.querySelector('[data-list="ips"]');
+      ipHost.innerHTML = data.ips
+        .map(
+          (item) => `
+            <article class="ip-item" style="--d:${item.d}">
+              <i></i>
+              <div>
+                <strong>${item.name}</strong>
+                <p>${item.lens}</p>
+              </div>
+              <small>${item.type}</small>
+            </article>
+          `
+        )
+        .join("");
+    </script>
+  </body>
+</html>

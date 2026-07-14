@@ -1,0 +1,2493 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>腾讯视频水下模式 · 复赛产品原型</title>
+  <style>
+    :root {
+      color-scheme: dark;
+      --bg: #070807;
+      --panel: rgba(18, 18, 15, 0.86);
+      --panel-solid: #11120f;
+      --panel-soft: rgba(255, 255, 255, 0.045);
+      --line: rgba(255, 255, 255, 0.11);
+      --line-strong: rgba(232, 174, 88, 0.42);
+      --text: #f5efe5;
+      --muted: #b2a89b;
+      --dim: #756e65;
+      --gold: #efb052;
+      --gold-deep: #35200d;
+      --green: #7fa878;
+      --cyan: #73aeb8;
+      --red: #d78065;
+      --shadow: 0 28px 80px rgba(0, 0, 0, 0.46);
+      --radius: 16px;
+      font-family: ui-sans-serif, -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", "Noto Sans CJK SC", sans-serif;
+    }
+
+    * { box-sizing: border-box; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      margin: 0;
+      min-width: 1120px;
+      min-height: 100vh;
+      color: var(--text);
+      background:
+        linear-gradient(140deg, rgba(115, 174, 184, 0.12), transparent 30%),
+        linear-gradient(24deg, rgba(239, 176, 82, 0.10), transparent 32%),
+        #070807;
+    }
+
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      background-image:
+        linear-gradient(rgba(255,255,255,0.025) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,0.018) 1px, transparent 1px);
+      background-size: 42px 42px;
+      mask-image: linear-gradient(to bottom, rgba(0,0,0,0.68), transparent 78%);
+    }
+
+    button, input, textarea { font: inherit; }
+    button { cursor: pointer; }
+
+    .app {
+      min-height: 100vh;
+      position: relative;
+      z-index: 1;
+    }
+
+    .topbar {
+      height: 66px;
+      display: flex;
+      align-items: center;
+      gap: 26px;
+      padding: 0 28px;
+      background: rgba(7, 8, 7, 0.94);
+      border-bottom: 1px solid rgba(255,255,255,0.065);
+      position: sticky;
+      top: 0;
+      z-index: 20;
+      backdrop-filter: blur(18px);
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      min-width: 144px;
+      font-size: 21px;
+      font-weight: 900;
+      letter-spacing: 0;
+    }
+
+    .brand-mark {
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      background: var(--gold);
+      position: relative;
+      box-shadow: 0 0 0 1px rgba(255,255,255,0.16) inset;
+    }
+
+    .brand-mark::after {
+      content: "";
+      position: absolute;
+      left: 13px;
+      top: 10px;
+      border-left: 11px solid #161006;
+      border-top: 7px solid transparent;
+      border-bottom: 7px solid transparent;
+    }
+
+    .nav {
+      display: flex;
+      gap: 20px;
+      color: #b8b0a5;
+      font-size: 15px;
+      white-space: nowrap;
+    }
+
+    .search {
+      margin-left: auto;
+      width: min(380px, 28vw);
+      height: 40px;
+      border: 1px solid rgba(255,255,255,0.12);
+      border-radius: 999px;
+      background: #1a1a18;
+      color: #746e66;
+      display: flex;
+      align-items: center;
+      padding: 0 18px;
+      font-size: 14px;
+    }
+
+    .top-actions {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      color: #aba39a;
+      font-size: 14px;
+      white-space: nowrap;
+    }
+
+    .download {
+      height: 40px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,0.14);
+      background: #191917;
+      color: var(--text);
+      padding: 0 18px;
+      font-weight: 800;
+    }
+
+    .page {
+      display: none;
+      padding: 28px;
+      min-height: calc(100vh - 66px);
+    }
+
+    .page.active { display: block; }
+
+    .page-shell {
+      max-width: 1480px;
+      margin: 0 auto;
+    }
+
+    .badge,
+    .tag {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 28px;
+      border-radius: 999px;
+      padding: 5px 11px;
+      font-size: 12px;
+      line-height: 1;
+      font-weight: 900;
+      white-space: nowrap;
+    }
+
+    .badge {
+      color: #ffd37b;
+      background: rgba(239,176,82,0.13);
+      border: 1px solid rgba(239,176,82,0.42);
+    }
+
+    .tag {
+      color: #beb6ab;
+      background: rgba(255,255,255,0.045);
+      border: 1px solid rgba(255,255,255,0.10);
+    }
+
+    .tag.open {
+      color: #c4e6bd;
+      background: rgba(127,168,120,0.12);
+      border-color: rgba(127,168,120,0.42);
+    }
+
+    .tag.recommend {
+      color: #ffd37b;
+      background: rgba(239,176,82,0.12);
+      border-color: rgba(239,176,82,0.42);
+    }
+
+    .primary,
+    .ghost,
+    .back,
+    .mini-btn {
+      border-radius: 999px;
+      min-height: 42px;
+      padding: 0 18px;
+      font-weight: 900;
+      border: 1px solid transparent;
+      color: inherit;
+    }
+
+    .primary {
+      background: var(--gold);
+      color: #171008;
+      box-shadow: 0 16px 32px rgba(239,176,82,0.24);
+    }
+
+    .ghost,
+    .back,
+    .mini-btn {
+      background: rgba(255,255,255,0.055);
+      border-color: rgba(255,255,255,0.12);
+      color: #ded6ca;
+    }
+
+    .mini-btn {
+      min-height: 34px;
+      padding: 0 13px;
+      font-size: 13px;
+    }
+
+    .primary:hover,
+    .ghost:hover,
+    .back:hover,
+    .mini-btn:hover {
+      transform: translateY(-1px);
+    }
+
+    .section-head {
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      gap: 22px;
+      margin-bottom: 20px;
+    }
+
+    .section-head h1,
+    .section-head h2 {
+      margin: 10px 0 8px;
+      line-height: 1.08;
+      letter-spacing: 0;
+    }
+
+    .section-head h1 { font-size: 42px; }
+    .section-head h2 { font-size: 30px; }
+
+    .section-head p {
+      margin: 0;
+      max-width: 760px;
+      color: var(--muted);
+      font-size: 16px;
+      line-height: 1.65;
+    }
+
+    .panel {
+      border: 1px solid var(--line);
+      background: var(--panel);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+    }
+
+    .watch-grid {
+      display: grid;
+      grid-template-columns: minmax(720px, 1fr) 376px;
+      gap: 28px;
+      max-width: 1500px;
+      margin: 0 auto;
+    }
+
+    .player {
+      position: relative;
+      min-height: 560px;
+      border-radius: 10px;
+      overflow: hidden;
+      background: #000;
+      box-shadow: var(--shadow);
+    }
+
+    .player-bg,
+    .visual-bg {
+      position: absolute;
+      inset: 0;
+      background-size: cover;
+      background-position: center;
+      filter: saturate(0.84) brightness(0.62);
+    }
+
+    .player-bg {
+      background-image:
+        linear-gradient(90deg, rgba(0,0,0,0.56), rgba(0,0,0,0.14) 48%, rgba(0,0,0,0.72)),
+        url("../../haodongxi/app/public/haodongxi/scenes/tiemei-dining-table.png");
+    }
+
+    .player::after,
+    .stage::after,
+    .hero-media::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      background:
+        linear-gradient(to bottom, rgba(0,0,0,0.18), transparent 40%, rgba(0,0,0,0.78)),
+        radial-gradient(circle at 62% 42%, transparent 0, rgba(0,0,0,0.28) 46%, rgba(0,0,0,0.66) 82%);
+    }
+
+    .episode-stamp {
+      position: absolute;
+      left: 34px;
+      top: 34px;
+      z-index: 2;
+    }
+
+    .episode-stamp h1 {
+      margin: 18px 0 8px;
+      font-size: 26px;
+      line-height: 1.25;
+    }
+
+    .episode-stamp p {
+      margin: 0;
+      color: #cfc6b9;
+      font-size: 15px;
+      line-height: 1.6;
+      max-width: 500px;
+    }
+
+    .underwater-card {
+      position: absolute;
+      z-index: 3;
+      right: 56px;
+      bottom: 78px;
+      width: 430px;
+      border-radius: 18px;
+      border: 1px solid var(--line-strong);
+      background: rgba(13, 12, 10, 0.88);
+      box-shadow: 0 28px 90px rgba(0,0,0,0.55);
+      backdrop-filter: blur(18px);
+      padding: 24px;
+    }
+
+    .underwater-card::before {
+      content: "";
+      position: absolute;
+      left: 18px;
+      right: 18px;
+      top: 0;
+      height: 3px;
+      border-radius: 0 0 4px 4px;
+      background: var(--gold);
+    }
+
+    .eyebrow {
+      margin-bottom: 13px;
+      color: var(--gold);
+      font-size: 13px;
+      font-weight: 900;
+    }
+
+    .underwater-card h2 {
+      margin: 0;
+      font-size: 31px;
+      line-height: 1.18;
+      letter-spacing: 0;
+    }
+
+    .underwater-card p {
+      margin: 14px 0 22px;
+      color: #c9c0b4;
+      font-size: 15px;
+      line-height: 1.7;
+    }
+
+    .cta-row,
+    .button-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .player-controls {
+      position: absolute;
+      z-index: 3;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      height: 52px;
+      background: linear-gradient(to top, rgba(0,0,0,0.96), rgba(0,0,0,0.5));
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 0 24px;
+      color: #b8afa4;
+      font-size: 13px;
+    }
+
+    .play-dot {
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      background: var(--gold);
+      flex: 0 0 auto;
+    }
+
+    .progress {
+      flex: 1;
+      height: 4px;
+      border-radius: 4px;
+      overflow: hidden;
+      background: rgba(255,255,255,0.22);
+    }
+
+    .progress span {
+      display: block;
+      width: 100%;
+      height: 100%;
+      background: var(--gold);
+    }
+
+    .side-panel {
+      min-height: 560px;
+      border-radius: 14px;
+      background: rgba(17,17,15,0.78);
+      border: 1px solid rgba(255,255,255,0.08);
+      padding: 26px;
+    }
+
+    .side-title {
+      font-size: 32px;
+      font-weight: 900;
+      margin-bottom: 6px;
+    }
+
+    .side-meta {
+      color: #948e85;
+      margin-bottom: 26px;
+      padding-bottom: 20px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .recommend-stack {
+      display: grid;
+      gap: 12px;
+    }
+
+    .rec-card {
+      min-height: 96px;
+      border-radius: 12px;
+      border: 1px solid var(--line);
+      background: rgba(255,255,255,0.035);
+      padding: 16px;
+      color: inherit;
+      text-align: left;
+    }
+
+    .rec-card.featured {
+      border-color: rgba(239,176,82,0.42);
+      background: linear-gradient(135deg, rgba(239,176,82,0.12), rgba(255,255,255,0.035));
+    }
+
+    .rec-card strong {
+      display: block;
+      margin-bottom: 8px;
+      font-size: 16px;
+    }
+
+    .rec-card span {
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.55;
+    }
+
+    .below-player {
+      grid-column: 1 / -1;
+      display: grid;
+      grid-template-columns: 1fr 376px;
+      gap: 28px;
+      margin-top: 8px;
+    }
+
+    .episode-actions {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      border-top: 1px solid var(--line);
+      padding-top: 20px;
+    }
+
+    .small-action {
+      border: 1px solid var(--line);
+      background: rgba(255,255,255,0.04);
+      color: #d9d2c7;
+      border-radius: 999px;
+      padding: 9px 15px;
+      font-size: 13px;
+      font-weight: 800;
+    }
+
+    .atlas-grid {
+      display: grid;
+      grid-template-columns: 230px minmax(620px, 1fr) 400px;
+      gap: 18px;
+      align-items: stretch;
+    }
+
+    .atlas-panel {
+      min-height: 628px;
+      padding: 18px;
+    }
+
+    .filter-title,
+    .timeline-title {
+      color: #e7ddcf;
+      font-size: 15px;
+      font-weight: 900;
+      margin-bottom: 14px;
+    }
+
+    .person-filter {
+      display: grid;
+      gap: 10px;
+    }
+
+    .person-chip {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      min-height: 54px;
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      padding: 10px;
+      background: rgba(255,255,255,0.035);
+      color: #d9d2c7;
+      text-align: left;
+      font-weight: 800;
+    }
+
+    .person-chip.active {
+      border-color: rgba(239,176,82,0.55);
+      background: rgba(239,176,82,0.11);
+    }
+
+    .avatar {
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      object-fit: cover;
+      background: #302a22;
+      flex: 0 0 auto;
+    }
+
+    .filter-note {
+      color: var(--dim);
+      font-size: 12px;
+      line-height: 1.6;
+      margin-top: 18px;
+      border-top: 1px solid var(--line);
+      padding-top: 14px;
+    }
+
+    .timeline {
+      position: relative;
+      display: grid;
+      gap: 12px;
+      padding: 6px 0;
+    }
+
+    .timeline::before {
+      content: "";
+      position: absolute;
+      left: 28px;
+      top: 24px;
+      bottom: 24px;
+      width: 2px;
+      background: linear-gradient(to bottom, rgba(239,176,82,0.62), rgba(255,255,255,0.10));
+    }
+
+    .event-node {
+      position: relative;
+      display: grid;
+      grid-template-columns: 56px 1fr auto;
+      gap: 12px;
+      align-items: center;
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      min-height: 86px;
+      padding: 12px 14px 12px 12px;
+      background: rgba(255,255,255,0.035);
+      color: var(--text);
+      text-align: left;
+    }
+
+    .event-node.active {
+      border-color: rgba(239,176,82,0.62);
+      background: linear-gradient(135deg, rgba(239,176,82,0.13), rgba(255,255,255,0.035));
+      box-shadow: 0 20px 60px rgba(0,0,0,0.25);
+    }
+
+    .node-dot {
+      z-index: 1;
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: #23211d;
+      border: 1px solid rgba(255,255,255,0.16);
+      display: grid;
+      place-items: center;
+      color: var(--gold);
+      font-weight: 900;
+    }
+
+    .event-node.active .node-dot {
+      background: var(--gold);
+      color: #181109;
+    }
+
+    .event-main strong {
+      display: block;
+      margin-bottom: 6px;
+      font-size: 17px;
+    }
+
+    .event-main span {
+      color: #a39a8e;
+      font-size: 13px;
+      line-height: 1.5;
+    }
+
+    .event-tags {
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+
+    .scene-thumb {
+      height: 184px;
+      border-radius: 14px;
+      background-image:
+        linear-gradient(to top, rgba(0,0,0,0.78), transparent 55%),
+        var(--detail-image, url("../../haodongxi/app/public/haodongxi/scenes/tiemei-dining-table.png"));
+      background-size: cover;
+      background-position: center;
+      margin-bottom: 16px;
+      border: 1px solid rgba(255,255,255,0.10);
+    }
+
+    .detail-title {
+      font-size: 23px;
+      font-weight: 900;
+      margin-bottom: 8px;
+    }
+
+    .detail-meta {
+      color: #a79f93;
+      font-size: 13px;
+      margin-bottom: 16px;
+    }
+
+    .detail-block {
+      border-top: 1px solid var(--line);
+      padding-top: 14px;
+      margin-top: 14px;
+    }
+
+    .detail-block h3 {
+      margin: 0 0 8px;
+      font-size: 14px;
+      color: var(--gold);
+    }
+
+    .detail-block p {
+      margin: 0;
+      color: #c7bdb0;
+      line-height: 1.65;
+      font-size: 14px;
+    }
+
+    .view-layout {
+      display: grid;
+      grid-template-columns: 410px minmax(660px, 1fr);
+      gap: 22px;
+      align-items: start;
+    }
+
+    .event-brief {
+      overflow: hidden;
+    }
+
+    .event-hero {
+      height: 250px;
+      position: relative;
+      background-image:
+        linear-gradient(to top, rgba(0,0,0,0.84), transparent 68%),
+        url("../../haodongxi/app/public/haodongxi/scenes/tiemei-dining-table.png");
+      background-size: cover;
+      background-position: center;
+    }
+
+    .event-hero .badge {
+      position: absolute;
+      left: 20px;
+      top: 20px;
+    }
+
+    .event-brief-body,
+    .view-main {
+      padding: 22px;
+    }
+
+    .event-brief h2,
+    .view-intro h1 {
+      margin: 0 0 10px;
+      line-height: 1.16;
+    }
+
+    .event-brief h2 { font-size: 28px; }
+    .view-intro h1 { font-size: 34px; }
+
+    .event-brief p,
+    .view-intro p {
+      margin: 0;
+      color: #c7bdb0;
+      line-height: 1.75;
+      font-size: 15px;
+    }
+
+    .theme-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 18px;
+    }
+
+    .view-main { min-height: 660px; }
+
+    .view-intro {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 20px;
+      padding-bottom: 18px;
+      border-bottom: 1px solid var(--line);
+      margin-bottom: 18px;
+    }
+
+    .event-count {
+      min-width: 156px;
+      border-radius: 14px;
+      border: 1px solid rgba(239,176,82,0.34);
+      background: rgba(239,176,82,0.08);
+      padding: 13px;
+      color: #d7c6ad;
+      font-size: 13px;
+      line-height: 1.55;
+    }
+
+    .view-cards {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 14px;
+    }
+
+    .view-card {
+      border: 1px solid var(--line);
+      background: rgba(255,255,255,0.035);
+      border-radius: 18px;
+      padding: 16px;
+      min-height: 210px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      overflow: hidden;
+    }
+
+    .view-card.open {
+      border-color: rgba(239,176,82,0.62);
+      background: linear-gradient(135deg, rgba(239,176,82,0.13), rgba(255,255,255,0.035));
+    }
+
+    .view-card.locked { opacity: 0.74; }
+
+    .view-card-top {
+      display: grid;
+      grid-template-columns: 58px 1fr;
+      gap: 12px;
+      align-items: center;
+    }
+
+    .view-card-avatar {
+      width: 58px;
+      height: 58px;
+      border-radius: 16px;
+      object-fit: cover;
+      border: 1px solid rgba(255,255,255,0.14);
+      background: #251f19;
+    }
+
+    .view-card h3 {
+      margin: 0 0 5px;
+      font-size: 20px;
+    }
+
+    .role {
+      color: #a9a197;
+      font-size: 13px;
+      line-height: 1.4;
+    }
+
+    .view-line {
+      margin: 0;
+      color: #e0d7cb;
+      font-size: 15px;
+      line-height: 1.45;
+      font-weight: 800;
+    }
+
+    .view-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 7px;
+    }
+
+    .view-tags span {
+      border-radius: 999px;
+      background: rgba(255,255,255,0.06);
+      color: #beb4a8;
+      padding: 5px 9px;
+      font-size: 12px;
+      line-height: 1;
+    }
+
+    .view-card-actions {
+      margin-top: auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .experience-layout {
+      display: grid;
+      grid-template-columns: minmax(760px, 1fr) 360px;
+      gap: 20px;
+    }
+
+    .experience-bar {
+      min-height: 92px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 20px;
+      padding: 16px 18px;
+      margin-bottom: 14px;
+    }
+
+    .experience-heading {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      min-width: 0;
+    }
+
+    .experience-copy {
+      min-width: 0;
+    }
+
+    .experience-kicker,
+    .experience-meta {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      color: #bfb5a8;
+      font-size: 13px;
+      min-width: 0;
+      flex-wrap: wrap;
+    }
+
+    .experience-kicker {
+      margin-bottom: 6px;
+      color: var(--gold);
+      font-weight: 900;
+    }
+
+    .experience-copy h1 {
+      margin: 0 0 6px;
+      font-size: 25px;
+      line-height: 1.18;
+      letter-spacing: 0;
+    }
+
+    .experience-progress {
+      min-width: 178px;
+      border-radius: 18px;
+      border: 1px solid rgba(255,255,255,0.10);
+      background: rgba(255,255,255,0.045);
+      padding: 12px 14px;
+      color: #bfb5a8;
+      font-size: 12px;
+      line-height: 1.35;
+      text-align: right;
+    }
+
+    .experience-progress strong {
+      display: block;
+      margin-top: 2px;
+      color: var(--text);
+      font-size: 22px;
+      line-height: 1.05;
+    }
+
+    .episode-strip {
+      display: grid;
+      grid-template-columns: 1.15fr 0.85fr 0.85fr;
+      gap: 10px;
+      margin-bottom: 18px;
+    }
+
+    .episode-strip-item {
+      border-radius: 16px;
+      border: 1px solid rgba(255,255,255,0.09);
+      background: rgba(255,255,255,0.045);
+      padding: 13px 14px;
+      min-height: 82px;
+    }
+
+    .episode-strip-item span {
+      display: block;
+      color: #8f867b;
+      font-size: 12px;
+      font-weight: 900;
+      margin-bottom: 7px;
+    }
+
+    .episode-strip-item strong {
+      display: block;
+      color: var(--text);
+      font-size: 18px;
+      margin-bottom: 5px;
+    }
+
+    .episode-strip-item p {
+      margin: 0;
+      color: #bfb6aa;
+      font-size: 13px;
+      line-height: 1.48;
+    }
+
+    .experience-meta b { color: var(--text); }
+    .sep { color: var(--dim); }
+
+    .stage {
+      min-height: 680px;
+      border-radius: 22px;
+      border: 1px solid var(--line);
+      background: #000;
+      overflow: hidden;
+      position: relative;
+      box-shadow: var(--shadow);
+    }
+
+    .stage .visual-bg {
+      background-image:
+        linear-gradient(90deg, rgba(0,0,0,0.72), rgba(0,0,0,0.18) 46%, rgba(0,0,0,0.58)),
+        url("../../haodongxi/app/public/haodongxi/scenes/tiemei-dining-table.png");
+    }
+
+    .scene-top-caption {
+      position: absolute;
+      left: 28px;
+      top: 26px;
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      z-index: 2;
+    }
+
+    .scene-chip {
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,0.14);
+      background: rgba(8,8,7,0.58);
+      color: #d8d0c5;
+      padding: 8px 12px;
+      font-size: 13px;
+      font-weight: 900;
+      backdrop-filter: blur(14px);
+    }
+
+    .beat-card {
+      position: absolute;
+      left: 30px;
+      bottom: 176px;
+      z-index: 3;
+      width: min(620px, calc(100% - 60px));
+      border-radius: 18px;
+      border: 1px solid rgba(255,255,255,0.12);
+      background: rgba(12, 11, 10, 0.78);
+      backdrop-filter: blur(18px);
+      padding: 22px;
+    }
+
+    .beat-card h1 {
+      margin: 0 0 12px;
+      font-size: 28px;
+      line-height: 1.18;
+    }
+
+    .beat-card p,
+    .ripple-panel p,
+    .angle-body p,
+    .echo-card p {
+      margin: 0;
+      color: #d7cec2;
+      line-height: 1.72;
+      font-size: 15px;
+    }
+
+    .dialogue-strip {
+      position: absolute;
+      left: 30px;
+      right: 30px;
+      bottom: 92px;
+      z-index: 3;
+      display: grid;
+      grid-template-columns: 92px 1fr;
+      gap: 14px;
+      align-items: center;
+      border-radius: 16px;
+      border: 1px solid rgba(255,255,255,0.10);
+      background: rgba(0,0,0,0.58);
+      padding: 14px 16px;
+      backdrop-filter: blur(12px);
+    }
+
+    .speaker {
+      color: var(--gold);
+      font-weight: 900;
+    }
+
+    .dialogue-strip p {
+      margin: 0;
+      color: #e7ded2;
+      line-height: 1.55;
+    }
+
+    .ripple-panel {
+      position: absolute;
+      right: 28px;
+      top: 92px;
+      z-index: 3;
+      width: 390px;
+      border-radius: 18px;
+      border: 1px solid rgba(239,176,82,0.42);
+      background: linear-gradient(180deg, rgba(44,29,14,0.88), rgba(13,12,10,0.86));
+      box-shadow: 0 24px 70px rgba(0,0,0,0.48);
+      padding: 20px;
+      backdrop-filter: blur(18px);
+    }
+
+    .ripple-panel.hidden { display: none; }
+
+    .ripple-panel h2 {
+      margin: 10px 0 12px;
+      font-size: 23px;
+      line-height: 1.24;
+    }
+
+    .ripple-actions {
+      display: flex;
+      gap: 10px;
+      margin-top: 18px;
+    }
+
+    .ripple-actions button {
+      flex: 1;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,0.12);
+      background: rgba(255,255,255,0.06);
+      color: #e2d8ca;
+      padding: 10px;
+      font-weight: 900;
+    }
+
+    .deep-toolbar {
+      position: absolute;
+      left: 50%;
+      bottom: 28px;
+      transform: translateX(-50%);
+      z-index: 4;
+      display: flex;
+      gap: 8px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,0.13);
+      background: rgba(11,10,9,0.72);
+      padding: 8px;
+      backdrop-filter: blur(16px);
+    }
+
+    .deep-tool {
+      min-width: 82px;
+      height: 40px;
+      border-radius: 999px;
+      border: 1px solid transparent;
+      background: transparent;
+      color: #cfc6ba;
+      font-weight: 900;
+    }
+
+    .deep-tool.active {
+      background: var(--gold);
+      color: #17120a;
+      box-shadow: 0 10px 26px rgba(239,176,82,0.25);
+    }
+
+    .experience-side {
+      display: grid;
+      gap: 14px;
+      align-content: start;
+    }
+
+    .angle-card,
+    .echo-card {
+      overflow: hidden;
+    }
+
+    .angle-portrait {
+      height: 210px;
+      background:
+        linear-gradient(to top, rgba(0,0,0,0.84), transparent 62%),
+        url("../../haodongxi/app/public/haodongxi/characters/luo-yi.png");
+      background-size: cover;
+      background-position: center 14%;
+      position: relative;
+    }
+
+    .angle-portrait .badge {
+      position: absolute;
+      left: 16px;
+      top: 16px;
+    }
+
+    .angle-body,
+    .echo-card {
+      padding: 18px;
+    }
+
+    .angle-body h2,
+    .echo-card h3 {
+      margin: 0 0 8px;
+      font-size: 24px;
+    }
+
+    .side-context {
+      display: grid;
+      gap: 10px;
+      margin-top: 16px;
+    }
+
+    .side-context div {
+      border-top: 1px solid rgba(255,255,255,0.08);
+      padding-top: 10px;
+    }
+
+    .side-context span {
+      display: block;
+      color: #8f867b;
+      font-size: 12px;
+      font-weight: 900;
+      margin-bottom: 4px;
+    }
+
+    .side-context strong {
+      color: #e5ddd3;
+      font-size: 14px;
+      line-height: 1.45;
+    }
+
+    .discover-row {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+      margin-top: 16px;
+    }
+
+    .discover-row span {
+      border-radius: 12px;
+      background: rgba(255,255,255,0.055);
+      border: 1px solid rgba(255,255,255,0.08);
+      padding: 10px 8px;
+      text-align: center;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.4;
+    }
+
+    .discover-row strong {
+      display: block;
+      color: var(--gold);
+      font-size: 18px;
+      margin-bottom: 2px;
+    }
+
+    .side-action {
+      width: 100%;
+      margin-top: 14px;
+    }
+
+    .compare-hero {
+      min-height: 560px;
+      border: 1px solid rgba(239,176,82,0.30);
+      border-radius: 28px;
+      overflow: hidden;
+      position: relative;
+      background: #050504;
+      box-shadow: var(--shadow);
+    }
+
+    .compare-hero::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background:
+        linear-gradient(90deg, rgba(0,0,0,0.86), rgba(0,0,0,0.34) 48%, rgba(0,0,0,0.86)),
+        linear-gradient(to top, rgba(0,0,0,0.80), transparent 58%),
+        url("../../haodongxi/app/public/haodongxi/scenes/tiemei-dining-table.png");
+      background-size: cover;
+      background-position: center;
+      filter: saturate(0.86) brightness(0.68);
+    }
+
+    .compare-hero-inner {
+      position: relative;
+      z-index: 1;
+      min-height: 560px;
+      padding: 34px;
+      display: grid;
+      grid-template-columns: minmax(620px, 1fr) 320px;
+      gap: 34px;
+      align-items: end;
+    }
+
+    .hero-copy { max-width: 860px; }
+
+    .hero-tags {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-bottom: 28px;
+    }
+
+    .hero-quote {
+      margin: 0;
+      font-size: 50px;
+      line-height: 1.12;
+      letter-spacing: 0;
+      font-weight: 900;
+      max-width: 880px;
+    }
+
+    .hero-meta {
+      margin-top: 22px;
+      color: #d7ccbc;
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      flex-wrap: wrap;
+      font-size: 15px;
+    }
+
+    .hero-actions {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-top: 32px;
+      flex-wrap: wrap;
+    }
+
+    .hero-card {
+      border: 1px solid rgba(255,255,255,0.12);
+      border-radius: 22px;
+      background: rgba(9,8,7,0.66);
+      backdrop-filter: blur(18px);
+      padding: 18px;
+      align-self: end;
+    }
+
+    .hero-card img {
+      width: 100%;
+      aspect-ratio: 1 / 1.08;
+      object-fit: cover;
+      object-position: center top;
+      border-radius: 16px;
+      border: 1px solid rgba(255,255,255,0.12);
+      background: #211b16;
+      margin-bottom: 14px;
+    }
+
+    .hero-card h2 {
+      margin: 0 0 6px;
+      font-size: 23px;
+    }
+
+    .hero-card p {
+      margin: 0;
+      color: #bfb5a7;
+      line-height: 1.55;
+      font-size: 13px;
+    }
+
+    .tabs {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin: 20px 0 14px;
+      border: 1px solid rgba(255,255,255,0.10);
+      border-radius: 999px;
+      background: rgba(14,14,12,0.84);
+      padding: 7px;
+      width: fit-content;
+      max-width: 100%;
+      overflow: auto;
+    }
+
+    .tab {
+      border: 0;
+      border-radius: 999px;
+      background: transparent;
+      color: #bcb3a8;
+      height: 38px;
+      padding: 0 18px;
+      font-weight: 900;
+      white-space: nowrap;
+    }
+
+    .tab.active {
+      background: var(--gold);
+      color: #17120a;
+      box-shadow: 0 10px 28px rgba(239,176,82,0.22);
+    }
+
+    .tab-panel {
+      display: none;
+      padding: 22px;
+    }
+
+    .tab-panel.active { display: block; }
+
+    .panel-head {
+      display: flex;
+      align-items: end;
+      justify-content: space-between;
+      gap: 18px;
+      margin-bottom: 18px;
+    }
+
+    .panel-head h2 {
+      margin: 0;
+      font-size: 25px;
+      line-height: 1.2;
+    }
+
+    .panel-head p {
+      margin: 6px 0 0;
+      color: #a99f93;
+      line-height: 1.55;
+      font-size: 14px;
+    }
+
+    .moment-list,
+    .cards-grid,
+    .archive-grid,
+    .flow-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    .compare-reel {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    .moment-card,
+    .reel-card,
+    .memory-card,
+    .archive-card,
+    .flow-card,
+    .invite-card {
+      border: 1px solid rgba(255,255,255,0.10);
+      border-radius: 18px;
+      background: linear-gradient(180deg, rgba(255,255,255,0.055), rgba(255,255,255,0.024));
+      padding: 18px;
+      min-height: 150px;
+    }
+
+    .moment-card.active,
+    .reel-card.active,
+    .archive-card.featured {
+      border-color: rgba(239,176,82,0.52);
+      background: linear-gradient(180deg, rgba(239,176,82,0.13), rgba(255,255,255,0.03));
+    }
+
+    .moment-card strong,
+    .memory-card h3,
+    .archive-card h3,
+    .flow-card h3 {
+      display: block;
+      margin: 0 0 12px;
+      font-size: 20px;
+      line-height: 1.2;
+    }
+
+    .moment-card p,
+    .memory-card p,
+    .archive-card p,
+    .flow-card p,
+    .invite-card p,
+    .reel-card small {
+      margin: 0;
+      color: #c9bfb2;
+      line-height: 1.62;
+      font-size: 14px;
+    }
+
+    .reel-label {
+      color: var(--gold);
+      font-size: 13px;
+      font-weight: 900;
+    }
+
+    .reel-card {
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      gap: 18px;
+      min-height: 178px;
+    }
+
+    .reel-card p {
+      margin: 0;
+      color: #ede5da;
+      line-height: 1.55;
+      font-size: 16px;
+      font-weight: 800;
+    }
+
+    .invite-layout {
+      display: grid;
+      grid-template-columns: 1fr 360px;
+      gap: 14px;
+      align-items: stretch;
+    }
+
+    .friend-options {
+      display: grid;
+      gap: 10px;
+    }
+
+    .friend-option {
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      background: rgba(255,255,255,0.04);
+      padding: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      color: #ddd5ca;
+      font-size: 14px;
+    }
+
+    .friend-option span:last-child {
+      color: #90877e;
+      font-size: 12px;
+    }
+
+    .archive-hero {
+      display: grid;
+      grid-template-columns: minmax(640px, 1fr) 400px;
+      gap: 22px;
+      align-items: stretch;
+      margin-bottom: 20px;
+    }
+
+    .archive-main {
+      min-height: 420px;
+      border-radius: 28px;
+      position: relative;
+      overflow: hidden;
+      background: #050504;
+      border: 1px solid rgba(239,176,82,0.28);
+      box-shadow: var(--shadow);
+    }
+
+    .archive-main::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background:
+        linear-gradient(90deg, rgba(0,0,0,0.82), rgba(0,0,0,0.22) 54%, rgba(0,0,0,0.70)),
+        url("../../haodongxi/app/public/haodongxi/scenes/shanghai-compound-night.png");
+      background-size: cover;
+      background-position: center;
+      filter: saturate(0.84) brightness(0.7);
+    }
+
+    .archive-main-content {
+      position: relative;
+      z-index: 1;
+      padding: 34px;
+      min-height: 420px;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+    }
+
+    .archive-main h1 {
+      margin: 18px 0 12px;
+      max-width: 740px;
+      font-size: 50px;
+      line-height: 1.08;
+    }
+
+    .archive-main p {
+      margin: 0 0 26px;
+      color: #d3c8ba;
+      max-width: 700px;
+      line-height: 1.68;
+      font-size: 16px;
+    }
+
+    .character-stack {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+    }
+
+    .character-mini {
+      min-height: 130px;
+      border-radius: 18px;
+      position: relative;
+      overflow: hidden;
+      border: 1px solid rgba(255,255,255,0.10);
+      background: #191511;
+    }
+
+    .character-mini img {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      opacity: 0.82;
+    }
+
+    .character-mini span {
+      position: absolute;
+      left: 12px;
+      bottom: 12px;
+      font-weight: 900;
+      text-shadow: 0 2px 12px rgba(0,0,0,0.88);
+    }
+
+    .archive-side {
+      padding: 22px;
+    }
+
+    .archive-side h2 {
+      margin: 0 0 14px;
+      font-size: 26px;
+    }
+
+    .archive-stat {
+      display: grid;
+      grid-template-columns: 76px 1fr;
+      gap: 12px;
+      padding: 14px 0;
+      border-top: 1px solid var(--line);
+    }
+
+    .archive-stat strong {
+      color: var(--gold);
+      font-size: 24px;
+    }
+
+    .archive-stat span {
+      color: var(--muted);
+      line-height: 1.55;
+      font-size: 13px;
+    }
+
+    .production-layout {
+      display: grid;
+      grid-template-columns: 1fr 360px;
+      gap: 20px;
+      align-items: start;
+    }
+
+    .flow-track {
+      display: grid;
+      gap: 14px;
+    }
+
+    .flow-step {
+      display: grid;
+      grid-template-columns: 82px 1fr 190px;
+      gap: 16px;
+      align-items: center;
+      padding: 18px;
+    }
+
+    .flow-number {
+      width: 58px;
+      height: 58px;
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      background: var(--gold);
+      color: #181109;
+      font-weight: 900;
+      font-size: 22px;
+    }
+
+    .flow-step h2 {
+      margin: 0 0 8px;
+      font-size: 24px;
+    }
+
+    .flow-step p {
+      margin: 0;
+      color: var(--muted);
+      line-height: 1.62;
+    }
+
+    .flow-output {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+    }
+
+    .editor-toggle {
+      position: fixed;
+      right: 18px;
+      bottom: 18px;
+      z-index: 50;
+      border: 1px solid rgba(239,176,82,0.5);
+      background: #17120d;
+      color: #ffd27a;
+      border-radius: 999px;
+      padding: 12px 16px;
+      font-weight: 900;
+      box-shadow: var(--shadow);
+    }
+
+    .editor {
+      position: fixed;
+      right: 18px;
+      top: 86px;
+      width: 340px;
+      max-height: calc(100vh - 120px);
+      overflow: auto;
+      z-index: 40;
+      display: none;
+      border-radius: 18px;
+      border: 1px solid rgba(239,176,82,0.42);
+      background: rgba(13, 12, 10, 0.96);
+      box-shadow: var(--shadow);
+      padding: 16px;
+    }
+
+    .editor.open { display: block; }
+
+    .editor h2 {
+      margin: 0 0 12px;
+      font-size: 18px;
+    }
+
+    .field {
+      display: grid;
+      gap: 6px;
+      margin-bottom: 12px;
+    }
+
+    .field label {
+      color: #bcb3a6;
+      font-size: 12px;
+      font-weight: 900;
+    }
+
+    .field input,
+    .field textarea {
+      width: 100%;
+      border: 1px solid rgba(255,255,255,0.13);
+      border-radius: 10px;
+      background: rgba(255,255,255,0.06);
+      color: var(--text);
+      padding: 9px 10px;
+      outline: none;
+      resize: vertical;
+    }
+
+    .editor-actions {
+      display: flex;
+      gap: 8px;
+      margin-top: 10px;
+    }
+
+    .editor-actions button {
+      flex: 1;
+      border-radius: 10px;
+      border: 1px solid var(--line);
+      background: rgba(255,255,255,0.06);
+      color: #ddd5ca;
+      padding: 9px;
+      font-weight: 900;
+    }
+
+    @media (max-width: 1180px) {
+      body { min-width: 0; }
+      .top-actions,
+      .nav { display: none; }
+      .search { width: auto; flex: 1; }
+      .watch-grid,
+      .below-player,
+      .atlas-grid,
+      .view-layout,
+      .experience-layout,
+      .episode-strip,
+      .compare-hero-inner,
+      .invite-layout,
+      .archive-hero,
+      .production-layout,
+      .flow-step { grid-template-columns: 1fr; }
+      .moment-list,
+      .cards-grid,
+      .archive-grid,
+      .flow-grid,
+      .compare-reel,
+      .view-cards,
+      .character-stack { grid-template-columns: 1fr; }
+      .underwater-card { left: 28px; right: 28px; width: auto; }
+      .hero-quote,
+      .archive-main h1 { font-size: 34px; }
+      .side-panel,
+      .atlas-panel,
+      .view-main { min-height: auto; }
+      .experience-bar,
+      .experience-heading {
+        align-items: flex-start;
+        flex-direction: column;
+      }
+      .experience-progress {
+        width: 100%;
+        text-align: left;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <header class="topbar">
+      <div class="brand"><span class="brand-mark"></span><span>腾讯视频</span></div>
+      <nav class="nav"><span>电视剧</span><span>电影</span><span>动漫</span><span>综艺</span><span>纪录片</span></nav>
+      <div class="search">搜索剧集、人物、片段</div>
+      <div class="top-actions"><span>会员专区</span><span>历史</span><span>创作</span><span>应用</span><button class="download">下载客户端</button></div>
+    </header>
+
+    <main id="page-entry" class="page active">
+      <section class="watch-grid">
+        <div class="player">
+          <div class="player-bg"></div>
+          <div class="episode-stamp">
+            <span class="badge">播放结束</span>
+            <h1>《好东西》 · 正片已播完</h1>
+            <p>刚刚看完：一段关系被重新理解的日常片刻</p>
+          </div>
+          <aside class="underwater-card">
+            <div class="eyebrow">水下模式 · 官方剧后体验</div>
+            <h2 data-edit-key="entryTitle">你刚看完的，不止这一层</h2>
+            <p data-edit-key="entrySubtitle">进入水下模式，发现正片之外的视角、暗线和未说出口的故事。</p>
+            <div class="cta-row">
+              <button class="primary" data-edit-key="entryCta" data-route="atlas">换个角度再看一遍</button>
+              <button class="ghost">稍后再看</button>
+            </div>
+          </aside>
+          <div class="player-controls">
+            <span class="play-dot"></span>
+            <div class="progress"><span></span></div>
+            <span>54:12 / 54:12</span>
+          </div>
+        </div>
+
+        <aside class="side-panel">
+          <div class="side-title">好东西</div>
+          <div class="side-meta">剧后推荐 · 水下模式</div>
+          <p class="eyebrow">看完后继续</p>
+          <div class="recommend-stack">
+            <button class="rec-card featured" data-route="atlas">
+              <strong>本集探索图谱</strong>
+              <span>从刚才那场日常片刻进入，换一个位置再看一次。</span>
+            </button>
+            <div class="rec-card">
+              <strong>下一段内容</strong>
+              <span>继续观看正片推荐内容。</span>
+            </div>
+            <div class="rec-card">
+              <strong>评论区</strong>
+              <span>观众正在聊这段关系里谁先把话说破。</span>
+            </div>
+          </div>
+        </aside>
+
+        <div class="below-player">
+          <div class="episode-actions">
+            <button class="small-action">重播本片段</button>
+            <button class="small-action">收藏</button>
+            <button class="small-action">加入片单</button>
+            <button class="small-action">查看台词</button>
+            <button class="small-action">分享</button>
+          </div>
+          <button class="rec-card featured" data-route="archive">
+            <strong>进入 IP 水下档案馆</strong>
+            <span>查看这个 IP 已沉淀的水下片刻。</span>
+          </button>
+        </div>
+      </section>
+    </main>
+
+    <main id="page-atlas" class="page">
+      <section class="page-shell">
+        <div class="section-head">
+          <div>
+            <button class="back" data-route="entry">返回播放页</button>
+            <h1 data-edit-key="atlasTitle">《好东西》本集探索图谱</h1>
+            <p data-edit-key="atlasSubtitle">这些正片带过的片刻，还可以换个角度再看一遍。</p>
+          </div>
+          <button class="ghost" data-route="archive">查看水下档案馆</button>
+        </div>
+
+        <div class="atlas-grid">
+          <aside class="panel atlas-panel">
+            <div class="filter-title">按人物筛选</div>
+            <div class="person-filter">
+              <button class="person-chip active"><img class="avatar" src="../../haodongxi/app/public/haodongxi/characters/xiaoye.png" alt="">全部事件</button>
+              <button class="person-chip"><img class="avatar" src="../../haodongxi/app/public/haodongxi/characters/xiaoye.png" alt="">小叶</button>
+              <button class="person-chip"><img class="avatar" src="../../haodongxi/app/public/haodongxi/characters/wang-tiemei.png" alt="">王铁梅</button>
+              <button class="person-chip"><img class="avatar" src="../../haodongxi/app/public/haodongxi/characters/wang-moli.png" alt="">王茉莉</button>
+              <button class="person-chip"><img class="avatar" src="../../haodongxi/app/public/haodongxi/characters/doctor-hu.png" alt="">小胡</button>
+            </div>
+            <p class="filter-note">先找到想再看一层的片刻，再换一个位置靠近它。</p>
+          </aside>
+
+          <section class="panel atlas-panel">
+            <div class="timeline-title">本集事件图谱</div>
+            <div class="timeline">
+              <button class="event-node active" data-title="真实事件 A" data-status="推荐路径 · 可进入" data-surface="正片里，一个日常动作让关系悄悄换了重量。" data-depth="从不同位置靠近这一幕里没说出口的关系变化。" data-image="url('../../haodongxi/app/public/haodongxi/scenes/tiemei-dining-table.png')">
+                <div class="node-dot">1</div>
+                <div class="event-main"><strong>真实事件 A</strong><span>正片里被快速带过，但人物关系发生了变化。</span></div>
+                <div class="event-tags"><span class="tag recommend">推荐</span><span class="tag open">可进入</span></div>
+              </button>
+              <button class="event-node" data-title="饭桌矛盾" data-status="待填充 · 真实片段" data-surface="一张桌子上，不同关系把话说到同一个地方。" data-depth="它适合作为多条人物线的交汇点，而不是单独当作完整叙事。">
+                <div class="node-dot">2</div>
+                <div class="event-main"><strong>饭桌矛盾</strong><span>几个人对爱、保护和话术的理解发生碰撞。</span></div>
+                <div class="event-tags"><span class="tag">待填充</span></div>
+              </button>
+              <button class="event-node" data-title="声音片段" data-status="概念预览" data-surface="声音把一些平时被带过的劳动和关系放大。" data-depth="这一段更适合做主题节点和水下卡，而不是主链路。">
+                <div class="node-dot">3</div>
+                <div class="event-main"><strong>声音片段</strong><span>用声音重新理解家务、城市和亲密关系。</span></div>
+                <div class="event-tags"><span class="tag">概念预览</span></div>
+              </button>
+              <button class="event-node" data-title="真实事件 B" data-status="待开放" data-surface="另一段真实剧情位置，等事件梳理后替换。" data-depth="可作为人物线的中段余波。">
+                <div class="node-dot">4</div>
+                <div class="event-main"><strong>真实事件 B</strong><span>人物把上一场的情绪带进新的日常动作。</span></div>
+                <div class="event-tags"><span class="tag">待开放</span></div>
+              </button>
+              <button class="event-node" data-title="结尾舞台" data-status="概念预览" data-surface="一个角色站到台前，也可能重新理解自己想待的位置。" data-depth="适合做回看页的情绪收束和档案馆沉淀。">
+                <div class="node-dot">5</div>
+                <div class="event-main"><strong>结尾舞台</strong><span>不是所有站上舞台的人，都必须把掌声当答案。</span></div>
+                <div class="event-tags"><span class="tag">概念预览</span></div>
+              </button>
+              <button class="event-node" data-title="真实事件 C" data-status="档案馆节点" data-surface="补充真实剧情位置，后续和主样章一起修订。" data-depth="用于展示单集之外的长期探索空间。">
+                <div class="node-dot">6</div>
+                <div class="event-main"><strong>真实事件 C</strong><span>保留给后续真实事件链补充。</span></div>
+                <div class="event-tags"><span class="tag">档案</span></div>
+              </button>
+            </div>
+          </section>
+
+          <aside class="panel atlas-panel">
+            <div class="scene-thumb" id="detailThumb"></div>
+            <div class="detail-title" id="detailTitle">真实事件 A</div>
+            <div class="detail-meta" id="detailStatus">推荐路径 · 可进入</div>
+            <div class="detail-block">
+              <h3>水面</h3>
+              <p id="detailSurface" data-edit-key="surfaceText">正片里，一个日常动作让关系悄悄换了重量。</p>
+            </div>
+            <div class="detail-block">
+              <h3>水下</h3>
+              <p id="detailDepth" data-edit-key="underwaterText">从不同位置靠近这一幕里没说出口的关系变化。</p>
+            </div>
+            <div class="detail-block">
+              <h3>关联人物</h3>
+              <div class="theme-list">
+                <span class="tag">小叶</span>
+                <span class="tag">王铁梅</span>
+                <span class="tag">王茉莉</span>
+              </div>
+            </div>
+            <button class="primary side-action" data-route="viewpoints">换个角度再看一遍</button>
+          </aside>
+        </div>
+      </section>
+    </main>
+
+    <main id="page-viewpoints" class="page">
+      <section class="page-shell">
+        <div class="section-head">
+          <div>
+            <button class="back" data-route="atlas">返回探索图谱</button>
+            <h1 data-edit-key="viewTitle">选择从哪里看见这一幕</h1>
+            <p data-edit-key="viewSubtitle">同一段真实事件，换个位置再靠近一点。</p>
+          </div>
+          <button class="ghost">真实事件 A</button>
+        </div>
+
+        <div class="view-layout">
+          <aside class="panel event-brief">
+            <div class="event-hero"><span class="badge">已选事件</span></div>
+            <div class="event-brief-body">
+              <h2>真实事件 A</h2>
+              <p>一段被正片轻轻带过的日常片刻，换个位置会有不同余波。</p>
+              <div class="theme-list">
+                <span class="tag recommend">日常关系</span>
+                <span class="tag">停顿</span>
+                <span class="tag">余波</span>
+              </div>
+            </div>
+          </aside>
+
+          <section class="panel view-main">
+            <div class="view-intro">
+              <div>
+                <h1>从一个位置进入</h1>
+                <p>每个视角只靠近自己所在位置能触到的声音、动作和停顿。</p>
+              </div>
+              <div class="event-count">已选事件<br><strong>真实事件 A</strong></div>
+            </div>
+
+            <div class="view-cards">
+              <article class="view-card open">
+                <div class="view-card-top">
+                  <img class="view-card-avatar" src="../../haodongxi/app/public/haodongxi/characters/luo-yi.png" alt="">
+                  <div><h3>旁边的人</h3><div class="role">餐桌边 / 楼道口</div></div>
+                </div>
+                <p class="view-line">最靠近那句被轻轻带过的话</p>
+                <div class="view-tags"><span>日常</span><span>停顿</span><span>眼神</span></div>
+                <div class="view-card-actions"><span class="tag open">开放</span><button class="mini-btn primary" data-route="experience">从这里进入</button></div>
+              </article>
+
+              <article class="view-card locked">
+                <div class="view-card-top">
+                  <img class="view-card-avatar" src="../../haodongxi/app/public/haodongxi/characters/wang-moli.png" alt="">
+                  <div><h3>孩子的位置</h3><div class="role">桌角 / 门边</div></div>
+                </div>
+                <p class="view-line">听见大人把真话说成玩笑</p>
+                <div class="view-tags"><span>童年</span><span>误读</span><span>直接</span></div>
+                <div class="view-card-actions"><span class="tag">预览</span><button class="mini-btn">稍后开放</button></div>
+              </article>
+
+              <article class="view-card locked">
+                <div class="view-card-top">
+                  <img class="view-card-avatar" src="../../haodongxi/app/public/haodongxi/characters/xiaoye.png" alt="">
+                  <div><h3>当事人附近</h3><div class="role">镜头没有停留的位置</div></div>
+                </div>
+                <p class="view-line">靠近她把话收回去的一秒</p>
+                <div class="view-tags"><span>亲密</span><span>自尊</span><span>爱</span></div>
+                <div class="view-card-actions"><span class="tag">片段预告</span><button class="mini-btn">预览</button></div>
+              </article>
+
+              <article class="view-card locked">
+                <div class="view-card-top">
+                  <img class="view-card-avatar" src="../../haodongxi/app/public/haodongxi/characters/wang-tiemei.png" alt="">
+                  <div><h3>保护者的位置</h3><div class="role">身边 / 斜对面</div></div>
+                </div>
+                <p class="view-line">看见担心里也藏着判断</p>
+                <div class="view-tags"><span>保护</span><span>边界</span><span>关系</span></div>
+                <div class="view-card-actions"><span class="tag">待开放</span><button class="mini-btn">预览</button></div>
+              </article>
+            </div>
+          </section>
+        </div>
+      </section>
+    </main>
+
+    <main id="page-experience" class="page">
+      <section class="page-shell">
+        <div class="panel experience-bar">
+          <div class="experience-heading">
+            <button class="back" data-route="viewpoints">返回视角选择</button>
+            <div class="experience-copy">
+              <div class="experience-kicker">
+                <span>好东西</span>
+                <span class="sep">/</span>
+                <span>本集水下模式</span>
+              </div>
+              <h1>换到旁边的位置，再看一次这一幕</h1>
+              <div class="experience-meta">
+                <span>刚看完：真实事件 A</span>
+                <span class="sep">/</span>
+                <span>来自本集探索图谱</span>
+                <span class="sep">/</span>
+                <span>当前视角：旁边的人</span>
+              </div>
+            </div>
+          </div>
+          <div class="experience-progress">
+            本集水下片刻
+            <strong>01 / 04</strong>
+          </div>
+        </div>
+
+        <div class="episode-strip">
+          <div class="episode-strip-item">
+            <span>本集事件</span>
+            <strong>真实事件 A</strong>
+            <p>一段被正片轻轻带过的日常片刻，换个位置会有不同余波。</p>
+          </div>
+          <div class="episode-strip-item">
+            <span>进入位置</span>
+            <strong>餐桌边 / 楼道口</strong>
+            <p>离那句话很近，离完整心事很远。</p>
+          </div>
+          <div class="episode-strip-item">
+            <span>观看方式</span>
+            <strong>自动推进</strong>
+            <p>你可以在浮起处停一下，也可以继续看完这一幕。</p>
+          </div>
+        </div>
+
+        <div class="experience-layout">
+          <section class="stage">
+            <div class="visual-bg"></div>
+            <div class="scene-top-caption">
+              <span class="scene-chip">真实事件 A</span>
+              <span class="scene-chip">旁边的人</span>
+            </div>
+
+            <article class="beat-card">
+              <h1 data-edit-key="experienceBeatTitle">那句话停在桌面上</h1>
+              <p data-edit-key="experienceBeatText">正片里，镜头很快从这句话切走。你站在旁边，先听见笑声，再听见笑声落下去以后短短的一截安静。</p>
+            </article>
+
+            <div class="ripple-panel" id="ripplePanel">
+              <div class="eyebrow" id="rippleMode">水下浮起 · 观看</div>
+              <h2 id="rippleTitle" data-edit-key="rippleTitle">有人先把筷子放慢了</h2>
+              <p id="rippleText" data-edit-key="rippleText">你看见桌边有个人没有立刻接话，只是把筷子放慢。那一秒不是尴尬，更像是她终于意识到，这句话不只是玩笑。</p>
+              <div class="ripple-actions">
+                <button data-action="hide-ripple">收起</button>
+                <button>继续这一幕</button>
+              </div>
+            </div>
+
+            <div class="dialogue-strip">
+              <span class="speaker">正片片段</span>
+              <p>“你不要总把自己说得那么轻松。”</p>
+            </div>
+
+            <div class="deep-toolbar" aria-label="看深一点">
+              <button class="deep-tool active" data-tool="watch" data-title="有人先把筷子放慢了" data-text="你看见桌边有个人没有立刻接话，只是把筷子放慢。那一秒不是尴尬，更像是她终于意识到，这句话不只是玩笑。">观看</button>
+              <button class="deep-tool" data-tool="recall" data-title="前一句玩笑又回来了一次" data-text="这句话让你想起前面那场更轻的对话。她不是突然认真，而是已经绕了很久。">回想</button>
+              <button class="deep-tool" data-tool="talk" data-title="一句轻轻的追问" data-text="你没有替任何人下判断，只是问了一句：你刚刚那句话，是说给谁听的？">对话</button>
+              <button class="deep-tool" data-tool="browse" data-title="桌上的小纸条" data-text="桌角压着一张写了一半的便签。字很短，像是有人本来准备把话写下来，后来又放弃了。">翻看</button>
+            </div>
+          </section>
+
+          <aside class="experience-side">
+            <section class="panel angle-card">
+              <div class="angle-portrait"><span class="badge">当前视角</span></div>
+              <div class="angle-body">
+                <h2>旁边的人</h2>
+                <p>你站在一个不太打扰的位置，离那句话很近，离当事人的完整心事很远。</p>
+                <div class="side-context">
+                  <div><span>本集事件</span><strong>真实事件 A</strong></div>
+                  <div><span>当前位置</span><strong>餐桌边 / 楼道口</strong></div>
+                  <div><span>回看沉淀</span><strong>这一秒会留到本集水下回看里。</strong></div>
+                </div>
+                <div class="discover-row">
+                  <span><strong>1 / 3</strong>已发现</span>
+                  <span><strong>旁边</strong>视角</span>
+                  <span><strong>01</strong>片刻</span>
+                </div>
+              </div>
+            </section>
+
+            <section class="panel echo-card">
+              <h3>这一秒，会留到回看里。</h3>
+              <p>它不会改变正片发生过什么，但会改变你理解这句话的方式。</p>
+              <button class="primary side-action" data-route="compare">查看本集水下回看</button>
+            </section>
+          </aside>
+        </div>
+      </section>
+    </main>
+
+    <main id="page-compare" class="page">
+      <section class="page-shell">
+        <div class="section-head">
+          <div>
+            <button class="back" data-route="experience">返回水下片段</button>
+            <h1 data-edit-key="compareTitle">本集水下回看</h1>
+            <p>这次你从一个位置重新看过同一幕，留下了几处可以带走的片刻。</p>
+          </div>
+          <button class="ghost" data-route="atlas">回到本集图谱</button>
+        </div>
+
+        <section class="compare-hero">
+          <div class="compare-hero-inner">
+            <div class="hero-copy">
+              <div class="hero-tags">
+                <span class="badge">旁边的人</span>
+                <span class="tag recommend">真实事件 A</span>
+                <span class="tag open">3 个片刻</span>
+              </div>
+              <p class="hero-quote" data-edit-key="reviewQuote">我从旁边看见，她没有立刻把那句话收回去。</p>
+              <div class="hero-meta"><span>好东西</span><span class="sep">/</span><span>本集水下回看</span></div>
+              <div class="hero-actions">
+                <button class="primary">分享这张水下卡</button>
+                <button class="ghost" data-route="archive">收进水下档案馆</button>
+              </div>
+            </div>
+            <aside class="hero-card">
+              <img src="../../haodongxi/app/public/haodongxi/characters/luo-yi.png" alt="">
+              <h2>旁边的人</h2>
+              <p>一个不打扰主线、但会留住桌面停顿的位置。</p>
+            </aside>
+          </div>
+        </section>
+
+        <nav class="tabs" aria-label="本集水下回看">
+          <button class="tab active" data-tab="review">回看</button>
+          <button class="tab" data-tab="contrast">对照</button>
+          <button class="tab" data-tab="cards">卡册</button>
+          <button class="tab" data-tab="invite">邀请</button>
+        </nav>
+
+        <section class="panel tab-panel active" data-panel="review">
+          <div class="panel-head">
+            <div><h2>刚才这一幕，留下三个片刻</h2><p>它们会留在本集水下。</p></div>
+            <span class="tag open">回看</span>
+          </div>
+          <div class="moment-list">
+            <article class="moment-card active"><strong>筷子慢下来</strong><p>一句话之后，动作先露出余波。</p></article>
+            <article class="moment-card"><strong>笑声短了一截</strong><p>玩笑还在，但有人没有顺着笑完。</p></article>
+            <article class="moment-card"><strong>便签压在桌角</strong><p>想说的话先被写下来，又被压住。</p></article>
+          </div>
+        </section>
+
+        <section class="panel tab-panel" data-panel="contrast">
+          <div class="panel-head">
+            <div><h2>同一幕，换几个位置回放</h2><p>每个位置只停在自己靠近的那一秒。</p></div>
+            <span class="tag open">4 个视角</span>
+          </div>
+          <div class="compare-reel">
+            <article class="reel-card"><div class="reel-label">正片</div><p>一句话说完，镜头切走。</p><small>水面上，这只是日常对话。</small></article>
+            <article class="reel-card active"><div class="reel-label">旁边的人</div><p>她没有立刻接话。</p><small>停顿比回答更早出现。</small></article>
+            <article class="reel-card"><div class="reel-label">孩子的位置</div><p>大人把真话说得像玩笑。</p><small>她听懂了语气，没听懂理由。</small></article>
+            <article class="reel-card"><div class="reel-label">保护者的位置</div><p>担心里也有一点判断。</p><small>越想接住，越怕自己说重。</small></article>
+          </div>
+        </section>
+
+        <section class="panel tab-panel" data-panel="cards">
+          <div class="panel-head">
+            <div><h2>水下卡册</h2><p>这些片刻会进入你的《好东西》水下档案。</p></div>
+            <span class="tag recommend">3 张新卡</span>
+          </div>
+          <div class="cards-grid">
+            <article class="memory-card"><h3>筷子慢下来</h3><p>一句话之后，动作先露出余波。</p><span class="tag open">已解锁</span></article>
+            <article class="memory-card"><h3>笑声短了一截</h3><p>玩笑还在，但有人没有顺着笑完。</p><span class="tag open">已解锁</span></article>
+            <article class="memory-card"><h3>桌角便签</h3><p>想说的话先被写下来，又被压住。</p><span class="tag open">已解锁</span></article>
+          </div>
+        </section>
+
+        <section class="panel tab-panel" data-panel="invite">
+          <div class="panel-head">
+            <div><h2>邀请朋友补一个视角</h2><p data-edit-key="shareInvite">我从旁边看见了这一幕。你从另一个位置再看一次？</p></div>
+            <span class="tag open">接力</span>
+          </div>
+          <div class="invite-layout">
+            <article class="invite-card">
+              <div><div class="eyebrow">分享给朋友</div><p>朋友进入后，会从另一个位置重新看同一幕。</p></div>
+              <button class="primary">邀请朋友补一个视角</button>
+            </article>
+            <div class="friend-options">
+              <div class="friend-option"><span>孩子的位置</span><span>待朋友进入</span></div>
+              <div class="friend-option"><span>保护者的位置</span><span>轻量视角</span></div>
+              <div class="friend-option"><span>当事人附近</span><span>片段预告</span></div>
+            </div>
+          </div>
+        </section>
+      </section>
+    </main>
+
+    <main id="page-archive" class="page">
+      <section class="page-shell">
+        <div class="section-head">
+          <div>
+            <button class="back" data-route="compare">返回本集回看</button>
+            <h1>《好东西》水下档案馆</h1>
+            <p>看过的水下片刻，会在这里慢慢沉淀下来。</p>
+          </div>
+          <div class="button-row">
+            <button class="ghost" data-route="atlas">继续本集探索</button>
+            <button class="primary" data-route="production">查看生成流程</button>
+          </div>
+        </div>
+
+        <div class="archive-hero">
+          <section class="archive-main">
+            <div class="archive-main-content">
+              <span class="badge">IP 水下档案馆</span>
+              <h1>那些正片之外的片刻，还可以再回来看看</h1>
+              <p>你解锁过的片刻、人物关系和事件余波，会在这里继续留下来。</p>
+              <div class="button-row"><button class="primary" data-route="atlas">回到本集图谱</button><button class="ghost" data-route="production">看生产流程</button></div>
+            </div>
+          </section>
+
+          <aside class="panel archive-side">
+            <h2>本 IP 已收进水下</h2>
+            <div class="archive-stat"><strong>06</strong><span>本集事件节点，当前开放 1 条主路径。</span></div>
+            <div class="archive-stat"><strong>12</strong><span>人物关联片刻，后续可随真实内容补齐。</span></div>
+            <div class="archive-stat"><strong>03</strong><span>已解锁水下卡，可分享或邀请朋友补视角。</span></div>
+          </aside>
+        </div>
+
+        <div class="archive-grid">
+          <article class="archive-card featured">
+            <h3>本集水下卡册</h3>
+            <p>筷子慢下来、笑声短了一截、桌角便签已经收进本集。</p>
+            <div class="theme-list"><span class="tag open">已解锁</span><span class="tag">可分享</span></div>
+          </article>
+          <article class="archive-card">
+            <h3>人物水下线</h3>
+            <p>小叶、铁梅、茉莉、小胡的片刻会按人物沉淀，方便长期回访。</p>
+            <div class="character-stack">
+              <div class="character-mini"><img src="../../haodongxi/app/public/haodongxi/characters/xiaoye.png" alt=""><span>小叶</span></div>
+              <div class="character-mini"><img src="../../haodongxi/app/public/haodongxi/characters/wang-tiemei.png" alt=""><span>铁梅</span></div>
+              <div class="character-mini"><img src="../../haodongxi/app/public/haodongxi/characters/wang-moli.png" alt=""><span>茉莉</span></div>
+            </div>
+          </article>
+          <article class="archive-card">
+            <h3>事件沉淀</h3>
+            <p>真实事件 A、饭桌矛盾、声音片段、结尾舞台会作为本片的水下入口保留。</p>
+            <div class="theme-list"><span class="tag">真实事件 A</span><span class="tag">声音片段</span><span class="tag">结尾舞台</span></div>
+          </article>
+        </div>
+      </section>
+    </main>
+
+    <main id="page-production" class="page">
+      <section class="page-shell">
+        <div class="section-head">
+          <div>
+            <button class="back" data-route="archive">返回档案馆</button>
+            <h1>AI 生产流程</h1>
+            <p>从官方素材到水下入口，这里展示一条可复用的生成链路。</p>
+          </div>
+          <button class="ghost" data-route="entry">回到播放入口</button>
+        </div>
+
+        <div class="production-layout">
+          <section class="flow-track">
+            <article class="panel flow-step">
+              <div class="flow-number">1</div>
+              <div><h2>导入官方素材</h2><p>剧本、片段、角色小传、台词、宣传物料和已有评论热词进入素材池。</p></div>
+              <div class="flow-output"><span class="tag">剧本</span><span class="tag">片段</span><span class="tag">角色</span></div>
+            </article>
+            <article class="panel flow-step">
+              <div class="flow-number">2</div>
+              <div><h2>提取事件与人物线</h2><p>AI 先拆出本集事件、人物关系、正片留白和可观察位置。</p></div>
+              <div class="flow-output"><span class="tag recommend">事件图谱</span><span class="tag">人物线</span></div>
+            </article>
+            <article class="panel flow-step">
+              <div class="flow-number">3</div>
+              <div><h2>生成水下入口</h2><p>为每个可探索事件配置视角、片刻、卡册和分享入口。</p></div>
+              <div class="flow-output"><span class="tag open">视角</span><span class="tag open">卡册</span><span class="tag open">回看</span></div>
+            </article>
+            <article class="panel flow-step">
+              <div class="flow-number">4</div>
+              <div><h2>审核后上线运营</h2><p>官方审核事实边界和内容口吻，再上线到播放后入口与 IP 档案馆。</p></div>
+              <div class="flow-output"><span class="tag">审核</span><span class="tag">上线</span><span class="tag">运营</span></div>
+            </article>
+          </section>
+
+          <aside class="panel archive-side">
+            <h2>输出到产品</h2>
+            <div class="archive-stat"><strong>入口</strong><span>播放结束后自然出现，不打断正片。</span></div>
+            <div class="archive-stat"><strong>图谱</strong><span>把一集拆成可探索的事件结构。</span></div>
+            <div class="archive-stat"><strong>档案</strong><span>让水下内容沉淀为 IP 的长期资产。</span></div>
+            <button class="primary side-action" data-route="entry">查看完整链路</button>
+          </aside>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <button class="editor-toggle" id="editorToggle">编辑模式</button>
+  <aside class="editor" id="editorPanel">
+    <h2>快速编辑</h2>
+    <div id="editorFields"></div>
+    <div class="editor-actions">
+      <button id="saveEdit">保存</button>
+      <button id="resetEdit">重置</button>
+    </div>
+  </aside>
+
+  <script>
+    const routes = {
+      entry: '#page-entry',
+      atlas: '#page-atlas',
+      viewpoints: '#page-viewpoints',
+      experience: '#page-experience',
+      compare: '#page-compare',
+      archive: '#page-archive',
+      production: '#page-production'
+    };
+
+    const editLabels = {
+      entryTitle: '播放入口主文案',
+      entrySubtitle: '播放入口副文案',
+      entryCta: '播放入口按钮',
+      atlasTitle: '探索图谱标题',
+      atlasSubtitle: '探索图谱副标题',
+      surfaceText: '事件水面文案',
+      underwaterText: '事件水下文案',
+      viewTitle: '视角选择标题',
+      viewSubtitle: '视角选择副标题',
+      experienceBeatTitle: '体验页片段标题',
+      experienceBeatText: '体验页片段正文',
+      rippleTitle: '水下浮起标题',
+      rippleText: '水下浮起正文',
+      compareTitle: '回看页标题',
+      reviewQuote: '回看页分享句',
+      shareInvite: '邀请文案'
+    };
+
+    const defaults = {};
+    document.querySelectorAll('[data-edit-key]').forEach((node) => {
+      defaults[node.dataset.editKey] = node.textContent.trim();
+    });
+
+    const storageKey = 'underwaterPrototypeCopyV2';
+    let saved = {};
+    try {
+      saved = JSON.parse(localStorage.getItem(storageKey) || '{}');
+    } catch {
+      saved = {};
+    }
+
+    function applySavedCopy() {
+      Object.entries(saved).forEach(([key, value]) => {
+        document.querySelectorAll(`[data-edit-key="${key}"]`).forEach((node) => {
+          node.textContent = value;
+        });
+      });
+    }
+
+    function showRoute(route, updateHash = true) {
+      const selector = routes[route] || routes.entry;
+      document.querySelectorAll('.page').forEach((page) => page.classList.remove('active'));
+      document.querySelector(selector)?.classList.add('active');
+      if (updateHash) window.location.hash = route;
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    document.querySelectorAll('[data-route]').forEach((node) => {
+      node.addEventListener('click', () => showRoute(node.dataset.route));
+    });
+
+    document.querySelectorAll('[data-action="hide-ripple"]').forEach((node) => {
+      node.addEventListener('click', () => document.getElementById('ripplePanel')?.classList.add('hidden'));
+    });
+
+    document.querySelectorAll('.person-chip').forEach((chip) => {
+      chip.addEventListener('click', () => {
+        document.querySelectorAll('.person-chip').forEach((item) => item.classList.remove('active'));
+        chip.classList.add('active');
+      });
+    });
+
+    document.querySelectorAll('.event-node').forEach((node) => {
+      node.addEventListener('click', () => {
+        document.querySelectorAll('.event-node').forEach((item) => item.classList.remove('active'));
+        node.classList.add('active');
+        document.getElementById('detailTitle').textContent = node.dataset.title || '真实事件';
+        document.getElementById('detailStatus').textContent = node.dataset.status || '待填充';
+        document.getElementById('detailSurface').textContent = node.dataset.surface || defaults.surfaceText;
+        document.getElementById('detailDepth').textContent = node.dataset.depth || defaults.underwaterText;
+        if (node.dataset.image) {
+          document.getElementById('detailThumb').style.setProperty('--detail-image', node.dataset.image);
+        }
+      });
+    });
+
+    document.querySelectorAll('.deep-tool').forEach((button) => {
+      button.addEventListener('click', () => {
+        document.querySelectorAll('.deep-tool').forEach((item) => item.classList.remove('active'));
+        button.classList.add('active');
+        const ripple = document.getElementById('ripplePanel');
+        ripple?.classList.remove('hidden');
+        document.getElementById('rippleMode').textContent = `水下浮起 · ${button.textContent.trim()}`;
+        document.getElementById('rippleTitle').textContent = button.dataset.title || defaults.rippleTitle;
+        document.getElementById('rippleText').textContent = button.dataset.text || defaults.rippleText;
+      });
+    });
+
+    document.querySelectorAll('.tab').forEach((tab) => {
+      tab.addEventListener('click', () => {
+        const target = tab.dataset.tab;
+        document.querySelectorAll('.tab').forEach((item) => item.classList.remove('active'));
+        document.querySelectorAll('.tab-panel').forEach((panel) => {
+          panel.classList.toggle('active', panel.dataset.panel === target);
+        });
+        tab.classList.add('active');
+      });
+    });
+
+    function buildEditor() {
+      const editorFields = document.getElementById('editorFields');
+      editorFields.innerHTML = '';
+      Object.entries(defaults).forEach(([key, value]) => {
+        const wrap = document.createElement('div');
+        wrap.className = 'field';
+        const label = document.createElement('label');
+        label.textContent = editLabels[key] || key;
+        const current = document.querySelector(`[data-edit-key="${key}"]`)?.textContent.trim() || value;
+        const input = current.length > 32 ? document.createElement('textarea') : document.createElement('input');
+        input.value = saved[key] || current;
+        input.dataset.key = key;
+        if (input.tagName === 'TEXTAREA') input.rows = 3;
+        input.addEventListener('input', () => {
+          document.querySelectorAll(`[data-edit-key="${key}"]`).forEach((node) => {
+            node.textContent = input.value;
+          });
+        });
+        wrap.append(label, input);
+        editorFields.appendChild(wrap);
+      });
+    }
+
+    document.getElementById('editorToggle').addEventListener('click', () => {
+      document.getElementById('editorPanel').classList.toggle('open');
+    });
+
+    document.getElementById('saveEdit').addEventListener('click', () => {
+      const next = {};
+      document.querySelectorAll('#editorFields [data-key]').forEach((input) => {
+        next[input.dataset.key] = input.value;
+      });
+      saved = next;
+      localStorage.setItem(storageKey, JSON.stringify(next));
+    });
+
+    document.getElementById('resetEdit').addEventListener('click', () => {
+      localStorage.removeItem(storageKey);
+      saved = {};
+      Object.entries(defaults).forEach(([key, value]) => {
+        document.querySelectorAll(`[data-edit-key="${key}"]`).forEach((node) => node.textContent = value);
+      });
+      buildEditor();
+    });
+
+    applySavedCopy();
+    buildEditor();
+
+    const initialRoute = window.location.hash.replace('#', '') || 'entry';
+    showRoute(routes[initialRoute] ? initialRoute : 'entry', false);
+  </script>
+</body>
+</html>

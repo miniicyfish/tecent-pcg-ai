@@ -1,0 +1,753 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>庆余年 · 水下 — 说明文档</title>
+<style>
+  /* ── Reset & Base ── */
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html { font-size: 15px; }
+  body {
+    font-family: -apple-system, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+    color: #1a1a1a; background: #f5f5f0; line-height: 1.85;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* ── Page container (A4-ish) ── */
+  .page {
+    max-width: 780px; margin: 0 auto; padding: 60px 56px;
+    background: #fff; min-height: 100vh;
+    box-shadow: 0 0 40px rgba(0,0,0,.06);
+  }
+
+  /* ── Typography ── */
+  h1 { font-size: 2rem; text-align: center; margin-bottom: .3em; letter-spacing: .05em; color: #0d1b2a; }
+  h2 { font-size: 1.35rem; margin-top: 2.4em; margin-bottom: .6em; padding-bottom: .35em; border-bottom: 2px solid #c4a35a; color: #0d1b2a; }
+  h3 { font-size: 1.12rem; margin-top: 1.8em; margin-bottom: .5em; color: #1b3a5c; }
+  h4 { font-size: 1rem; margin-top: 1.4em; margin-bottom: .4em; color: #333; }
+  h5 { font-size: .95rem; margin-top: 1.2em; margin-bottom: .3em; color: #555; }
+  p { margin-bottom: .9em; }
+  strong { color: #0d1b2a; }
+  blockquote {
+    border-left: 3px solid #c4a35a; padding: .6em 1em; margin: 1em 0;
+    background: #faf8f2; color: #4a4a4a; font-style: italic;
+  }
+  ul, ol { padding-left: 1.5em; margin-bottom: .9em; }
+  li { margin-bottom: .3em; }
+  hr { border: none; border-top: 1px solid #ddd; margin: 2em 0; }
+
+  /* ── Subtitle ── */
+  .subtitle { text-align: center; color: #7a6e52; font-style: italic; margin-bottom: 2em; font-size: 1.05rem; }
+
+  /* ── Meta table ── */
+  .meta-table { width: 100%; border-collapse: collapse; margin-bottom: 2em; font-size: .9rem; }
+  .meta-table td { padding: 6px 12px; border: 1px solid #ddd; }
+  .meta-table td:first-child { width: 120px; font-weight: 600; background: #f8f6f0; color: #555; }
+
+  /* ── Tables ── */
+  table { width: 100%; border-collapse: collapse; margin: 1em 0 1.2em; font-size: .88rem; }
+  th, td { padding: 8px 10px; border: 1px solid #d0d0d0; text-align: left; vertical-align: top; }
+  th { background: #1b3a5c; color: #fff; font-weight: 600; }
+
+  /* ── 30s box ── */
+  .summary-box {
+    background: linear-gradient(135deg, #0d1b2a 0%, #1b3a5c 100%);
+    color: #e8e0d0; padding: 28px 32px; margin: 1.5em 0 2em; border-radius: 4px;
+  }
+  .summary-box p { color: #d8d0c0; margin-bottom: .7em; }
+  .summary-box p:last-child { margin-bottom: 0; }
+  .summary-box strong { color: #e8c97a; }
+
+  /* ── Architecture diagrams (CSS) ── */
+  .arch-diagram { display: flex; align-items: center; justify-content: center; gap: 12px; margin: 1.2em 0; flex-wrap: wrap; }
+  .arch-box {
+    border: 2px solid #1b3a5c; padding: 12px 16px; text-align: center; font-size: .82rem;
+    background: #f0f4f8; min-width: 140px; border-radius: 3px;
+  }
+  .arch-box.highlight { border-color: #c4a35a; background: #faf8f2; }
+  .arch-arrow { font-size: 1.2rem; color: #999; }
+  .arch-sub { display: flex; flex-direction: column; gap: 8px; margin-top: 8px; align-items: center; }
+  .arch-sub .arch-box { border-color: #aaa; background: #fafafa; font-size: .78rem; }
+
+  .prompt-layers {
+    border: 2px solid #1b3a5c; border-radius: 4px; overflow: hidden; margin: 1.2em 0; font-size: .82rem;
+  }
+  .prompt-layer {
+    padding: 8px 16px; border-bottom: 1px solid #ddd; display: flex; gap: 12px;
+  }
+  .prompt-layer:last-child { border-bottom: none; }
+  .prompt-layer .label { font-weight: 600; color: #1b3a5c; min-width: 80px; white-space: nowrap; }
+  .prompt-layer.system { background: #f0f4f8; }
+  .prompt-layer.user { background: #faf8f2; }
+
+  /* ── Image placeholders ── */
+  .img-placeholder {
+    border: 2px dashed #c4a35a; background: #faf8f2; padding: 20px; text-align: center;
+    margin: 1em 0; cursor: pointer; position: relative; min-height: 120px;
+    display: flex; align-items: center; justify-content: center; flex-direction: column;
+    transition: background .2s;
+  }
+  .img-placeholder:hover { background: #f5f0e5; }
+  .img-placeholder .hint { color: #999; font-size: .85rem; }
+  .img-placeholder .hint::before { content: "📷 "; }
+  .img-placeholder img {
+    max-width: 100%; max-height: 400px; object-fit: contain; display: block;
+  }
+  .img-placeholder input[type=file] {
+    position: absolute; inset: 0; opacity: 0; cursor: pointer;
+  }
+
+  /* ── Pixel art row ── */
+  .pixel-row {
+    display: flex; gap: 20px; justify-content: center; margin: 1.2em 0; flex-wrap: wrap;
+  }
+  .pixel-card {
+    text-align: center; flex: 0 0 180px;
+  }
+  .pixel-card img {
+    width: 120px; height: 120px; object-fit: cover; image-rendering: pixelated;
+    border: 2px solid #c4a35a; background: #1b3a5c;
+  }
+  .pixel-card .name { font-size: .85rem; font-weight: 600; margin-top: .4em; color: #1b3a5c; }
+  .pixel-card .desc { font-size: .75rem; color: #888; }
+
+  /* ── Scene images ── */
+  .scene-img {
+    width: 100%; height: 200px; object-fit: cover; image-rendering: pixelated;
+    border: 1px solid #ddd; margin: .8em 0;
+  }
+
+  /* ── Flow chart (text-based) ── */
+  .flow { background: #f8f6f0; padding: 20px 24px; font-size: .85rem; line-height: 2; margin: 1em 0; border: 1px solid #e0ddd5; border-radius: 3px; white-space: pre-wrap; font-family: "PingFang SC", sans-serif; }
+
+  /* ── Toolbar ── */
+  .toolbar {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 1000;
+    background: #0d1b2a; color: #fff; padding: 8px 20px;
+    display: flex; align-items: center; justify-content: space-between;
+    font-size: .85rem; box-shadow: 0 2px 12px rgba(0,0,0,.2);
+  }
+  .toolbar button {
+    background: #c4a35a; color: #0d1b2a; border: none; padding: 6px 18px;
+    font-weight: 600; cursor: pointer; border-radius: 3px; font-size: .85rem;
+  }
+  .toolbar button:hover { background: #d4b36a; }
+  .toolbar .info { color: #999; font-size: .78rem; }
+
+  /* ── Editable hint ── */
+  [contenteditable=true]:focus { outline: 2px solid #c4a35a44; outline-offset: 2px; }
+  .edit-hint { display: inline-block; font-size: .7rem; color: #c4a35a; background: #faf8f2; padding: 1px 6px; border-radius: 2px; margin-left: 8px; vertical-align: middle; }
+
+  /* ── Print styles ── */
+  @media print {
+    body { background: #fff; }
+    .toolbar, .edit-hint, .img-placeholder .hint, .img-placeholder input[type=file] { display: none !important; }
+    .page { box-shadow: none; padding: 40px 48px; max-width: none; }
+    h2 { page-break-before: auto; }
+    .summary-box { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    th { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    .arch-box { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    .prompt-layer { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    .img-placeholder { border-style: solid; }
+    .img-placeholder:not(.has-image) { display: none; }
+    @page { margin: 15mm 12mm; size: A4; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ── Toolbar ── -->
+<div class="toolbar">
+  <div>
+    <strong>庆余年 · 水下</strong> — 说明文档编辑器
+    <span class="info">（点击文字直接编辑 · 点击图片区域上传截图）</span>
+  </div>
+  <button onclick="window.print()">打印 / 导出 PDF</button>
+</div>
+
+<div class="page" style="margin-top: 52px;">
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- COVER -->
+<!-- ═══════════════════════════════════════════ -->
+
+<h1 contenteditable="true">庆余年 · 水下</h1>
+<p class="subtitle" contenteditable="true">每部剧都是一座冰山。你看到的，只是水面以上。</p>
+
+<table class="meta-table">
+  <tr><td>作品名称</td><td contenteditable="true">庆余年 · 水下</td></tr>
+  <tr><td>参赛赛道</td><td>命题赛道 · 赛题1：用 AI 玩转出圈交互叙事，解锁长视频沉浸式新体验</td></tr>
+  <tr><td>产品形态</td><td>腾讯视频长视频 IP 的 AI 衍生交互层</td></tr>
+  <tr><td>选手姓名</td><td contenteditable="true" style="color:#c4a35a;">（请填写）</td></tr>
+  <tr><td>Demo 链接</td><td contenteditable="true" style="color:#c4a35a;">（请填写）</td></tr>
+</table>
+
+<hr>
+
+<!-- 30s summary -->
+<div class="summary-box">
+  <p contenteditable="true">剧播完后，用户的延展消费（搜解析、看二创、补考据）几乎全部流向站外。腾讯视频承担了核心内容投入，却缺少一个承接"剧后消费"的站内产品形态。</p>
+  <p contenteditable="true">《庆余年 · 水下》是一个 <strong>AI 衍生交互层</strong>：用户以小人物视角进入剧集世界，<strong>主线由原作锁定不可改写</strong>，用户通过四个"手电筒"工具选择<strong>往哪个方向看得更深</strong>。AI 在每一刻自主判断当前场景"水下有没有东西"，并实时生成不可能预写的纵深内容。<strong>选择是手电筒，不是方向盘。</strong></p>
+  <p contenteditable="true">核心机制与 IP 内容解耦，可复用到腾讯视频整个 IP 库。</p>
+</div>
+
+<!-- ── Demo 首页截图 ── -->
+<div class="img-placeholder" onclick="this.querySelector('input').click()">
+  <span class="hint">点击上传：Demo 首页截图（"每部剧都是一座冰山"入口页）</span>
+  <input type="file" accept="image/*" onchange="handleImage(this)">
+</div>
+
+<hr>
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- 序章 -->
+<!-- ═══════════════════════════════════════════ -->
+
+<h2>序章：一个判断</h2>
+
+<p contenteditable="true">赛题问的是：AI 原生时代"看内容"这件事的终极形态。</p>
+
+<p contenteditable="true">我们的判断是：<strong>AI 给长视频带来的不是"更多自由度"，而是"更多纵深"。</strong></p>
+
+<p contenteditable="true">每一部剧都是一座冰山。观众看到的是水面以上——剧本写好的台词、镜头拍下的画面、剪辑保留的镜头。水线之下还有一整座山——角色没说出口的潜台词、没被拍到的日常侧面、没被展开的世界细节、主线之外的边缘故事。这些在编剧脑子里存在过，受限于时长和镜头语言，最终没能浮上水面。<strong>AI 不改变一部剧讲了什么。AI 让观众有能力往水下看。</strong></p>
+
+<p contenteditable="true">基于这个判断，我们做了《庆余年 · 水下》——一个<strong>腾讯视频长视频 IP 的 AI 衍生交互层</strong>。看完剧，用一个小人物的视角"活"一遍那些镜头没拍到的故事。固定的是世界（主线由原作锁定），自由的是你的眼睛（你选择往哪里看得更深）。</p>
+
+<p contenteditable="true">下文将依次展开：用户与平台的双向痛点（模块一），产品方案与核心机制（模块二），AI 如何成为这个产品不可替代的核心（模块三），以及它如何作为一套可复用的 IP 衍生层框架在腾讯视频整个内容库中落地（模块四）。</p>
+
+<hr>
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- 模块一 -->
+<!-- ═══════════════════════════════════════════ -->
+
+<h2>模块一：用户洞察与问题定义</h2>
+
+<h3>1.1 目标用户</h3>
+
+<p contenteditable="true">腾讯视频拥有大规模付费会员基础。在这个用户池里，《庆余年 · 水下》优先服务的不是"随便点开一集当背景音"的泛用户，而是三类对 IP 有更高情感投入、更强分享意愿、更明显延展消费需求的人。</p>
+
+<table>
+  <tr><th>用户类型</th><th>典型行为</th><th>当前缺口</th><th>产品机会</th></tr>
+  <tr contenteditable="true"><td>分享型年轻观众</td><td>追剧时刷微博、小红书、朋友圈，喜欢发截图、金句、人物 cut</td><td>分享素材多来自站外，腾讯视频只承担播放入口</td><td>用个性化结语和分享卡片，把"我在这个世界里的经历"变成可传播内容</td></tr>
+  <tr contenteditable="true"><td>深度 IP 粉丝</td><td>看解析、补原著、做考据、复看名场面</td><td>深度消费发生在豆瓣、B 站、小红书等站外社区</td><td>用 AI 生成镜头之外的纵深，让站内承接"看懂更多"的需求</td></tr>
+  <tr contenteditable="true"><td>剧荒回访用户</td><td>没有新剧追时，回到喜欢的老 IP 重刷片段或搜二创</td><td>回访路径零散，缺少新的官方体验入口</td><td>用小人物视角和多身份线，让老 IP 在剧荒期仍有新的消费理由</td></tr>
+</table>
+
+<p contenteditable="true">这三类用户未必占会员的大多数，但他们往往贡献了更高的停留、复看、讨论和传播价值。他们也是腾讯视频最不应该流失、却最容易被站外社区承接走的用户。《庆余年 · 水下》就是为这群人做的。</p>
+
+<h3>1.2 用户洞察：用户想要的不是自由度，是纵深</h3>
+
+<p contenteditable="true">在定义产品方向之前，我们先排除了三种看似合理但方向错误的思路，最终锁定了真正的用户需求。</p>
+
+<p contenteditable="true"><strong>排除一：分支选择叙事。</strong> Netflix 的 Bandersnatch 和互动影游把"交互"理解为不断选择路径。但观众看剧的核心状态是连续沉浸，频繁选择会把用户从"观看者"变成"路径判断者"，把看剧变成做题。AI 让分支更多、更动态，并不能解决这个根本问题。</p>
+
+<p contenteditable="true"><strong>排除二：让用户当编剧。</strong> Fable 的 AI 流媒体 Showrunner 让用户写 prompt 生成新剧情。它验证了用户对"在喜欢的世界观里看到新内容"有真实欲望；但也暴露了：<strong>大多数观众不想当编剧</strong>。写 prompt、设定目标、决定人物命运，本质是创作，不是消费。</p>
+
+<p contenteditable="true"><strong>排除三：把长视频变成别的媒介。</strong> 有人试图把长视频变得更短（切成解说）、更刺激（变成游戏）、更高自由度（变成开放世界）。但长视频在所有内容形态中真正不可替代的优势，恰恰是连续叙事、角色厚度和情绪沉浸。AI 应该放大这种纵深，而不是用别的内容形态替代它。</p>
+
+<p contenteditable="true">排除这三条路后，核心洞察浮出水面：</p>
+
+<table>
+  <tr><th>洞察</th><th>用户现象</th><th>产品机会</th></tr>
+  <tr contenteditable="true"><td>看完不等于消费结束</td><td>用户看完正片后继续搜解析、看二创、补原著、读考据</td><td>剧后消费应该被腾讯视频站内承接</td></tr>
+  <tr contenteditable="true"><td>用户想探索，不想改写</td><td>观众想"再多看看这个世界"，而不是"我来决定接下来发生什么"</td><td>交互应从"改写剧情"转向"探索纵深"</td></tr>
+  <tr contenteditable="true"><td>IP 长尾正在外溢</td><td>讨论、二创、复看、角色解读主要沉淀在站外平台</td><td>腾讯视频需要一个官方、个性化、可分享的 IP 衍生层</td></tr>
+</table>
+
+<h3>1.3 痛点（双向）</h3>
+
+<p contenteditable="true">这里是这个产品的核心立论。我们不只是在解决用户的体验问题，更是在解决长视频商业模式中的一块<strong>结构性缺失</strong>。这两个痛点其实是同一件事的两面。</p>
+
+<h4>用户侧：消费周期被剧集长度强行截断</h4>
+
+<p contenteditable="true">观众和一部剧的关系，并不在最后一集播完时结束。一部真正打动人的剧，会在观众脑子里继续运转——继续猜想、继续回味、继续怀念、想要二刷。但当下的产品形态是：<strong>剧播完，App 关掉，关系就结束了</strong>。</p>
+
+<p contenteditable="true">观众用来弥补这种落差的行为路径是：暂停腾讯视频，打开豆瓣搜剧评，打开小红书看二创，打开微博刷人物 cut，打开 B 站看 up 主的角色解析。这不是少数核心粉的小众行为，而是许多深度观众都会经历的剧后消费路径。<strong>用户的延展性消费需求是真实的、强烈的、可被产品承接的</strong>——只不过它长期发生在腾讯视频之外。</p>
+
+<h4>平台侧：生产周期与消费周期严重不对等，长尾价值全部外溢</h4>
+
+<p contenteditable="true">长视频是所有内容形态中<strong>生产投入重、开发周期长、集中消费窗口短</strong>的那一种。但真正关键的不是这个不对等本身，而是接下来这件事——</p>
+
+<p contenteditable="true"><strong>腾讯视频主要享受到的是"播出窗口期"的消费红利。</strong> 剧播完之后，IP 进入长尾期，但围绕这部剧的很多社交资产——讨论热度、二创流量、剧粉社区、考据生态——都沉淀在豆瓣、小红书、微博、B 站。承担核心内容投入和分发的平台，只享受到相对集中的播放消费；剧播完之后的大量延展价值，流向了别人的池子。</p>
+
+<p contenteditable="true">这意味着：</p>
+<ul contenteditable="true">
+  <li>平台投入的内容成本只能在播出窗口内变现</li>
+  <li>围绕一部 IP 自然形成的社交势能与平台无关</li>
+  <li>用户对 IP 的情感深化、复看欲望、"住进世界观"的需求，<strong>没有任何站内出口可以承接</strong></li>
+  <li>赛题原题里反复提到的"出圈"——出圈的目的地几乎都是别的平台</li>
+</ul>
+
+<p contenteditable="true">这不是体验优化能解决的问题。这是长视频商业模式中<strong>缺失的一块产品</strong>——专门用来在剧播完后的长尾期，把延展性消费需求承接在站内的产品形态。《庆余年 · 水下》就是为这一块缺失而设计的。</p>
+
+<h3>1.4 使用场景</h3>
+
+<h4>场景一：意犹未尽 —— 刚刷完，不想离开</h4>
+<p contenteditable="true">用户刚看完《庆余年第二季》最新一集。关键剧情刚发生（比如牛栏街刺杀、滕梓荆死了），她情绪还满着，但下一集要等一周。过去她会怎么做：暂停 App，打开豆瓣或小红书搜讨论。现在腾讯视频会在播放页底部推送一个入口——「<strong>进入庆余年 · 水下</strong>」。她点进去，选择"以茶馆掌柜的视角再看一遍牛栏街刺杀"。她在 App 内完成了一段新的沉浸体验，没有立刻跳出。<strong>这段原本可能属于豆瓣和小红书的剧后消费，现在留在了腾讯视频。</strong></p>
+
+<h4>场景二：剧荒回访 —— 回到喜欢的世界</h4>
+<p contenteditable="true">用户最近没有新剧追。打开腾讯视频，习惯性地在首页滑一滑，没有想看的就关掉。但他突然想起——"水下"里他还没玩过鉴查院文书的视角。他点进去，又在那个世界里完成了一段新的体验。<strong>这是衍生层对会员留存最直接的价值——它让 IP 在剧荒期依然能产生消费。</strong></p>
+
+<h4>场景三：被朋友带入 —— 反向激活新观众</h4>
+<p contenteditable="true">用户的朋友在朋友圈发了一张水下生成的分享卡片：「我在范府当杂役，今晚月色很好，范少爷站在院子里很久没说话——我看到了和电视里完全不一样的他」。用户没看过《庆余年》，但这段文字勾起了她的好奇。<strong>衍生体验反向把新用户带回了主内容。</strong></p>
+
+<p contenteditable="true"><strong>这三个场景共同勾勒出这个产品对腾讯视频的真实价值：它把"剧播完之后"的所有用户行为路径，从站外拉回到了站内。</strong></p>
+
+<hr>
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- 模块二 -->
+<!-- ═══════════════════════════════════════════ -->
+
+<h2>模块二：产品方案设计</h2>
+
+<h3>2.1 产品概述</h3>
+
+<p contenteditable="true">《庆余年 · 水下》是一个<strong>长视频 IP 的 AI 衍生交互层</strong>。它不是另一部剧，不是一个游戏，不是一个聊天工具。它是搭在原作之上的另一层产品——观众看完剧之后，<strong>进入这部剧的世界，用一个小人物的视角"活"一遍那些镜头没拍到的故事</strong>。</p>
+
+<blockquote contenteditable="true">固定的是世界，自由的是你的眼睛。选择是手电筒，不是方向盘。</blockquote>
+
+<p contenteditable="true">这不是宣传语，这是一条严格的产品边界：</p>
+<ul contenteditable="true">
+  <li><strong>主线固定</strong>——原作锁死，用户的任何动作都不会改写剧情走向、不会改变结局、不会让滕梓荆活下来。</li>
+  <li><strong>介入是稀疏的、有重量的</strong>——用户不需要每隔几秒做一次选择。大多数时候在"看"，介入只发生在用户主动选择"我想看得更深一点"的时候。</li>
+  <li><strong>介入决定的不是"接下来发生什么"，而是"我想从哪个角度看见什么"</strong>——用户的角色是居民和观察者，不是编剧。</li>
+</ul>
+
+<h3>2.2 核心机制</h3>
+
+<h4>机制一：小人物身份选择</h4>
+
+<p contenteditable="true">用户进入产品后，先选择一个站在主线边缘的小人物身份。每个身份有明确的位置、信息权限和"水下视角"：</p>
+
+<!-- ── 三个身份的像素风立绘 ── -->
+<div class="pixel-row">
+  <div class="pixel-card">
+    <img src="underwater/public/pixels/zhou-fusheng.png" alt="周福生">
+    <div class="name">周福生</div>
+    <div class="desc">京都茶馆掌柜 · 牛栏街</div>
+  </div>
+  <div class="pixel-card">
+    <img src="underwater/public/pixels/sun-youde.png" alt="孙有德">
+    <div class="name">孙有德</div>
+    <div class="desc">鉴查院末等文书</div>
+  </div>
+  <div class="pixel-card">
+    <img src="underwater/public/pixels/liu-an.png" alt="刘安">
+    <div class="name">刘安</div>
+    <div class="desc">范府杂役</div>
+  </div>
+</div>
+
+<table>
+  <tr><th>身份</th><th>位置</th><th>能照见的水下</th></tr>
+  <tr><td>周福生 · 京都茶馆掌柜</td><td>牛栏街 · 听风茶馆</td><td>朝堂风云的民间回响、各方势力暗线交汇</td></tr>
+  <tr><td>孙有德 · 鉴查院末等文书</td><td>鉴查院 · 文书房</td><td>情报机构内部的暗流、上层权力斗争的碎片</td></tr>
+  <tr><td>刘安 · 范府杂役</td><td>范建府邸</td><td>范闲不为人知的日常、府中人物的真实面貌</td></tr>
+</table>
+
+<p contenteditable="true">身份的设计核心不是"角色卡牌"，而是<strong>视角约束</strong>——这个身份能听到什么、看到什么、知道什么、不能知道什么，全部由身份的位置决定。这是后续 AI 判断"水下是否有内容"的关键依据。</p>
+
+<!-- ── 身份选择页截图 ── -->
+<div class="img-placeholder" onclick="this.querySelector('input').click()">
+  <span class="hint">点击上传：Demo 身份选择页截图</span>
+  <input type="file" accept="image/*" onchange="handleImage(this)">
+</div>
+
+<h4>机制二：视觉小说式主线播放</h4>
+
+<p contenteditable="true">主线由原作锁定的故事节点组成（每个身份 7 幕）。每一幕被拆成有节奏的几个 beat 自动推进：</p>
+
+<div style="text-align: center; margin: 1em 0; font-size: .95rem; color: #1b3a5c; font-weight: 600;">
+  [镜头/旁白] → [角色对话×N] → [你的感知] → (可选)[水下回响]
+</div>
+
+<ul contenteditable="true">
+  <li><strong>镜头</strong>：第三人称客观叙事，提供场景信息</li>
+  <li><strong>角色对话</strong>：原作角色的台词，带头像和情绪标签</li>
+  <li><strong>你的感知</strong>：第二人称写"你"作为这个小人物此刻的内心活动</li>
+  <li><strong>水下回响</strong>：上一幕用工具看到的纵深，会作为新的 beat 渗透回当前场景</li>
+</ul>
+
+<p contenteditable="true">整个体验默认自动播放，用户也可以切到手动模式。这种节奏让用户大部分时候处于"被剧带着走"的状态——和看剧本身的心理状态一致。</p>
+
+<!-- ── 场景背景展示 ── -->
+<div style="display: flex; gap: 8px; margin: 1em 0;">
+  <img class="scene-img" src="underwater/public/pixels/teahouse.png" alt="茶馆" style="flex:1; height: 160px;">
+  <img class="scene-img" src="underwater/public/pixels/jianchayuan-room.png" alt="鉴查院" style="flex:1; height: 160px;">
+  <img class="scene-img" src="underwater/public/pixels/fanfu-courtyard.png" alt="范府" style="flex:1; height: 160px;">
+</div>
+<p style="text-align: center; font-size: .75rem; color: #999;">三条身份线对应的场景：听风茶馆 · 鉴查院文书房 · 范府庭院</p>
+
+<!-- ── 场景播放截图 ── -->
+<div class="img-placeholder" onclick="this.querySelector('input').click()">
+  <span class="hint">点击上传：Demo 场景播放截图（beat 展示 + 角色对话）</span>
+  <input type="file" accept="image/*" onchange="handleImage(this)">
+</div>
+
+<h4>机制三：四把手电筒——AI 自主判断纵深</h4>
+
+<p contenteditable="true">底部常驻 4 个工具，对应四种不同的纵深：</p>
+
+<table>
+  <tr><th>工具</th><th>含义</th><th>通用能力</th></tr>
+  <tr><td>🔊 侧耳</td><td>听见低语、潜台词、信息差</td><td>听觉纵深</td></tr>
+  <tr><td>💭 追忆</td><td>连接前因、旧事、历史线索</td><td>时间纵深</td></tr>
+  <tr><td>👁 细看</td><td>观察物件、表情、动作异常</td><td>视觉纵深</td></tr>
+  <tr><td>👣 跟随</td><td>跟着某人离开当前视角</td><td>空间纵深</td></tr>
+</table>
+
+<p contenteditable="true">四个工具任何场景都能点。但<strong>它们不是预设好的开关，AI 会基于"当前身份、当前场景、历史选择"判断此刻这个工具能不能看到东西</strong>：</p>
+<ul contenteditable="true">
+  <li><strong>有水下时</strong>：返回一组有节奏的"水下片段"——可能是镜头、角色对话、你的感知或短暂内心，让用户像经历一小段补充戏一样看见纵深</li>
+  <li><strong>没有水下时</strong>：返回 30-50 字的自然空结果——"你侧耳听了听，只有寻常的闲聊声"</li>
+</ul>
+
+<p contenteditable="true"><strong>默认是"没有发现"</strong>。系统在 prompt 层面对 AI 强约束："不要为了显得聪明而硬挖信息"。这个设计是为了保护两件事——<br>1. 让"发现纵深"这件事真正有重量（每次有发现都不是流水账）<br>2. 让小人物的视角真实（不是上帝视角，看不到不该看的东西）</p>
+
+<p contenteditable="true">在呈现上，工具结果不是一段分析文字，而是嵌在当前场景里的短暂补充片段。它不改变主线，也不把用户带到另一个页面；它只是让当前这一幕多浮出一层信息，看完后自然回到原来的叙事节奏。</p>
+
+<!-- ── 工具使用截图 ── -->
+<div class="img-placeholder" onclick="this.querySelector('input').click()">
+  <span class="hint">点击上传：Demo 工具栏 + 水下片段弹出截图</span>
+  <input type="file" accept="image/*" onchange="handleImage(this)">
+</div>
+
+<h4>机制四：水下回响——发现会持续渗透</h4>
+
+<p contenteditable="true">用户用工具发现的内容不会孤立闪现完就消失。它会被记录下来，<strong>在下一幕作为"水下回响"自动渗透回场景</strong>：</p>
+<blockquote contenteditable="true">「方才『侧耳』照见的细节，让此刻多了一层意味：……」</blockquote>
+<p contenteditable="true">这意味着前面的发现会改变后续场景的意味。同一段对话，没解锁过纵深的人和解锁过的人读到的厚度不一样。这是这个产品最贴近"真正的叙事纵深"的机制——不是堆砌孤立的彩蛋，而是让发现累积成对世界的理解。</p>
+
+<h4>机制五：结语生成、分享卡片与旅程回看</h4>
+
+<p contenteditable="true">走完一条身份线后，AI 基于用户经历的所有场景 + 解锁的所有纵深，<strong>为这个用户个性化生成一段结语 + 一句分享文案</strong>：</p>
+<blockquote contenteditable="true">例：「我在范府做杂役，看见少爷眼神变了」</blockquote>
+<p contenteditable="true">每个用户的水下经历都不同，所以每个人的分享文案也不同。结尾页会把这句话组织成一张可传播的分享卡：它不是普通的通关截图，而是把用户身份、关键场景和个人化经历压缩成一个可以被朋友理解的微型故事。</p>
+<p contenteditable="true">分享卡下面还有一次"旅程回看"：系统会把用户这次解锁过的纵深发现整理出来，让用户回看自己这次到底看见了哪些水下。</p>
+<p contenteditable="true">结尾还有一个明确的引导：<strong>"同一个世界，换一个身份，会看到完全不同的水下"</strong>——直接激发重玩。</p>
+
+<!-- ── 结语页截图 ── -->
+<div class="img-placeholder" onclick="this.querySelector('input').click()">
+  <span class="hint">点击上传：Demo 结语 + 分享卡片 + 旅程回看截图</span>
+  <input type="file" accept="image/*" onchange="handleImage(this)">
+</div>
+
+<h3>2.3 主体验流：以茶馆掌柜走过牛栏街刺杀为例</h3>
+
+<p contenteditable="true">下面以"周福生"这条线为例，走查一次完整的主体验。这是 Demo 录屏会展示的那条主线。</p>
+
+<div class="flow" contenteditable="true">入口页（"每部剧都是一座冰山"）
+  ↓
+身份选择（3 张像素风卡片）→ 用户选「周福生 · 京都茶馆掌柜」
+  ↓
+第1幕「清晨开门」
+  · 镜头：天还没亮透，牛栏街上只有几盏灯笼……
+  · 老李（随意）：「福生，今儿水烧得早啊」
+  · 你的感知：你点点头，二十年了，牛栏街的清晨都是这个味道……
+  ↓ （用户暂未使用工具，直接「继续」）
+  ↓
+第2幕「熟客议论」
+  · 户部小吏甲（压低声音）：「范府那位少爷，跟林家郡主的婚事定了」
+  · 你的感知：你端茶续水，脸上挂着笑。这种"压低声音的对话"你听过太多次……
+  ↓ （用户点击「侧耳」→ AI 判断有触发物 → 返回有内容）
+  ↓
+[水下片段] 🔊 侧耳 [鉴查院暗流]
+  · 你借着续水靠近半步，听见"长公主府的人最近在动"……
+  ↓
+第3幕「面生客人」
+  · [水下回响] 方才"侧耳"照见的细节，让此刻多了一层意味……
+  ↓ （用户点击「细看」→ 结合上一幕信息 → 返回有内容）
+  ↓
+[水下片段] 👁 细看 [刺客踩点]
+  · 袖子里那东西的形状太直，不像账本，也不像茶具……
+  ↓
+第4幕「牛栏街刺杀」→ 第5-7幕 → [结语 + 分享卡片 + 旅程回看]</div>
+
+<p contenteditable="true">如果用户切换身份（比如鉴查院文书孙有德），同一个事件会在另一组 7 幕里以<strong>完全不同的视角</strong>展开——刺杀那一刻在茶馆是"街上人来人往突然变成混乱"，在鉴查院文书房是"楼上传来急促脚步声、所有人的脸色都变了"。<strong>这是 Demo 在 3 分钟录屏里要展示的核心证据：同一件事，水下的角度可以完全不同。</strong></p>
+
+<h3>2.4 与现有方案的差异化</h3>
+
+<table>
+  <tr><th>现有方案</th><th>代表</th><th>用户身份</th><th>AI 的角色</th><th>我们的判断</th></tr>
+  <tr><td>分支选择叙事</td><td>Bandersnatch、橙光</td><td>决策者</td><td>路由器</td><td>把观众变成产品经理；打断沉浸</td></tr>
+  <tr><td>AI 角色对话</td><td>Character.AI</td><td>对话发起者</td><td>角色扮演</td><td>角色脱离故事语境</td></tr>
+  <tr><td>用户写 prompt</td><td>Fable Showrunner</td><td>编剧</td><td>内容生成器</td><td>大多数观众不想当编剧</td></tr>
+  <tr><td>站外二创</td><td>豆瓣/小红书/B站</td><td>阅读者</td><td>不参与</td><td>内容静态、不在站内</td></tr>
+</table>
+
+<p contenteditable="true"><strong>《庆余年 · 水下》的位置：</strong>用户身份是居民/观察者，主线由原作锁定，AI 是纵深判断者+实时生成者，内容为 AI 实时个性化生成，落地在腾讯视频站内。这五条同时成立，构成了一个<strong>目前还没有被占据的产品位置</strong>。</p>
+
+<hr>
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- 模块三 -->
+<!-- ═══════════════════════════════════════════ -->
+
+<h2>模块三：AI 原生能力说明</h2>
+
+<p contenteditable="true">这个模块是这份文档里我们最希望评委逐字阅读的部分。AI 在这个产品里不是装饰，不是宣传词，不是在已有产品上叠加的"智能小工具"。<strong>这个产品离开 AI 不可能存在</strong>——下面说明为什么。</p>
+
+<h3>3.1 AI 核心能力</h3>
+
+<h4>能力一：跨域叙事结构理解</h4>
+<p contenteditable="true">AI 需要在每一次工具调用前，整合：庆余年世界观规则、8 个核心角色的性格/动机/关系、用户当前身份及信息权限边界、当前场景全文、之前的场景摘要和纵深发现、此刻选择的工具的语义边界。这是一个<strong>多源叙事上下文的整合任务</strong>。</p>
+
+<h4>能力二：纵深存在性判断（hasDepth 决策）</h4>
+<p contenteditable="true">这是最关键、最非常规的 AI 能力。传统 AI 应用倾向于"无论什么输入都给内容丰富的输出"。我们反过来——<strong>默认不生成内容</strong>。只有同时满足三个条件才允许 hasDepth=true：</p>
+<ol contenteditable="true">
+  <li>当前场景文本中存在<strong>明确的触发物</strong>（不是 AI 凭空想象的）</li>
+  <li>用户选择的工具能<strong>自然触达</strong>这个触发物</li>
+  <li>用户的小人物身份<strong>有权限</strong>看见或听见这个信息</li>
+</ol>
+<p contenteditable="true">这个能力的本质是：<strong>让 AI 学会克制</strong>——不是每次都要生成精彩内容，而是在没有可挖之处时承认没有可挖之处。</p>
+
+<h4>能力三：上下文敏感的纵深生成</h4>
+<p contenteditable="true">当 hasDepth=true 时，AI 生成的是第二人称的具体感官——"你听到……"、"你看到……"、"你想起……"，必须与世界观一致，且必须考虑用户之前的发现。</p>
+
+<h4>能力四：纵深内容的叙事化组织</h4>
+<p contenteditable="true">AI 需要判断哪些信息通过环境出现、哪些通过角色说出口、哪些通过小人物的感知出现、哪些只能点到为止。水下不是资料卡，而是一段用户可以顺着看下去的补充叙事。</p>
+
+<h4>能力五：个性化结语合成</h4>
+<p contenteditable="true">AI 综合所有场景 + 所有纵深，为每个用户量身合成结语和分享文案。分享卡片本身成为可传播的微叙事。</p>
+
+<h3>3.2 这个产品离开 AI 还能成立吗？</h3>
+
+<p contenteditable="true">赛题模板里有一个关键评分项：<strong>"去掉 AI 这个产品还能成立吗？"</strong> 正面回答：</p>
+
+<p contenteditable="true">纵深内容的枚举规模：3 身份 × 7 节点 × 4 工具 = 84 个工具点，每个还依赖用户历史路径——人工撰写量会快速膨胀到不可维护。<strong>但更关键的是：即使写完了，体验依然会失败。</strong></p>
+
+<p contenteditable="true"><strong>第一，失去"自然空结果"。</strong> 预写的"没有发现"是固定字符串，用户用一两次就会识破。AI 实时生成的"具体的没有发现"才让用户相信这是真实运转的世界。</p>
+<p contenteditable="true"><strong>第二，失去历史依赖。</strong> 前面发现的内容应该让后续场景读起来不一样——这种累积的叙事厚度只能由 AI 实时整合历史上下文生成。</p>
+<p contenteditable="true"><strong>第三，失去身份的真实位置。</strong> 不同身份的视角、信息权限、认知边界完全不同，靠人工每个身份都要重写。</p>
+<p contenteditable="true"><strong>第四，失去可扩展性。</strong> 框架可复用到整个 IP 库——如果每部剧都要人工撰写，商业模式不成立。</p>
+
+<blockquote contenteditable="true"><strong>离开 AI，《庆余年 · 水下》不是"会变得更差"，而是"不可能存在"。</strong></blockquote>
+
+<h3>3.3 技术方案</h3>
+
+<h4>系统架构</h4>
+
+<p contenteditable="true">整个产品采用 Next.js + Vercel 的全栈一体化架构：</p>
+
+<!-- ── 架构图 (HTML/CSS) ── -->
+<div class="arch-diagram">
+  <div class="arch-box">
+    <strong>前端组件</strong><br>
+    <span style="font-size:.75rem; color:#666;">React 客户端</span>
+  </div>
+  <div class="arch-arrow">→</div>
+  <div class="arch-box highlight">
+    <strong>Next.js API 路由</strong><br>
+    <span style="font-size:.75rem; color:#666;">/api/tool · /api/epilogue</span>
+  </div>
+  <div class="arch-arrow">→</div>
+  <div class="arch-box">
+    <strong>大模型 API</strong><br>
+    <span style="font-size:.75rem; color:#666;">OpenAI 兼容协议</span>
+  </div>
+</div>
+<div class="arch-sub">
+  <div class="arch-arrow">↓</div>
+  <div style="display: flex; gap: 12px;">
+    <div class="arch-box">Prompt 分层编排</div>
+    <div class="arch-box">JSON 解析 + 容错回退</div>
+  </div>
+</div>
+
+<p contenteditable="true" style="margin-top: 1em;">模型层采用 OpenAI 兼容协议，可在不改业务代码的前提下切换底层模型（当前 MiniMax-M2.7，可切换 DeepSeek、GLM、腾讯混元等）。</p>
+
+<h4>分层 Prompt 架构</h4>
+
+<div class="prompt-layers">
+  <div style="padding: 8px 16px; background: #1b3a5c; color: #fff; font-weight: 600;">System Prompt（六层结构）</div>
+  <div class="prompt-layer system"><span class="label">Layer 1</span> 世界观 brief（固定，约 300 字）</div>
+  <div class="prompt-layer system"><span class="label">Layer 2</span> 核心角色档案（8 个角色：性格 / 动机）</div>
+  <div class="prompt-layer system"><span class="label">Layer 3</span> 用户身份上下文（位置 / 权限 / 认知边界）</div>
+  <div class="prompt-layer system"><span class="label">Layer 4</span> 当前工具的语义边界（4 选 1）</div>
+  <div class="prompt-layer system"><span class="label">Layer 5</span> 输出协议（严格 JSON schema）</div>
+  <div class="prompt-layer system"><span class="label">Layer 6</span> 纵深生成规则（8 条硬约束）</div>
+</div>
+
+<div class="prompt-layers" style="margin-top: 12px;">
+  <div style="padding: 8px 16px; background: #7a6e52; color: #fff; font-weight: 600;">User Prompt（运行时上下文）</div>
+  <div class="prompt-layer user"><span class="label">场景</span> 当前场景完整信息（标题、描述、对话、感知）</div>
+  <div class="prompt-layer user"><span class="label">历史</span> 之前的场景摘要（最近 3 幕）</div>
+  <div class="prompt-layer user"><span class="label">发现</span> 之前的纵深发现（depth history，附标签）</div>
+  <div class="prompt-layer user"><span class="label">工具</span> 用户此刻选择的工具 + 当前场景"自然工具"提示</div>
+</div>
+
+<p contenteditable="true" style="margin-top: 1em;">这种分层让"框架"和"IP 内容"彻底解耦——换一个 IP，只需要替换 Layer 1-3，Layer 4-6 完全复用。</p>
+
+<h4>关键设计约束</h4>
+
+<table>
+  <tr><th>约束</th><th>设计目的</th></tr>
+  <tr><td>默认 hasDepth=false</td><td>防止 AI 硬挖信息，保护"发现"的重量感</td></tr>
+  <tr><td>身份权限边界</td><td>小人物不允许出现上帝视角</td></tr>
+  <tr><td>严格 JSON + 双重解析 fallback</td><td>兼容模型偶发异常输出，确保前端永不崩</td></tr>
+  <tr><td>主线只读</td><td>不允许编造原作不存在的角色或事件</td></tr>
+  <tr><td>工具语义匹配</td><td>"侧耳"不返回视觉信息，"追忆"不返回当下事件</td></tr>
+</table>
+
+<h4>一次实际调用的例子</h4>
+
+<p contenteditable="true"><strong>输入上下文</strong>：用户身份 = 周福生（茶馆掌柜），当前场景 = teahouse_02「熟客议论」，用户操作 = 点击「侧耳」</p>
+
+<p contenteditable="true"><strong>AI 输出（实际返回的 JSON）</strong>：</p>
+
+<div style="background: #f8f6f0; padding: 16px; font-size: .82rem; border: 1px solid #ddd; margin: .8em 0; border-radius: 3px; overflow-x: auto;">
+<pre style="margin:0; white-space: pre-wrap; font-family: 'SF Mono', Menlo, monospace;">{
+  "hasDepth": true,
+  "content": "你借着续水靠近那两个户部小吏，听见他们提到长公主府近日有动静……",
+  "depthTag": "鉴查院暗流",
+  "beats": [
+    { "kind": "narration", "text": "你借着续水绕到那两个户部小吏背后，壶嘴的白气正好遮住你的眼神。" },
+    { "kind": "dialogue", "speaker": "户部小吏甲", "mood": "压低声音",
+      "text": "长公主府的人这几天在动，反而陈萍萍那边一点声响没有，这才更怪。" },
+    { "kind": "perception", "text": "你低头给他们续上水，没敢抬眼。茶馆里这一瞬间安静得不自然。" }
+  ],
+  "innerThoughts": [
+    { "character": "户部小吏甲", "thought": "这话再说下去回头要出事——茶馆里耳朵多。" }
+  ]
+}</pre>
+</div>
+
+<p contenteditable="true">这段纵深会作为当前场景里的短暂补充片段出现，用户看完后回到主线。这条发现被存入 depthHistory，下一幕作为「水下回响」beat 自然出现。前端配 loading 状态："你屏住呼吸，等那点声响浮上来"——把等待时间变成体验的一部分。</p>
+
+<blockquote contenteditable="true"><strong>AI 不创造世界，AI 让观众能多看见这个世界一层。</strong></blockquote>
+
+<hr>
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- 模块四 -->
+<!-- ═══════════════════════════════════════════ -->
+
+<h2>模块四：加分项</h2>
+
+<h3>4.1 落地可行性</h3>
+
+<h4>4.1.1 我们做的不是 Demo，是框架</h4>
+
+<p contenteditable="true">我们从一开始就把"机制层"和"内容层"严格分开——框架负责体验机制，IP 内容包负责具体世界：</p>
+
+<p contenteditable="true"><strong>框架（不依赖任何具体 IP，可直接复用）：</strong>视觉小说式播放引擎、固定主线 + AI 打光的协议、四把手电筒工具的语义体系、AI 调用与输出协议、水下回响的累积机制、结语与分享卡片的合成机制。</p>
+
+<p contenteditable="true"><strong>IP 内容包（每接入一个 IP 替换一次）：</strong>世界观 brief、核心角色档案、用户身份设定、固定主线剧情节点、视觉素材包。</p>
+
+<h4>4.1.2 在腾讯视频内容库里的迁移路径</h4>
+
+<table>
+  <tr><th>IP 类型</th><th>代表作品</th><th>可设计的小人物身份</th><th>水下主题</th></tr>
+  <tr><td>古装权谋</td><td>庆余年、繁花、长相思</td><td>仆役、店家、文书</td><td>朝堂风云的民间回响</td></tr>
+  <tr><td>悬疑</td><td>三体、漫长的季节</td><td>邻居、值班员、地方记者</td><td>案件边缘的琐碎线索</td></tr>
+  <tr><td>都市</td><td>玫瑰的故事、与凤行</td><td>同事、服务员、物业</td><td>人物关系的暗流</td></tr>
+  <tr><td>综艺</td><td>五十公里桃花坞</td><td>后期剪辑、工作人员</td><td>节目素材的另一条叙事线</td></tr>
+  <tr><td>动漫 IP</td><td>斗罗大陆</td><td>学院旁观学生、商队伙计</td><td>大事件的边缘视角</td></tr>
+</table>
+
+<h4>4.1.3 接入腾讯视频站内的具体路径</h4>
+
+<p contenteditable="true"><strong>落点一：剧集播放页底部入口</strong>——剧集每集播完时推送「进入水下」入口。<br>
+<strong>落点二：会员特权点位</strong>——水下作为 VIP 增值特权，非会员能看主线但不能解锁纵深。<br>
+<strong>落点三：IP 专题独立 Tab</strong>——把"水下"作为 IP 聚合 Tab 的核心模块。<br>
+<strong>落点四：分享卡片回流</strong>——分享到微信/朋友圈/小红书后直接回到腾讯视频。</p>
+
+<h4>4.1.4 当前 Demo 是方法论选择，未来空间在哪里</h4>
+
+<p contenteditable="true">当前 Demo 的极简形态（像素风 + 视觉小说 + 公开资料）恰恰是最有说服力的状态——它说明<strong>"小人物视角 + AI 自主判断纵深 + 主线锁定 + 水下回响"这套机制本身就足够支撑产品成立</strong>。资源升级是放大器，不是必要条件。</p>
+
+<table>
+  <tr><th>升级维度</th><th>当前 Demo</th><th>中期</th><th>远期</th></tr>
+  <tr><td>产品形态</td><td>像素风 + 视觉小说</td><td>半实拍 + 局部动画 + 配音</td><td>3D 实时渲染</td></tr>
+  <tr><td>叙事素材</td><td>公开资料</td><td>官方剧本 + 编剧未删减素材</td><td>编剧同步创作"水下文档"</td></tr>
+  <tr><td>角色覆盖</td><td>小人物</td><td>配角自身视角</td><td>用户驱动角色选择</td></tr>
+</table>
+
+<h4>4.1.5 演进路径</h4>
+
+<table>
+  <tr><th>阶段</th><th>内容</th><th>成本</th></tr>
+  <tr><td>阶段一 · 单 IP 单事件试点</td><td>庆余年 · 牛栏街刺杀，3 个身份线（已完成）</td><td>已落地</td></tr>
+  <tr><td>阶段二 · 单 IP 多事件包</td><td>庆余年完整衍生层，覆盖更多关键事件</td><td>内容生产</td></tr>
+  <tr><td>阶段三 · 多 IP 扩展</td><td>横跨多部头部 IP，建立内容包标准</td><td>流水线化</td></tr>
+  <tr><td>阶段四 · 站内深度嵌入</td><td>集成进剧集播放页、会员体系、IP Tab</td><td>产品+工程</td></tr>
+</table>
+
+<h3>4.2 商业化思考</h3>
+
+<h4>4.2.1 商业价值</h4>
+
+<table>
+  <tr><th>商业价值</th><th>落地路径</th><th>价值锚点</th></tr>
+  <tr><td>延长 IP 生命周期</td><td>衍生层让 IP 在剧播完后持续产生消费</td><td>活跃消费窗口从"播出期"延展到"长尾期"</td></tr>
+  <tr><td>拉高用户停留时长</td><td>剧播完后用户继续完成水下体验</td><td>直接增加广告库存与会员价值</td></tr>
+  <tr><td>降低剧荒期会员流失</td><td>剧荒期用户回到喜欢的世界观继续消费</td><td>改善 ARPU 与续费率</td></tr>
+  <tr><td>社交传播带动新用户</td><td>分享卡片成为 IP 出圈载体</td><td>"内容反向引流"获客通道</td></tr>
+  <tr><td>会员特权差异化</td><td>水下作为 VIP 增值能力</td><td>强化付费动机</td></tr>
+</table>
+
+<h4>4.2.2 商业模式</h4>
+<p contenteditable="true">短期：作为腾讯视频会员的增值能力（最低摩擦路径）。中期可演进出：单 IP 永久解锁、特殊身份付费解锁、IP 联动运营（新剧开播同步推出衍生层）、官方授权变现。</p>
+
+<h4>4.2.3 不做的边界</h4>
+<p contenteditable="true"><strong>第一，不消解原作的作者性。</strong> AI 不改写主线、不编造不存在的关键事件、不让"已经死的角色活下来"。<br>
+<strong>第二，不做信息茧房。</strong> 每一次发现基于"当前场景客观存在的触发物"，不是用户口味画像。<br>
+<strong>第三，不替代原作消费。</strong> 水下的价值是<strong>让看过的人看得更深</strong>，不是给没看的人提供"五分钟看懂庆余年"。</p>
+<p contenteditable="true">这三条边界让这个产品始终是 IP 的<strong>放大器</strong>，不是 IP 的<strong>替代品</strong>。</p>
+
+<hr>
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- 结语 -->
+<!-- ═══════════════════════════════════════════ -->
+
+<h2>结语：长视频该被怎样改造</h2>
+
+<p contenteditable="true">赛题问的是 AI 原生时代"看内容"这件事的终极形态。</p>
+
+<p contenteditable="true">我们注意到，这个时代有几种试图回答这个问题的方向。有人想把长视频做得更短、更刺激；有人想把长视频做成游戏；有人想让用户当编剧。每一种都有它的合理性，但每一种都在用别的内容形态替代长视频本身。</p>
+
+<p contenteditable="true">我们的判断是另一个方向。</p>
+
+<p contenteditable="true"><strong>长视频在所有内容形态里真正不可替代的，是叙事的纵深和角色情感的厚度。</strong>这是抖音做不到的，是 Character.AI 做不到的，是任何短视频或交互游戏做不到的。AI 进入长视频，不应该削平这种纵深，让长视频变得更像别的；AI 应该放大这种纵深，让长视频成为它本来就该成为的样子——一个观众可以"住进去"的世界。</p>
+
+<p contenteditable="true">观众想要的从来不是"我来决定接下来发生什么"。观众想要的是"我还想再多看看这个世界，看看那些镜头没拍到的地方"。</p>
+
+<p contenteditable="true">《庆余年 · 水下》是我们对这个问题的回答。</p>
+
+<p contenteditable="true">它不试图改造"看视频"这件事本身。它在剧播完之后开辟了一个新的入口——你看完了水面上的故事，现在可以进来，从一个角落里的小人物的眼睛，看到水面之下那座完整的冰山。</p>
+
+<p style="text-align: center; margin-top: 2em; font-size: 1.1rem; color: #7a6e52;" contenteditable="true">每一部剧都是一座冰山。<br>你看到的，只是水面以上。</p>
+
+<hr>
+<p style="text-align: center; color: #999; font-size: .85rem;" contenteditable="true"><em>文档完，期待评审。</em></p>
+
+</div><!-- .page -->
+
+<script>
+function handleImage(input) {
+  const file = input.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    const container = input.parentElement;
+    // Remove hint
+    const hint = container.querySelector('.hint');
+    if (hint) hint.style.display = 'none';
+    // Check if img exists
+    let img = container.querySelector('img');
+    if (!img) {
+      img = document.createElement('img');
+      container.insertBefore(img, input);
+    }
+    img.src = e.target.result;
+    container.classList.add('has-image');
+  };
+  reader.readAsDataURL(file);
+}
+</script>
+</body>
+</html>

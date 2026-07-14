@@ -1,0 +1,542 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>好东西 · 水下｜复赛视频 02 叙事纵深</title>
+    <style>
+      :root {
+        --bg: #050504;
+        --panel: #11100e;
+        --text: #f7efe3;
+        --muted: rgba(247, 239, 227, 0.62);
+        --gold: #f2bd59;
+        --gold-soft: rgba(242, 189, 89, 0.16);
+        --water: #86c2ca;
+        --line: rgba(242, 189, 89, 0.62);
+        --t: 14s;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        min-height: 100vh;
+        overflow: hidden;
+        background:
+          radial-gradient(circle at 22% 18%, rgba(242, 189, 89, 0.13), transparent 28%),
+          radial-gradient(circle at 70% 78%, rgba(134, 194, 202, 0.11), transparent 34%),
+          #030303;
+        color: var(--text);
+        font-family: "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", system-ui, sans-serif;
+      }
+
+      .wrap {
+        display: grid;
+        min-height: 100vh;
+        place-items: center;
+        padding: 30px;
+      }
+
+      .stage {
+        position: relative;
+        width: min(100vw - 60px, calc((100vh - 60px) * 16 / 9));
+        max-width: 1920px;
+        aspect-ratio: 16 / 9;
+        overflow: hidden;
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        border-radius: 28px;
+        background: #050504;
+        box-shadow: 0 28px 88px rgba(0, 0, 0, 0.58);
+        isolation: isolate;
+      }
+
+      .stage::after {
+        content: "";
+        position: absolute;
+        inset: 0;
+        z-index: 80;
+        pointer-events: none;
+        background:
+          linear-gradient(rgba(255,255,255,.035) 1px, transparent 1px) 0 0 / 100% 3px,
+          radial-gradient(circle at 50% 50%, transparent 58%, rgba(0, 0, 0, .5));
+        opacity: .28;
+        mix-blend-mode: screen;
+      }
+
+      .scene {
+        position: absolute;
+        inset: 0;
+      }
+
+      .bg-grid {
+        position: absolute;
+        inset: 0;
+        background:
+          linear-gradient(90deg, rgba(255,255,255,.035) 1px, transparent 1px) 0 0 / 88px 88px,
+          linear-gradient(rgba(255,255,255,.025) 1px, transparent 1px) 0 0 / 88px 88px;
+        opacity: .22;
+      }
+
+      .header {
+        position: absolute;
+        left: 6.8%;
+        right: 6.8%;
+        top: 7%;
+        z-index: 20;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+      }
+
+      .kicker {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        color: var(--gold);
+        font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+        font-size: 14px;
+        font-weight: 900;
+        letter-spacing: .16em;
+      }
+
+      .kicker::before {
+        content: "";
+        width: 46px;
+        height: 2px;
+        border-radius: 999px;
+        background: var(--gold);
+      }
+
+      .feed {
+        position: absolute;
+        inset: 0;
+        z-index: 4;
+        opacity: .78;
+        animation: feedClear var(--t) cubic-bezier(.2,.8,.2,1) both;
+      }
+
+      .strip {
+        position: absolute;
+        display: grid;
+        gap: 18px;
+        width: 280px;
+        transform: rotate(var(--r));
+      }
+
+      .strip.left {
+        left: 5%;
+        top: 18%;
+        --r: -8deg;
+      }
+
+      .strip.right {
+        right: 8%;
+        top: 16%;
+        --r: 7deg;
+      }
+
+      .short-card {
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        height: 150px;
+        border: 1px solid rgba(255,255,255,.1);
+        border-radius: 22px;
+        background:
+          linear-gradient(135deg, rgba(255,255,255,.11), rgba(255,255,255,.035)),
+          linear-gradient(120deg, rgba(242,189,89,.13), rgba(134,194,202,.07));
+        padding: 24px 28px;
+        box-shadow: 0 22px 58px rgba(0,0,0,.28);
+        overflow: hidden;
+        backdrop-filter: blur(18px);
+      }
+
+      .short-card::before {
+        content: "";
+        position: absolute;
+        left: -24px;
+        top: -28px;
+        width: 150px;
+        height: 150px;
+        background:
+          radial-gradient(circle, rgba(242,189,89,.42), transparent 42%),
+          radial-gradient(circle at 70% 70%, rgba(134,194,202,.18), transparent 45%);
+        filter: blur(4px);
+        opacity: .72;
+      }
+
+      .short-card::after {
+        content: attr(data-index);
+        position: absolute;
+        right: 20px;
+        top: 18px;
+        color: rgba(247,239,227,.22);
+        font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+        font-size: 12px;
+        font-weight: 900;
+        letter-spacing: .16em;
+      }
+
+      .short-card .label {
+        position: relative;
+        z-index: 2;
+        color: rgba(247,239,227,.82);
+        font-size: 24px;
+        font-weight: 950;
+        letter-spacing: 0;
+      }
+
+      .short-card .hint {
+        position: relative;
+        z-index: 2;
+        margin-top: 12px;
+        color: rgba(247,239,227,.34);
+        font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+        font-size: 12px;
+        font-weight: 850;
+        letter-spacing: .12em;
+      }
+
+      .dining-frame {
+        position: absolute;
+        left: 50%;
+        top: 52%;
+        z-index: 8;
+        width: 58%;
+        aspect-ratio: 16 / 9;
+        transform: translate(-50%, -50%) scale(.84);
+        overflow: hidden;
+        border: 1px solid rgba(242, 189, 89, .22);
+        border-radius: 28px;
+        background:
+          linear-gradient(to bottom, rgba(0,0,0,.08), rgba(0,0,0,.42)),
+          url("assets/dining-depth.png") center / cover;
+        box-shadow: 0 34px 100px rgba(0,0,0,.64);
+        animation: frameRise var(--t) cubic-bezier(.2,.8,.2,1) both;
+      }
+
+      .dining-frame::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(90deg, rgba(0,0,0,.58), transparent 38%, rgba(0,0,0,.62));
+      }
+
+      .dining-frame::after {
+        content: "第二次饭桌";
+        position: absolute;
+        left: 28px;
+        top: 24px;
+        border: 1px solid rgba(242, 189, 89, .36);
+        border-radius: 999px;
+        background: rgba(0,0,0,.34);
+        padding: 9px 14px;
+        color: rgba(247, 239, 227, .72);
+        font-size: 14px;
+        font-weight: 900;
+      }
+
+      .surface-copy {
+        position: absolute;
+        left: 50%;
+        top: 31.5%;
+        z-index: 18;
+        width: min(920px, 55%);
+        transform: translateX(-50%);
+        text-align: center;
+        animation: surfaceCopy var(--t) cubic-bezier(.2,.8,.2,1) both;
+      }
+
+      .surface-copy h1,
+      .depth-copy h2 {
+        margin: 0;
+        font-size: clamp(48px, 5.15vw, 92px);
+        font-weight: 950;
+        line-height: 1.04;
+        letter-spacing: 0;
+      }
+
+      .surface-copy p {
+        margin: 24px auto 0;
+        max-width: 760px;
+        color: var(--muted);
+        font-size: clamp(16px, 1.55vw, 26px);
+        font-weight: 800;
+        line-height: 1.5;
+      }
+
+      .water-split {
+        position: absolute;
+        left: 10%;
+        right: 10%;
+        top: 58%;
+        z-index: 30;
+        height: 2px;
+        background: linear-gradient(90deg, transparent, rgba(134,194,202,.9), rgba(242,189,89,.72), transparent);
+        box-shadow: 0 0 28px rgba(134,194,202,.42);
+        transform-origin: center;
+        animation: splitLine var(--t) cubic-bezier(.2,.8,.2,1) both;
+      }
+
+      .water-split::before,
+      .water-split::after {
+        position: absolute;
+        top: -36px;
+        color: rgba(247,239,227,.46);
+        font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+        font-size: 12px;
+        font-weight: 900;
+        letter-spacing: .15em;
+      }
+
+      .water-split::before {
+        content: "SURFACE";
+        left: 0;
+      }
+
+      .water-split::after {
+        content: "UNDERCURRENT";
+        right: 0;
+      }
+
+      .depth-layer {
+        position: absolute;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        z-index: 16;
+        height: 45%;
+        background:
+          radial-gradient(circle at 50% 0, rgba(134,194,202,.2), transparent 48%),
+          linear-gradient(to bottom, rgba(4,25,30,.1), rgba(6,24,27,.8));
+        clip-path: polygon(0 13%, 100% 0, 100% 100%, 0 100%);
+        animation: depthLayer var(--t) ease both;
+      }
+
+      .depth-copy {
+        position: absolute;
+        left: 50%;
+        bottom: 12%;
+        z-index: 36;
+        width: min(1160px, 78%);
+        transform: translateX(-50%);
+        text-align: center;
+        animation: depthCopy var(--t) cubic-bezier(.2,.8,.2,1) both;
+      }
+
+      .depth-copy .small {
+        margin-bottom: 18px;
+        color: var(--gold);
+        font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+        font-size: 14px;
+        font-weight: 900;
+        letter-spacing: .18em;
+      }
+
+      .depth-copy h2 span {
+        color: var(--gold);
+      }
+
+      .meaning-row {
+        display: flex;
+        justify-content: center;
+        gap: 12px;
+        margin-top: 24px;
+      }
+
+      .meaning-row span {
+        border: 1px solid rgba(255,255,255,.1);
+        border-radius: 999px;
+        background: rgba(255,255,255,.06);
+        padding: 9px 15px;
+        color: rgba(247,239,227,.68);
+        font-size: 14px;
+        font-weight: 850;
+      }
+
+      .stage.paused * {
+        animation-play-state: paused !important;
+      }
+
+      body.shot * {
+        animation: none !important;
+      }
+
+      body.shot-split .feed {
+        opacity: .25;
+        transform: scale(.96);
+      }
+
+      body.shot-split .dining-frame {
+        opacity: 1;
+        transform: translate(-50%, -50%) scale(1);
+      }
+
+      body.shot-split .surface-copy,
+      body.shot-split .water-split {
+        opacity: 1;
+      }
+
+      body.shot-split .surface-copy {
+        transform: translateX(-50%);
+      }
+
+      body.shot-split .water-split {
+        transform: none;
+      }
+
+      body.shot-split .depth-layer {
+        opacity: 1;
+      }
+
+      body.shot-split .depth-copy {
+        opacity: 0;
+      }
+
+      body.shot-depth .feed,
+      body.shot-final .feed {
+        opacity: 0;
+      }
+
+      body.shot-depth .dining-frame,
+      body.shot-final .dining-frame {
+        opacity: 1;
+        transform: translate(-50%, -50%) scale(1.02);
+      }
+
+      body.shot-depth .water-split,
+      body.shot-depth .depth-layer,
+      body.shot-depth .depth-copy,
+      body.shot-final .water-split,
+      body.shot-final .depth-layer,
+      body.shot-final .depth-copy {
+        opacity: 1;
+      }
+
+      body.shot-depth .water-split,
+      body.shot-final .water-split {
+        transform: scaleX(1);
+      }
+
+      body.shot-depth .depth-copy,
+      body.shot-final .depth-copy {
+        transform: translateX(-50%);
+      }
+
+      body.shot-depth .surface-copy,
+      body.shot-final .surface-copy {
+        opacity: 0;
+      }
+
+      @keyframes feedClear {
+        0%, 38% { opacity: .9; transform: scale(1); filter: blur(0); }
+        55%, 100% { opacity: 0; transform: scale(.94); filter: blur(10px); }
+      }
+
+      @keyframes frameRise {
+        0%, 22% { opacity: 0; transform: translate(-50%, -48%) scale(.7); filter: blur(12px); }
+        38%, 64% { opacity: 1; transform: translate(-50%, -50%) scale(1); filter: blur(0); }
+        82%, 100% { opacity: 1; transform: translate(-50%, -51%) scale(1.03); filter: blur(0); }
+      }
+
+      @keyframes surfaceCopy {
+        0%, 18% { opacity: 0; transform: translate(-50%, 18px); }
+        28%, 56% { opacity: 1; transform: translate(-50%, 0); }
+        68%, 100% { opacity: 0; transform: translate(-50%, -12px); }
+      }
+
+      @keyframes splitLine {
+        0%, 48% { opacity: 0; transform: scaleX(.2); }
+        62%, 100% { opacity: 1; transform: scaleX(1); }
+      }
+
+      @keyframes depthLayer {
+        0%, 52% { opacity: 0; transform: translateY(22%); }
+        68%, 100% { opacity: 1; transform: translateY(0); }
+      }
+
+      @keyframes depthCopy {
+        0%, 58% { opacity: 0; transform: translate(-50%, 22px); }
+        74%, 100% { opacity: 1; transform: translate(-50%, 0); }
+      }
+
+      @media (max-width: 900px) {
+        .stage {
+          width: 100vw;
+          border-radius: 0;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="wrap">
+      <main class="stage" id="stage" aria-label="复赛视频 02 叙事纵深概念动画">
+        <div class="bg-grid"></div>
+        <div class="header">
+          <div class="kicker">02 CONCEPT / LONG VIDEO DEPTH</div>
+        </div>
+
+        <section class="scene feed">
+          <div class="strip left">
+            <div class="short-card" data-index="FEED 01">
+              <div class="label">短视频</div>
+              <div class="hint">INSTANT CUT</div>
+            </div>
+            <div class="short-card" data-index="FEED 02">
+              <div class="label">快速解说</div>
+              <div class="hint">STORY IN MINUTES</div>
+            </div>
+            <div class="short-card" data-index="FEED 03">
+              <div class="label">热梗切片</div>
+              <div class="hint">MEME MOMENT</div>
+            </div>
+          </div>
+          <div class="strip right">
+            <div class="short-card" data-index="ALT 01">
+              <div class="label">游戏</div>
+              <div class="hint">PLAY AGAIN</div>
+            </div>
+            <div class="short-card" data-index="ALT 02">
+              <div class="label">倍速浏览</div>
+              <div class="hint">SKIP TO POINT</div>
+            </div>
+            <div class="short-card" data-index="ALT 03">
+              <div class="label">评论区</div>
+              <div class="hint">KEEP TALKING</div>
+            </div>
+          </div>
+        </section>
+
+        <section class="scene">
+          <div class="dining-frame"></div>
+          <div class="surface-copy">
+            <h1>长视频最不可替代的<br />是什么？</h1>
+            <p>当正片结束，观众真正想留下来的，是一段关系、一句台词、一个没被说透的停顿。</p>
+          </div>
+          <div class="water-split"></div>
+          <div class="depth-layer"></div>
+          <div class="depth-copy">
+            <div class="small">WHAT LONG VIDEO REALLY OWNS</div>
+            <h2><span>叙事纵深</span> · 内容厚度</h2>
+            <div class="meaning-row">
+              <span>角色没有说出口的部分</span>
+              <span>事件之后仍在扩散的余波</span>
+              <span>用户想把故事读厚的冲动</span>
+            </div>
+          </div>
+        </section>
+      </main>
+    </div>
+
+    <script>
+      const params = new URLSearchParams(window.location.search);
+      const shot = params.get('shot');
+      if (params.get('clean') === '1') document.body.classList.add('clean');
+      if (shot) document.body.classList.add('shot', `shot-${shot}`);
+    </script>
+  </body>
+</html>

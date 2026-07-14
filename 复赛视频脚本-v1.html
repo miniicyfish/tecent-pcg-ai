@@ -1,0 +1,1283 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>好东西 · 水下 — 复赛作品说明文档</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@500;700;900&family=Noto+Sans+SC:wght@300;400;500;700;900&family=JetBrains+Mono:wght@400;600;800&display=swap" rel="stylesheet" />
+    <style>
+      *, *::before, *::after { box-sizing: border-box; }
+      :root {
+        --bg: #050504;
+        --ink: #070807;
+        --panel: #11100e;
+        --card: #171510;
+        --paper: #f5efe5;
+        --paper-2: #c9c0b4;
+        --muted: #948e85;
+        --dim: rgba(245, 239, 229, 0.42);
+        --gold: #efb052;
+        --gold-2: #f2bd59;
+        --gold-soft: rgba(239, 176, 82, 0.18);
+        --water: #73aeb8;
+        --water-2: #8cc7cf;
+        --red: #d78065;
+        --green: #9fd48a;
+        --line: rgba(255, 255, 255, 0.12);
+        --rule: rgba(239, 176, 82, 0.54);
+        --shadow: 0 30px 90px rgba(0, 0, 0, 0.58);
+      }
+
+      html { font-size: 15px; }
+      body {
+        margin: 0;
+        padding-top: 46px;
+        background:
+          radial-gradient(circle at 14% 8%, rgba(215, 128, 101, 0.12), transparent 26%),
+          radial-gradient(circle at 86% 12%, rgba(115, 174, 184, 0.12), transparent 28%),
+          radial-gradient(circle at 52% 94%, rgba(239, 176, 82, 0.08), transparent 32%),
+          #030303;
+        color: var(--paper);
+        font-family: "Noto Sans SC", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+        line-height: 1.72;
+        -webkit-font-smoothing: antialiased;
+        font-feature-settings: "palt";
+      }
+
+      body::before {
+        content: "";
+        position: fixed;
+        inset: 0;
+        z-index: -1;
+        pointer-events: none;
+        background:
+          linear-gradient(rgba(255,255,255,.028) 1px, transparent 1px) 0 0 / 100% 3px,
+          linear-gradient(90deg, rgba(255,255,255,.025) 1px, transparent 1px) 0 0 / 86px 86px,
+          linear-gradient(rgba(255,255,255,.018) 1px, transparent 1px) 0 0 / 86px 86px;
+        opacity: 0.42;
+        mix-blend-mode: screen;
+      }
+
+      .toolbar {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        z-index: 1000;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 18px;
+        min-height: 46px;
+        padding: 8px 22px;
+        border-bottom: 1px solid var(--line);
+        background: rgba(5, 5, 4, 0.88);
+        color: var(--paper-2);
+        box-shadow: 0 8px 34px rgba(0, 0, 0, 0.42);
+        backdrop-filter: blur(18px);
+        font-size: 12px;
+      }
+      .toolbar b {
+        color: var(--gold);
+        font-family: "JetBrains Mono", monospace;
+        letter-spacing: .14em;
+      }
+      .toolbar button {
+        min-height: 30px;
+        border: 1px solid rgba(239, 176, 82, 0.42);
+        border-radius: 999px;
+        background: var(--gold);
+        color: #120d07;
+        padding: 0 16px;
+        font: 800 12px/1 "Noto Sans SC", sans-serif;
+        cursor: pointer;
+        transition: transform .18s ease, background .18s ease;
+      }
+      .toolbar button:hover { transform: translateY(-1px); background: var(--gold-2); }
+
+      .page {
+        position: relative;
+        width: 210mm;
+        min-height: 297mm;
+        margin: 12mm auto;
+        padding: 18mm 19mm 20mm;
+        overflow: hidden;
+        page-break-after: always;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background:
+          radial-gradient(circle at 18% 12%, rgba(239,176,82,.12), transparent 26%),
+          radial-gradient(circle at 82% 76%, rgba(115,174,184,.10), transparent 28%),
+          linear-gradient(180deg, rgba(255,255,255,.035), transparent 28%),
+          var(--panel);
+        box-shadow: var(--shadow);
+      }
+      .page:last-child { page-break-after: auto; }
+      .page::before {
+        content: "HAO DONG XI · UNDERWATER · FINAL ROUND DOCUMENT";
+        position: absolute;
+        top: 8mm;
+        left: 19mm;
+        right: 19mm;
+        padding-bottom: 3mm;
+        border-bottom: 1px solid rgba(239, 176, 82, 0.42);
+        color: rgba(239, 176, 82, 0.70);
+        font-family: "JetBrains Mono", monospace;
+        font-size: 7.5pt;
+        font-weight: 800;
+        letter-spacing: .24em;
+      }
+      .page::after {
+        content: "";
+        position: absolute;
+        inset: 0;
+        z-index: 0;
+        pointer-events: none;
+        background:
+          linear-gradient(rgba(255,255,255,.028) 1px, transparent 1px) 0 0 / 100% 3px,
+          radial-gradient(circle at 50% 42%, transparent 58%, rgba(0,0,0,.38));
+        opacity: .42;
+        mix-blend-mode: screen;
+      }
+      .page > * { position: relative; z-index: 1; }
+      .page.cover { padding: 0; border: none; background: #050504; }
+      .page.cover::before { display: none; }
+      .page.cover::after { opacity: .34; }
+
+      .page-number {
+        position: absolute;
+        left: 0;
+        right: 0;
+        bottom: 10mm;
+        z-index: 2;
+        color: rgba(239, 176, 82, 0.62);
+        font-family: "JetBrains Mono", monospace;
+        font-size: 7.5pt;
+        letter-spacing: .28em;
+        text-align: center;
+      }
+      .page-tag {
+        display: block;
+        margin: 0 0 10mm;
+        color: var(--gold);
+        font-family: "JetBrains Mono", monospace;
+        font-size: 8pt;
+        font-weight: 800;
+        letter-spacing: .22em;
+        text-transform: uppercase;
+      }
+
+      h1, h2, h3, h4 {
+        margin: 0;
+        color: var(--paper);
+        font-family: "Noto Serif SC", serif;
+        line-height: 1.22;
+        letter-spacing: 0;
+      }
+      p { margin: 0 0 3mm; color: var(--paper-2); text-align: justify; text-justify: inter-ideograph; }
+      strong { color: var(--paper); font-weight: 900; }
+      em { color: var(--gold); font-style: normal; }
+      ul, ol { margin: 0 0 4mm; padding-left: 5mm; color: var(--paper-2); }
+      li { margin-bottom: 1.5mm; }
+      li::marker { color: var(--gold); }
+      code {
+        border: 1px solid rgba(239, 176, 82, .22);
+        border-radius: 4px;
+        background: rgba(239, 176, 82, .10);
+        color: var(--gold);
+        padding: 0 4px;
+        font-family: "JetBrains Mono", monospace;
+        font-size: .9em;
+      }
+
+      .cover-bg {
+        position: absolute;
+        inset: 0;
+        background:
+          linear-gradient(90deg, rgba(3,3,3,.92), rgba(3,3,3,.42) 45%, rgba(3,3,3,.90)),
+          linear-gradient(to bottom, rgba(0,0,0,.10), rgba(0,0,0,.72) 58%, #050504 100%),
+          url("haodongxi/app/public/haodongxi/scenes/tiemei-dining-table.png") center / cover;
+        filter: saturate(.92) brightness(.82);
+      }
+      .cover-frame {
+        position: absolute;
+        inset: 18mm;
+        border: 1px solid rgba(239, 176, 82, 0.24);
+        border-radius: 28px;
+      }
+      .cover-frame::before,
+      .cover-frame::after {
+        content: "";
+        position: absolute;
+        height: 2px;
+        border-radius: 999px;
+        background: linear-gradient(90deg, transparent, var(--gold), transparent);
+        opacity: .72;
+      }
+      .cover-frame::before { left: 9%; right: 48%; top: 26%; }
+      .cover-frame::after { left: 46%; right: 8%; bottom: 22%; background: linear-gradient(90deg, transparent, var(--water), transparent); }
+      .cover-content {
+        position: relative;
+        z-index: 2;
+        display: flex;
+        flex-direction: column;
+        min-height: 297mm;
+        padding: 23mm 22mm 18mm;
+      }
+      .cover-kicker {
+        display: inline-flex;
+        align-items: center;
+        gap: 12px;
+        align-self: flex-start;
+        color: var(--gold);
+        font-family: "JetBrains Mono", monospace;
+        font-size: 8pt;
+        font-weight: 900;
+        letter-spacing: .22em;
+      }
+      .cover-kicker::before {
+        content: "";
+        width: 42px;
+        height: 2px;
+        border-radius: 999px;
+        background: var(--gold);
+      }
+      .cover-title {
+        margin-top: auto;
+        max-width: 138mm;
+        font-size: 54pt;
+        font-weight: 900;
+        line-height: .98;
+      }
+      .cover-title span { color: var(--gold); }
+      .cover-subtitle {
+        margin-top: 7mm;
+        max-width: 122mm;
+        color: rgba(245,239,229,.78);
+        font-size: 15pt;
+        font-weight: 900;
+        line-height: 1.55;
+      }
+      .cover-quote {
+        margin-top: 13mm;
+        padding-left: 6mm;
+        border-left: 3px solid var(--gold);
+        color: var(--paper);
+        font-family: "Noto Serif SC", serif;
+        font-size: 18pt;
+        line-height: 1.75;
+      }
+      .cover-quote span {
+        display: block;
+        color: var(--gold);
+      }
+      .cover-meta {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 5mm;
+        margin-top: auto;
+        padding-top: 8mm;
+        border-top: 1px solid rgba(239, 176, 82, 0.34);
+      }
+      .cover-meta dt {
+        margin-bottom: 1mm;
+        color: rgba(239, 176, 82, .76);
+        font-family: "JetBrains Mono", monospace;
+        font-size: 7pt;
+        font-weight: 800;
+        letter-spacing: .16em;
+      }
+      .cover-meta dd {
+        margin: 0;
+        color: var(--paper);
+        font-size: 9pt;
+        font-weight: 800;
+        line-height: 1.5;
+      }
+
+      .module-head {
+        display: grid;
+        grid-template-columns: 24mm 1fr auto;
+        gap: 6mm;
+        align-items: start;
+        margin-bottom: 7mm;
+        padding-top: 3mm;
+      }
+      .module-head .num {
+        color: var(--gold);
+        font-family: "JetBrains Mono", monospace;
+        font-size: 33pt;
+        font-weight: 800;
+        line-height: 1;
+      }
+      .module-head .kicker {
+        margin-bottom: 2mm;
+        color: var(--water-2);
+        font-family: "JetBrains Mono", monospace;
+        font-size: 7.5pt;
+        font-weight: 800;
+        letter-spacing: .18em;
+      }
+      .module-head h2 { font-size: 22pt; font-weight: 900; }
+      .timecode {
+        border: 1px solid rgba(239,176,82,.40);
+        border-radius: 999px;
+        background: rgba(239,176,82,.10);
+        color: var(--gold);
+        padding: 2mm 4mm;
+        font-family: "JetBrains Mono", monospace;
+        font-size: 8pt;
+        font-weight: 800;
+        letter-spacing: .12em;
+        white-space: nowrap;
+      }
+
+      h3 {
+        margin: 7mm 0 3mm;
+        padding-left: 4mm;
+        border-left: 2px solid var(--gold);
+        font-size: 13pt;
+        font-weight: 900;
+      }
+      h4 {
+        margin: 5mm 0 2mm;
+        color: var(--gold);
+        font-size: 10.5pt;
+        font-weight: 800;
+      }
+
+      .lede {
+        margin: 0 0 6mm;
+        padding: 4mm 5mm;
+        border: 1px solid rgba(255,255,255,.12);
+        border-left: 3px solid var(--gold);
+        border-radius: 8px;
+        background:
+          linear-gradient(135deg, rgba(239,176,82,.10), rgba(115,174,184,.06)),
+          rgba(255,255,255,.035);
+        color: rgba(245,239,229,.88);
+        font-family: "Noto Serif SC", serif;
+        font-size: 12pt;
+        line-height: 1.78;
+      }
+      .summary-box,
+      .callout {
+        margin: 5mm 0;
+        padding: 5mm 6mm;
+        border: 1px solid rgba(255,255,255,.12);
+        border-radius: 8px;
+        background:
+          linear-gradient(180deg, rgba(255,255,255,.045), transparent),
+          rgba(17,16,14,.90);
+        box-shadow: 0 18px 52px rgba(0,0,0,.30);
+      }
+      .summary-box {
+        border-color: rgba(239,176,82,.32);
+        background:
+          linear-gradient(135deg, rgba(239,176,82,.16), rgba(115,174,184,.07)),
+          #0d0c0a;
+      }
+      .summary-box::before,
+      .callout .ti {
+        display: block;
+        margin-bottom: 3mm;
+        color: var(--gold);
+        font-family: "JetBrains Mono", monospace;
+        font-size: 7.5pt;
+        font-weight: 900;
+        letter-spacing: .22em;
+      }
+      .summary-box::before { content: "30 SECOND READ"; }
+      .callout.dark {
+        border-color: rgba(239,176,82,.28);
+        background:
+          radial-gradient(circle at 20% 18%, rgba(239,176,82,.12), transparent 34%),
+          #070807;
+      }
+      .callout .ti { margin-bottom: 2mm; }
+      .callout p:last-child,
+      .summary-box p:last-child { margin-bottom: 0; }
+
+      table {
+        width: 100%;
+        margin: 3mm 0 5mm;
+        border-collapse: separate;
+        border-spacing: 0;
+        overflow: hidden;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: rgba(255,255,255,.035);
+        font-size: 8.8pt;
+      }
+      th, td {
+        padding: 2.8mm 3.2mm;
+        border-bottom: 1px solid rgba(255,255,255,.09);
+        border-right: 1px solid rgba(255,255,255,.08);
+        color: var(--paper-2);
+        text-align: left;
+        vertical-align: top;
+        line-height: 1.58;
+      }
+      th:last-child, td:last-child { border-right: none; }
+      tr:last-child td { border-bottom: none; }
+      thead th {
+        background: rgba(239,176,82,.14);
+        color: var(--gold);
+        font-family: "JetBrains Mono", monospace;
+        font-size: 7.5pt;
+        font-weight: 900;
+        letter-spacing: .12em;
+      }
+      tbody tr:nth-child(even) td { background: rgba(255,255,255,.018); }
+
+      .grid-2, .grid-3 {
+        display: grid;
+        gap: 4mm;
+        margin: 4mm 0;
+      }
+      .grid-2 { grid-template-columns: repeat(2, 1fr); }
+      .grid-3 { grid-template-columns: repeat(3, 1fr); }
+      .metric-card,
+      .tool-card,
+      .pipeline-card {
+        min-height: 34mm;
+        padding: 4mm;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background:
+          linear-gradient(180deg, rgba(255,255,255,.045), transparent),
+          rgba(255,255,255,.028);
+      }
+      .metric-card .label,
+      .tool-card .label,
+      .pipeline-card .label {
+        display: block;
+        margin-bottom: 2mm;
+        color: var(--gold);
+        font-family: "JetBrains Mono", monospace;
+        font-size: 7.2pt;
+        font-weight: 900;
+        letter-spacing: .18em;
+      }
+      .metric-card h4,
+      .tool-card h4,
+      .pipeline-card h4 {
+        margin: 0 0 2mm;
+        color: var(--paper);
+        font-size: 11pt;
+      }
+      .metric-card p,
+      .tool-card p,
+      .pipeline-card p {
+        margin: 0;
+        font-size: 8.8pt;
+        line-height: 1.62;
+      }
+
+      .flow {
+        display: grid;
+        gap: 2.2mm;
+        margin: 4mm 0;
+      }
+      .flow .step {
+        display: grid;
+        grid-template-columns: 28mm 1fr;
+        gap: 4mm;
+        align-items: start;
+        padding: 3mm 4mm;
+        border: 1px solid rgba(255,255,255,.10);
+        border-radius: 8px;
+        background: rgba(255,255,255,.030);
+      }
+      .flow .stepno {
+        color: var(--gold);
+        font-family: "JetBrains Mono", monospace;
+        font-size: 7.4pt;
+        font-weight: 900;
+        letter-spacing: .14em;
+      }
+      .flow .stepbody {
+        color: var(--paper-2);
+        font-size: 9pt;
+        line-height: 1.6;
+      }
+
+      .code-block {
+        margin: 4mm 0;
+        padding: 4mm 5mm;
+        overflow: hidden;
+        border: 1px solid rgba(115,174,184,.28);
+        border-radius: 8px;
+        background: #070807;
+        color: rgba(245,239,229,.80);
+        font-family: "JetBrains Mono", monospace;
+        font-size: 7.8pt;
+        line-height: 1.65;
+        white-space: pre-wrap;
+      }
+
+      .screen {
+        position: relative;
+        min-height: 74mm;
+        margin: 5mm 0;
+        overflow: hidden;
+        border: 1px solid rgba(255,255,255,.11);
+        border-radius: 16px;
+        background:
+          linear-gradient(90deg, rgba(0,0,0,.60), rgba(0,0,0,.16) 46%, rgba(0,0,0,.72)),
+          url("haodongxi/app/public/haodongxi/scenes/dining/dining_04_xiaoye.png") center / cover;
+        box-shadow: 0 24px 70px rgba(0,0,0,.38);
+      }
+      .screen::after {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background:
+          linear-gradient(rgba(255,255,255,.04) 1px, transparent 1px) 0 0 / 100% 3px,
+          radial-gradient(circle at 50% 50%, transparent 52%, rgba(0,0,0,.50));
+        pointer-events: none;
+        mix-blend-mode: screen;
+        opacity: .38;
+      }
+      .screen-copy {
+        position: absolute;
+        left: 7mm;
+        bottom: 7mm;
+        z-index: 2;
+        max-width: 92mm;
+      }
+      .screen-copy .badge {
+        display: inline-flex;
+        margin-bottom: 3mm;
+        border: 1px solid rgba(239,176,82,.42);
+        border-radius: 999px;
+        background: rgba(0,0,0,.42);
+        color: var(--gold);
+        padding: 1.5mm 3mm;
+        font-family: "JetBrains Mono", monospace;
+        font-size: 7pt;
+        font-weight: 900;
+        letter-spacing: .16em;
+      }
+      .screen-copy h3 {
+        margin: 0;
+        padding: 0;
+        border: none;
+        font-size: 20pt;
+      }
+      .screen-copy p {
+        margin-top: 2mm;
+        color: rgba(245,239,229,.78);
+        font-weight: 700;
+      }
+
+      .quote {
+        margin: 4mm 0;
+        padding: 4mm 6mm;
+        border-left: 3px solid var(--gold);
+        color: var(--paper);
+        font-family: "Noto Serif SC", serif;
+        font-size: 13pt;
+        line-height: 1.75;
+      }
+
+      .end-mark {
+        margin-top: 12mm;
+        color: var(--gold);
+        font-family: "Noto Serif SC", serif;
+        font-size: 18pt;
+        letter-spacing: .75em;
+        text-align: center;
+      }
+      .colophon {
+        margin-top: 7mm;
+        color: rgba(239,176,82,.58);
+        font-family: "JetBrains Mono", monospace;
+        font-size: 7.5pt;
+        letter-spacing: .22em;
+        text-align: center;
+      }
+
+      @page { size: A4; margin: 0; }
+      @media print {
+        body { padding-top: 0; background: white; }
+        body::before, .toolbar { display: none !important; }
+        .page { margin: 0; border-radius: 0; box-shadow: none; page-break-after: always; }
+        .page:last-child { page-break-after: auto; }
+        * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="toolbar">
+      <div><b>好东西 · 水下</b> 复赛作品说明文档 · v1 · 删除迁移说明版</div>
+      <button onclick="window.print()">打印 / 导出 PDF</button>
+    </div>
+
+    <section class="page cover" data-no-header>
+      <div class="cover-bg"></div>
+      <div class="cover-frame"></div>
+      <div class="cover-content">
+        <div class="cover-kicker">PCG · AI · FINAL ROUND · 2026</div>
+
+        <h1 class="cover-title">好东西<span> · 水下</span></h1>
+        <div class="cover-subtitle">UNDERWATER — A HAO DONG XI AI EXPERIENCE</div>
+
+        <div class="cover-quote">
+          正片讲完故事，
+          <span>水下让用户继续住在故事里。</span>
+        </div>
+
+        <dl class="cover-meta">
+          <div>
+            <dt>TITLE</dt>
+            <dd>好东西 · 水下</dd>
+          </div>
+          <div>
+            <dt>TRACK</dt>
+            <dd>命题赛道 · 赛题 1<br />用 AI 玩转出圈交互叙事</dd>
+          </div>
+          <div>
+            <dt>FORMAT</dt>
+            <dd>腾讯视频长视频 IP 的<br />AI 衍生交互层</dd>
+          </div>
+          <div>
+            <dt>AUTHOR</dt>
+            <dd>李映熠</dd>
+          </div>
+          <div>
+            <dt>DEMO</dt>
+            <dd>tencent-pcg-ai.vercel.app</dd>
+          </div>
+          <div>
+            <dt>DATE</dt>
+            <dd>2026 / 05</dd>
+          </div>
+        </dl>
+      </div>
+    </section>
+
+    <section class="page">
+      <span class="page-tag">Contents · Summary</span>
+      <div class="module-head">
+        <div class="num">00</div>
+        <div>
+          <div class="kicker">ONE JUDGEMENT / SECOND-LAYER WORLD</div>
+          <h2>目录与 30 秒摘要</h2>
+        </div>
+        <div class="timecode">P.02</div>
+      </div>
+
+      <div class="summary-box">
+        <p>剧播完后，用户的延展兴趣（搜解析、补考据、找名场面、对照角色心思）几乎全部<strong>流向站外</strong>。腾讯视频承担核心内容投入且拥有官方资源，却缺少一个<strong>承接剧后内容消费的站内产品形态</strong>。</p>
+        <p><strong>《好东西 · 水下》补的就是这一层</strong>：当用户想更深入理解一部剧、想知道同一个饭桌上每个人当下在想什么时，可以<strong>在腾讯视频内</strong>继续走进这个故事。主线剧情不被改写，但观看视角可以改变。</p>
+        <p>它不是聊天工具，也不是互动小说，而是一套<strong>可复用的长视频衍生 AI 交互框架</strong>：AI 基于官方资源与当前语境判断“此刻能否看见更深一层”，为每次探索生成不可预写、但仍然还原且深刻的内容。</p>
+      </div>
+
+      <h3>章节构成</h3>
+      <table>
+        <thead>
+          <tr><th>章</th><th>名称</th><th>核心问题</th><th>页</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>00</td><td>一个判断</td><td>长视频不可替代的是叙事纵深，水下让纵深可被进入</td><td>P.03</td></tr>
+          <tr><td>01</td><td>用户洞察与问题定义</td><td>剧后消费为什么会从腾讯视频流向站外</td><td>P.04</td></tr>
+          <tr><td>02</td><td>产品方案设计</td><td>主线不改写，用户只换一个位置看剧情</td><td>P.06</td></tr>
+          <tr><td>03</td><td>AI 原生能力说明</td><td>AI 为什么是体验内核，而不是装饰</td><td>P.09</td></tr>
+          <tr><td>04</td><td>落地与商业化</td><td>如何从单场景 demo 变成腾讯视频可运营能力</td><td>P.12</td></tr>
+          <tr><td>END</td><td>第二层世界</td><td>正片讲完故事，水下让用户继续住在故事里</td><td>P.14</td></tr>
+        </tbody>
+      </table>
+
+      <div class="screen">
+        <div class="screen-copy">
+          <span class="badge">播放结束 · 官方剧后体验</span>
+          <h3>同一帧画面，换一个人看会变厚。</h3>
+          <p>不是我们替你改剧情，是你替自己换位置。</p>
+        </div>
+      </div>
+
+      <div class="page-number">— 02 —</div>
+    </section>
+
+    <section class="page">
+      <span class="page-tag">00 · One Judgement</span>
+      <div class="module-head">
+        <div class="num">00</div>
+        <div>
+          <div class="kicker">NARRATIVE DEPTH / PRODUCT THESIS</div>
+          <h2>一个判断</h2>
+        </div>
+        <div class="timecode">P.03</div>
+      </div>
+
+      <p class="lede">赛题问的是：AI 原生时代“看内容”这件事的终极形态。我们的判断是——AI 给长视频带来的不是“更多自由度”，而是“更多纵深”。</p>
+
+      <p>每一场戏都是一张桌子。观众看到的是桌面以上：剧本写好的台词、镜头拍下的画面、剪辑保留的镜头。桌面之下还有一整层：每个人此刻没说出口的话、心里正在算的账、上一次同样的话被谁讲过、桌下偷偷握起又松开的手。</p>
+
+      <div class="quote">AI 不改变一部剧讲了什么。AI 让观众有能力往水下看。</div>
+
+      <p>基于这个判断，我们做了《好东西 · 水下》：一个<strong>腾讯视频长视频 IP 的 AI 衍生交互层</strong>。看完一集后，用户可以用片中任意一个角色的位置“再活”一遍那场饭桌。固定的是世界，主线由原作锁定；自由的是眼睛，用户选择从谁的位置看。</p>
+
+      <h3>核心准则</h3>
+      <div class="grid-2">
+        <div class="metric-card">
+          <span class="label">RULE 01</span>
+          <h4>同一帧画面，换一个人看会变厚</h4>
+          <p>视角不是装饰性人物卡，而是信息权限。小叶能看见自己的勇气，铁梅能看见自己的克制，茉莉能看见大人没有说出口的东西。</p>
+        </div>
+        <div class="metric-card">
+          <span class="label">RULE 02</span>
+          <h4>不是改剧情，是换位置</h4>
+          <p>用户不能决定谁泼水、谁离开、谁说台词。交互只发生在“往哪里看得更深”，不发生在“接下来发生什么”。</p>
+        </div>
+      </div>
+
+      <div class="callout dark">
+        <div class="ti">产品边界</div>
+        <p>它不是宣传语，而是严格的产品边界：主线只读、视角有权限、AI 默认克制。这个边界决定了它和互动影游、AI 角色聊天、用户写 prompt 生成新剧情的根本不同。</p>
+      </div>
+
+      <div class="page-number">— 03 —</div>
+    </section>
+
+    <section class="page">
+      <span class="page-tag">01 · User Insight</span>
+      <div class="module-head">
+        <div class="num">01</div>
+        <div>
+          <div class="kicker">USER VALUE / PLATFORM GAP</div>
+          <h2>用户洞察与问题定义</h2>
+        </div>
+        <div class="timecode">P.04</div>
+      </div>
+
+      <p class="lede">《好东西 · 水下》解决的不是“让视频更好玩”这一层表面问题，而是长视频剧后消费被站外平台承接走的结构性缺口。</p>
+
+      <h3>目标用户</h3>
+      <table>
+        <thead>
+          <tr><th>用户类型</th><th>典型行为</th><th>当前缺口</th><th>产品机会</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><strong>分享型年轻观众</strong></td><td>追剧时发截图、金句、人物 cut</td><td>分享素材多来自站外，腾讯视频只承担播放入口</td><td>用个性化结语和分享卡，把“我从谁的位置看到的”变成可传播微叙事</td></tr>
+          <tr><td><strong>深度 IP 粉丝</strong></td><td>看解析、补设定、复看名场面</td><td>深度消费发生在豆瓣、B 站、小红书等站外社区</td><td>用 AI 生成镜头之外的纵深，让站内承接“看懂更多”的需求</td></tr>
+          <tr><td><strong>剧荒回访用户</strong></td><td>回到喜欢的老 IP 重刷片段或搜二创</td><td>回访路径零散，缺少新的官方体验入口</td><td>用多视角和关键场，让老 IP 在剧荒期仍有新的消费理由</td></tr>
+        </tbody>
+      </table>
+
+      <h3>排除三个错误方向</h3>
+      <div class="grid-3">
+        <div class="metric-card">
+          <span class="label">NOT 01</span>
+          <h4>分支选择叙事</h4>
+          <p>把看剧变成做题。频繁选择会把用户从观看者变成路径判断者。</p>
+        </div>
+        <div class="metric-card">
+          <span class="label">NOT 02</span>
+          <h4>让用户写 prompt</h4>
+          <p>大多数观众不想当编剧。写 prompt 是创作，不是消费。</p>
+        </div>
+        <div class="metric-card">
+          <span class="label">NOT 03</span>
+          <h4>把长视频变成别的形态</h4>
+          <p>解说、游戏化、开放世界都在替代长视频本身，而不是放大长视频。</p>
+        </div>
+      </div>
+
+      <h3>三个使用场景</h3>
+      <div class="flow">
+        <div class="step"><div class="stepno">SCENE 01</div><div class="stepbody"><strong>意犹未尽</strong>：用户刚看完《好东西》第二次饭桌，播放页底部出现“进入好东西 · 水下”。原本属于豆瓣/小红书的剧后消费，留在腾讯视频。</div></div>
+        <div class="step"><div class="stepno">SCENE 02</div><div class="stepbody"><strong>剧荒回访</strong>：用户没新剧追，但想起来水下里还没玩过茉莉视角的那场戏。衍生层让 IP 在剧荒期依然能产生消费。</div></div>
+        <div class="step"><div class="stepno">SCENE 03</div><div class="stepbody"><strong>反向激活</strong>：朋友圈出现分享卡“我是铁梅，那一桌饭我没说话，但我看见了小叶为什么泼那杯水”。分享卡把站外讨论反向带回腾讯视频。</div></div>
+      </div>
+
+      <div class="page-number">— 04 —</div>
+    </section>
+
+    <section class="page">
+      <span class="page-tag">01 · Problem Definition</span>
+      <div class="module-head">
+        <div class="num">01</div>
+        <div>
+          <div class="kicker">DOUBLE-SIDED PAIN POINT</div>
+          <h2>同一件事的两面</h2>
+        </div>
+        <div class="timecode">P.05</div>
+      </div>
+
+      <div class="grid-2">
+        <div class="metric-card">
+          <span class="label">USER SIDE</span>
+          <h4>用户侧：剧播完，关系结束</h4>
+          <p>一部真正打动人的剧会在观众脑子里继续运转：继续猜想、回味、怀念、想要二刷。但当下产品形态是剧播完，App 关掉，关系结束。</p>
+        </div>
+        <div class="metric-card">
+          <span class="label">PLATFORM SIDE</span>
+          <h4>平台侧：长尾资产沉淀在别处</h4>
+          <p>剧播完后，讨论热度、二创流量、剧粉社区、考据生态，这些围绕 IP 的社交资产往往沉淀在豆瓣、小红书、微博和 B 站。</p>
+        </div>
+      </div>
+
+      <h3>核心洞察</h3>
+      <table>
+        <thead>
+          <tr><th>洞察</th><th>用户现象</th><th>产品机会</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><strong>看完不等于消费结束</strong></td><td>用户看完正片继续搜解析、看二创、补设定</td><td>剧后消费应该被腾讯视频站内承接</td></tr>
+          <tr><td><strong>用户想探索，不想改写</strong></td><td>观众想“再多看看这场戏”，不是决定剧情走向</td><td>交互应从改写剧情转向探索纵深</td></tr>
+          <tr><td><strong>IP 长尾正在外溢</strong></td><td>讨论、二创、复看主要沉淀在站外平台</td><td>腾讯视频需要官方、个性化、可分享的 IP 衍生层</td></tr>
+        </tbody>
+      </table>
+
+      <div class="callout dark">
+        <div class="ti">立论</div>
+        <p><strong>《好东西 · 水下》就是为这一块缺失而设计的。</strong>它把剧后消费从“去站外寻找解释和余韵”，改成“在腾讯视频里继续走进这个故事”。</p>
+      </div>
+
+      <div class="page-number">— 05 —</div>
+    </section>
+
+    <section class="page">
+      <span class="page-tag">02 · Product Design</span>
+      <div class="module-head">
+        <div class="num">02</div>
+        <div>
+          <div class="kicker">PRODUCT MECHANISM / VIEWPOINT FIRST</div>
+          <h2>产品方案设计</h2>
+        </div>
+        <div class="timecode">P.06</div>
+      </div>
+
+      <p class="lede">《好东西 · 水下》可以理解为腾讯视频正片之后的官方剧后体验入口。用户看完剧、还想继续理解人物和事件时，不需要跳去站外搜解析，而是直接进入一个由原作场景搭建的互动空间。</p>
+
+      <h3>产品边界</h3>
+      <table>
+        <thead>
+          <tr><th>边界</th><th>含义</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><strong>主线固定</strong></td><td>谁泼了那杯水、铁梅最后说了什么，由原作决定，用户不能改写。</td></tr>
+          <tr><td><strong>体验像看剧，不像做题</strong></td><td>大多数时候系统自动播放剧情，用户只在“这里还能不能看深一点”时主动使用 AI 交互。</td></tr>
+          <tr><td><strong>选择改变视角</strong></td><td>用户选择的不是“接下来发生什么”，而是“我站在谁的位置看这件事”。</td></tr>
+        </tbody>
+      </table>
+
+      <h3>机制一 · 同桌视角选择</h3>
+      <table>
+        <thead>
+          <tr><th>视角</th><th>在桌上的位置</th><th>这一桌饭意味着什么</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>小叶</td><td>小马的女朋友、铁梅的好朋友</td><td>替朋友抱不平的勇气、对“恋爱脑”标签的反抗</td></tr>
+          <tr><td>王铁梅</td><td>这一桌饭的主人</td><td>维持桌面平衡的克制、对小叶选择的复杂情绪</td></tr>
+          <tr><td>茉莉</td><td>铁梅的女儿</td><td>被大人忽略但什么都看见的眼睛</td></tr>
+          <tr><td>小马</td><td>前男友</td><td>自我合理化、被动应付、试图维持体面</td></tr>
+          <tr><td>前夫</td><td>旁观局外人</td><td>嘲讽混杂着尴尬，看得见但不参与</td></tr>
+        </tbody>
+      </table>
+
+      <h3>机制二 · 视觉小说式主线播放</h3>
+      <div class="code-block">[镜头 / 旁白]  ->  [角色对话 x N]  ->  [你的感知]  ->  (可选) [水下回响]</div>
+      <p>关键设计：当用户在某一帧停下来想看深一点时，AI 调用以“这一帧的当前 beat 文本”为锚，不是整段大模糊。这样水下内容始终贴着具体台词、动作或物件生长。</p>
+
+      <div class="page-number">— 06 —</div>
+    </section>
+
+    <section class="page">
+      <span class="page-tag">02 · Product Mechanisms</span>
+      <div class="module-head">
+        <div class="num">02</div>
+        <div>
+          <div class="kicker">TOOLS / ECHO / PERSONAL ENDING</div>
+          <h2>三工具与水下回响</h2>
+        </div>
+        <div class="timecode">P.07</div>
+      </div>
+
+      <h3>机制三 · 三个工具：AI 自主判断纵深</h3>
+      <div class="grid-3">
+        <div class="tool-card">
+          <span class="label">OBSERVE</span>
+          <h4>观察</h4>
+          <p>视觉纵深。看见物件、表情、动作里的信号：桌上那杯水、对面那个人此刻的眼睛、谁在偷偷看谁。</p>
+        </div>
+        <div class="tool-card">
+          <span class="label">MEMORY</span>
+          <h4>回忆</h4>
+          <p>时间纵深。这一刻让“我”想起了什么：同样的话、同样的场面、上一次发生的时候我做了什么。</p>
+        </div>
+        <div class="tool-card">
+          <span class="label">ARCHIVE</span>
+          <h4>翻看</h4>
+          <p>知识纵深。翻看世界里的资料、记录、过往。在《好东西》的语境里更克制，多用于跨集呼应。</p>
+        </div>
+      </div>
+
+      <div class="callout dark">
+        <div class="ti">关键设计：默认是“没有发现”</div>
+        <p>同一个工具在不同视角、不同帧上可能有发现，也可能什么都没有。我们刻意让“没有发现”成为正常结果。这样每一次真的看见水下，才会有分量；同时也能守住每个视角的可信边界，避免 AI 把用户变成上帝视角。</p>
+      </div>
+
+      <h3>机制四 · 水下回响</h3>
+      <p>用户前面发现的内容不会看完就消失。系统记录到 <code>depthHistory</code>，并在下一帧 / 下一幕以“水下回响”的方式回到主线里。</p>
+      <p>例如小叶视角第五幕，AI 把前一次回忆中她下的决定“下次再被这样讲，我要替自己说话”作为水下回响，回到这一帧“我很不喜欢这个词”的旁边。同一句话被读出了重量。</p>
+
+      <h3>机制五 · 结语生成与分享卡片</h3>
+      <p>一条视角线结束后，系统根据用户走过的所有 beat 和所有水下，生成一段个人结语、一张分享卡片和一组旅程回看。用户带走的不是通用成就页，而是“我从谁的位置看了那一桌饭”。</p>
+
+      <div class="page-number">— 07 —</div>
+    </section>
+
+    <section class="page">
+      <span class="page-tag">02 · Demo Flow</span>
+      <div class="module-head">
+        <div class="num">02</div>
+        <div>
+          <div class="kicker">REAL DEMO / SIX TOOL CALLS</div>
+          <h2>一条实际玩法</h2>
+        </div>
+        <div class="timecode">P.08</div>
+      </div>
+
+      <p class="lede">跟着小叶看完那一桌饭，再换铁梅看一遍。完整流程包含 6 次工具调用、1 次视角硬切、3 次水下回响。</p>
+
+      <h3>小叶视角</h3>
+      <table>
+        <thead>
+          <tr><th>节点</th><th>工具</th><th>锚点</th><th>水下输出</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>第四幕 · 泼水之后</td><td>观察</td><td>“铁梅你看。”</td><td>小叶不是泼给小马的，是泼给铁梅看的。她在用这一下提醒铁梅：你也可以不让。</td></tr>
+          <tr><td>第五幕 · “恋爱脑”</td><td>回忆</td><td>“我很不喜欢这个词。”</td><td>上一次有人这样讲她，她没顶嘴。她下了决定：下次再被这样讲，我要替自己说话。</td></tr>
+          <tr><td>第五幕 · 反命名</td><td>回忆</td><td>“更勇敢更有爱的能力。”</td><td>第一次给自己的爱重新命名。水下回响第一次出现：[袒露 -> 命名]。</td></tr>
+          <tr><td>第五幕 · 算账</td><td>回忆</td><td>“不爱我会更苦。”</td><td>她真的算过的账。水下回响：[袒露 -> 命名 -> 实证]，小叶线收束。</td></tr>
+        </tbody>
+      </table>
+
+      <h3>跨视角硬切</h3>
+      <p>用 url query <code>?id=tiemei&amp;scene=3</code> 直接跳回第四幕同一帧，视角徽标从小叶翻成铁梅，色温从微暖转向偏冷。</p>
+
+      <table>
+        <thead>
+          <tr><th>节点</th><th>工具</th><th>锚点</th><th>水下输出</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>第四幕 · 同一帧</td><td>观察</td><td>“铁梅你看。”</td><td>暖黄餐灯落在小马身上，小叶端杯子那一秒她的眼睛是笑着的。铁梅当下就懂了：这是小叶在替她出手。</td></tr>
+          <tr><td>第五幕 · 终回响</td><td>观察</td><td>“我只是不想你受伤。”</td><td>铁梅胃缩了一下。她选了不爱、不苦、也不勇敢的那条路。终回响：呼应小叶的“不爱会更苦”。</td></tr>
+        </tbody>
+      </table>
+
+      <div class="quote">我从小叶的位置坐了一桌饭，又从铁梅的位置坐了一遍：同一杯水、不同的目光、两个人各自的账。</div>
+
+      <div class="page-number">— 08 —</div>
+    </section>
+
+    <section class="page">
+      <span class="page-tag">03 · AI Native</span>
+      <div class="module-head">
+        <div class="num">03</div>
+        <div>
+          <div class="kicker">AI AS EXPERIENCE CORE</div>
+          <h2>AI 原生能力说明</h2>
+        </div>
+        <div class="timecode">P.09</div>
+      </div>
+
+      <p class="lede">AI 在这个产品里不是装饰，不是宣传词，不是在已有产品上叠加的“智能小工具”。这个产品离开 AI 不可能存在。</p>
+
+      <h3>五项 AI 核心能力</h3>
+      <table>
+        <thead>
+          <tr><th>#</th><th>能力</th><th>含义</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>01</td><td>跨域叙事结构理解</td><td>整合世界观规则、角色档案、用户视角、当前帧 beat、历史发现和当前工具语义。</td></tr>
+          <tr><td>02</td><td><strong>纵深存在性判断 hasDepth</strong></td><td>默认不生成内容。AI 必须先回答：当前视角 × 当前帧 × 当前工具，是否存在自然、合理、不越权的水下信息。</td></tr>
+          <tr><td>03</td><td>上下文敏感的纵深生成</td><td>当 hasDepth=true 时，AI 生成的是用户可以直接体验的纵深内容，不是抽象解析。</td></tr>
+          <tr><td>04</td><td>纵深内容的叙事化组织</td><td>判断内容应通过环境、角色心声、沉默或点到为止的方式浮出。</td></tr>
+          <tr><td>05</td><td>个性化结语与分享素材组织</td><td>每条视角线结束后合成结语和分享文案，让分享卡本身成为可传播的微叙事。</td></tr>
+        </tbody>
+      </table>
+
+      <h3>hasDepth 的三个允许条件</h3>
+      <div class="grid-3">
+        <div class="metric-card">
+          <span class="label">CHECK 01</span>
+          <h4>触发物存在</h4>
+          <p>当前帧 beat 文本中存在明确触发物，一句台词、一个动作、一件物件，而不是 AI 凭空想象。</p>
+        </div>
+        <div class="metric-card">
+          <span class="label">CHECK 02</span>
+          <h4>工具语义匹配</h4>
+          <p>观察触达视觉细节，回忆触达时间线索，翻看触达资料或跨集信息。</p>
+        </div>
+        <div class="metric-card">
+          <span class="label">CHECK 03</span>
+          <h4>视角权限合理</h4>
+          <p>用户的角色视角有立场看见这个信息。小叶不应知道铁梅此刻心里在算什么。</p>
+        </div>
+      </div>
+
+      <div class="page-number">— 09 —</div>
+    </section>
+
+    <section class="page">
+      <span class="page-tag">03 · Technical Design</span>
+      <div class="module-head">
+        <div class="num">03</div>
+        <div>
+          <div class="kicker">PROMPT LAYERS / JSON CONTRACT</div>
+          <h2>技术方案与一次实际调用</h2>
+        </div>
+        <div class="timecode">P.10</div>
+      </div>
+
+      <p><strong>系统架构：</strong>Next.js + Vercel 全栈一体化，无需独立后端。模型层采用 OpenAI 兼容协议，可在不改业务代码的前提下切换底层模型，给后续接入腾讯混元等自有模型留出空间。</p>
+
+      <h3>分层 Prompt 架构</h3>
+      <table>
+        <thead>
+          <tr><th>层</th><th>内容</th><th>归属</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>L1 · WORLD</td><td>世界观 brief</td><td>IP 包</td></tr>
+          <tr><td>L2 · CHARS</td><td>5 个角色档案：性格 / 动机 / 关系</td><td>IP 包</td></tr>
+          <tr><td>L3 · ROLE</td><td>用户视角上下文：位置 / 权限 / 认知边界</td><td>IP 包</td></tr>
+          <tr><td>L4 · TOOL</td><td>当前工具的语义边界</td><td>框架</td></tr>
+          <tr><td>L5 · IO</td><td>输出协议：严格 JSON schema</td><td>框架</td></tr>
+          <tr><td>L6 · RULE</td><td>纵深生成规则：硬约束</td><td>框架</td></tr>
+        </tbody>
+      </table>
+
+      <h3>一次实际调用</h3>
+      <table>
+        <thead>
+          <tr><th>字段</th><th>值</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>用户视角</td><td>小叶</td></tr>
+          <tr><td>当前帧</td><td>第四幕 · 泼水之后转头那一帧</td></tr>
+          <tr><td>beat 文本</td><td>“铁梅你看。”</td></tr>
+          <tr><td>工具</td><td>观察</td></tr>
+          <tr><td>历史上下文</td><td>第一/二/三幕摘要，暂无解锁纵深</td></tr>
+        </tbody>
+      </table>
+
+      <div class="code-block">{
+  "hasDepth": true,
+  "content": "她没看小马。她转头叫了一声「铁梅」。",
+  "depthTag": "替朋友出手",
+  "beats": [
+    { "kind": "narration", "text": "她端着杯子的那只手没抖。她没看小马。" },
+    { "kind": "perception", "text": "她转头叫了一声「铁梅」——像在说：你看，这一下其实不是给他的。" }
+  ],
+  "innerThoughts": [
+    { "character": "小叶", "thought": "你也可以不让的，铁梅。" }
+  ]
+}</div>
+
+      <div class="page-number">— 10 —</div>
+    </section>
+
+    <section class="page">
+      <span class="page-tag">03 · Why AI</span>
+      <div class="module-head">
+        <div class="num">03</div>
+        <div>
+          <div class="kicker">IMPOSSIBLE WITHOUT AI</div>
+          <h2>离开 AI 还能成立吗？</h2>
+        </div>
+        <div class="timecode">P.11</div>
+      </div>
+
+      <p class="lede">假设不用 AI，预先写完所有内容。结论不是“体验会变差”，而是产品形态本身会不成立。</p>
+
+      <table>
+        <thead>
+          <tr><th>枚举维度</th><th>组合数</th><th>问题</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>单部剧 / 单集 / 工具点</td><td>5 视角 × 5 幕 × 3 工具 ≈ 75</td><td>看似可控</td></tr>
+          <tr><td>叠加历史路径依赖</td><td>75 × K</td><td>每个工具点要写多个版本</td></tr>
+          <tr><td>单 IP 多集</td><td>每一集都要重复一轮</td><td>工作量线性膨胀</td></tr>
+          <tr><td>更多 IP 接入</td><td>× IP 数 × 平均集数</td><td>人工穷举不可维护</td></tr>
+        </tbody>
+      </table>
+
+      <h3>即使写完，体验依然失败</h3>
+      <div class="grid-2">
+        <div class="metric-card">
+          <span class="label">LOSS 01</span>
+          <h4>自然空结果</h4>
+          <p>大部分工具点回应“没有发现”。固定字符串用一两次就会被识破。AI 实时基于上下文生成的具体空结果，才让用户相信世界在运转。</p>
+        </div>
+        <div class="metric-card">
+          <span class="label">LOSS 02</span>
+          <h4>历史依赖</h4>
+          <p>第三幕用回忆听到的内容，应让第四幕观察读起来不一样。累积的叙事厚度只能由 AI 实时整合上下文生成。</p>
+        </div>
+        <div class="metric-card">
+          <span class="label">LOSS 03</span>
+          <h4>视角的真实位置</h4>
+          <p>不同视角的认知边界、说话方式、能看见的细节完全不同。AI 通过视角上下文 prompt 自然处理这一切。</p>
+        </div>
+        <div class="metric-card">
+          <span class="label">LOSS 04</span>
+          <h4>可扩展性</h4>
+          <p>如果每一部剧都需要人工撰写，扩展成本会让商业模式不成立。AI 既是体验内核，也是商业模式支柱。</p>
+        </div>
+      </div>
+
+      <div class="page-number">— 11 —</div>
+    </section>
+
+    <section class="page">
+      <span class="page-tag">04 · Operation</span>
+      <div class="module-head">
+        <div class="num">04</div>
+        <div>
+          <div class="kicker">FRAMEWORK / PRODUCTION PIPELINE</div>
+          <h2>落地与商业化</h2>
+        </div>
+        <div class="timecode">P.12</div>
+      </div>
+
+      <p class="lede">我们做的不是一个孤立 demo，而是一套“框架 + IP 内容包”的站内剧后体验能力。框架一次性建设，内容包随 IP 替换。</p>
+
+      <h3>框架与内容包</h3>
+      <div class="grid-2">
+        <div class="metric-card">
+          <span class="label">FRAMEWORK</span>
+          <h4>一次性建设</h4>
+          <ul>
+            <li>视觉小说式播放引擎</li>
+            <li>主线锁定 + AI 打光协议</li>
+            <li>三个工具的语义体系</li>
+            <li>分层 Prompt + JSON 解析容错</li>
+            <li>水下回响累积机制</li>
+            <li>结语 + 分享卡片合成</li>
+          </ul>
+        </div>
+        <div class="metric-card">
+          <span class="label">IP PACKAGE</span>
+          <h4>每个 IP 替换一次</h4>
+          <ul>
+            <li>世界观 brief</li>
+            <li>核心角色档案</li>
+            <li>用户视角设定</li>
+            <li>固定主线节点</li>
+            <li>视觉素材包</li>
+            <li>工具命名与语气规则</li>
+          </ul>
+        </div>
+      </div>
+
+      <h3>五步生产流水线</h3>
+      <div class="flow">
+        <div class="step"><div class="stepno">STEP 01</div><div class="stepbody"><strong>输入 INPUT</strong>：剧本 / 角色小传 / 分集大纲 / 正片关键帧 / 官方物料进入资料库。站外平台拿不到这些原始素材。</div></div>
+        <div class="step"><div class="stepno">STEP 02</div><div class="stepbody"><strong>分析 ANALYZE</strong>：AI 提取叙事结构网，包括人物关系、关键事件、未展开支线、情绪节点和世界规则。</div></div>
+        <div class="step"><div class="stepno">STEP 03</div><div class="stepbody"><strong>提取 EXTRACT</strong>：析出角色沉默、事件余波、小人物视角、被剪掉的关系线。每张水下卡都有水面锚点。</div></div>
+        <div class="step"><div class="stepno">STEP 04</div><div class="stepbody"><strong>生成 GENERATE</strong>：组装成可运营的 IP 内容包：观察位、水下节点、触发物、工具建议、回响规则。</div></div>
+        <div class="step"><div class="stepno">STEP 05</div><div class="stepbody"><strong>审核 · 上线 REVIEW</strong>：经过边界、剧透、OOC、官方口径四道审核闸门后，进入腾讯视频站内运营。</div></div>
+      </div>
+
+      <div class="page-number">— 12 —</div>
+    </section>
+
+    <section class="page">
+      <span class="page-tag">04 · Business Value</span>
+      <div class="module-head">
+        <div class="num">04</div>
+        <div>
+          <div class="kicker">CHANNEL / PHASE / ROI</div>
+          <h2>站内路径与商业价值</h2>
+        </div>
+        <div class="timecode">P.13</div>
+      </div>
+
+      <h3>接入腾讯视频站内的具体路径</h3>
+      <div class="grid-2">
+        <div class="pipeline-card">
+          <span class="label">CHANNEL 01</span>
+          <h4>剧集播放页</h4>
+          <p>每集播完时，播放页底部推送“进入好东西 · 水下”入口，承接看完一集还不想走的用户。</p>
+        </div>
+        <div class="pipeline-card">
+          <span class="label">CHANNEL 02</span>
+          <h4>会员特权</h4>
+          <p>水下作为 VIP 增值能力：非会员可体验主线，会员可解锁更多纵深，强化付费动机。</p>
+        </div>
+        <div class="pipeline-card">
+          <span class="label">CHANNEL 03</span>
+          <h4>IP 专题 Tab</h4>
+          <p>每个头部 IP 在站内内容聚合 Tab 中，把水下作为核心模块，剧荒期仍提供持续消费理由。</p>
+        </div>
+        <div class="pipeline-card">
+          <span class="label">CHANNEL 04</span>
+          <h4>分享卡片</h4>
+          <p>用户结束体验后生成带腾讯视频水印与入口的分享卡，把站外讨论反向切回站内。</p>
+        </div>
+      </div>
+
+      <h3>演进路径</h3>
+      <table>
+        <thead>
+          <tr><th>阶段</th><th>名称</th><th>状态</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Phase 01 · NOW</td><td>单 IP 单场景试点：好东西 · 第二次饭桌，5 视角线</td><td><strong>已落地（当前 Demo）</strong></td></tr>
+          <tr><td>Phase 02 · NEAR</td><td>单 IP 多场景包：覆盖更多关键场</td><td>内容生产 + 1 名产品</td></tr>
+          <tr><td>Phase 03 · MID</td><td>多 IP 扩展：横跨多部头部 IP，建立内容包标准</td><td>流水线化生产</td></tr>
+          <tr><td>Phase 04 · LONG</td><td>站内深度嵌入：剧集播放页、会员体系、IP Tab</td><td>产品 + 工程协同</td></tr>
+        </tbody>
+      </table>
+
+      <h3>四个商业价值锚点</h3>
+      <div class="grid-2">
+        <div class="metric-card"><span class="label">LIFETIME</span><h4>延长 IP 生命周期</h4><p>让 IP 从播出期的几周消费窗口，延展到长尾期的持续运营空间。</p></div>
+        <div class="metric-card"><span class="label">RETENTION</span><h4>降低剧荒期会员流失</h4><p>在没有新剧追的间隙，水下持续提供消费内容，改善续费率与 ARPU。</p></div>
+        <div class="metric-card"><span class="label">ACQUISITION</span><h4>社交传播带动新用户</h4><p>个性化分享卡反向把站外讨论切回腾讯视频，是内容反向引流通道。</p></div>
+        <div class="metric-card"><span class="label">IP ROI</span><h4>放大 IP 资产价值</h4><p>一部头部内容能产出的消费层从一层变两层，提升头部内容采购的可承受成本上限。</p></div>
+      </div>
+
+      <div class="page-number">— 13 —</div>
+    </section>
+
+    <section class="page">
+      <span class="page-tag">END · Second-Layer World</span>
+      <div class="module-head">
+        <div class="num">END</div>
+        <div>
+          <div class="kicker">CLOSING STATEMENT</div>
+          <h2>长视频该被怎样改造</h2>
+        </div>
+        <div class="timecode">P.14</div>
+      </div>
+
+      <p class="lede">AI 进入长视频，不应该削平这种纵深，让长视频变得更像别的；AI 应该放大这种纵深，让长视频成为它本来就该成为的样子：一个观众可以“住进去”的世界。</p>
+
+      <p>这个时代有几种试图回答“AI 原生时代看内容”的方向：把长视频做得更短、更刺激；把长视频做成游戏，让观众做选择、改变结局；让用户当编剧，写 prompt 生成新剧情。每一种都有合理性，但每一种都在<strong>用别的内容形态替代长视频本身</strong>。</p>
+
+      <p>我们的判断是另一个方向：长视频在所有内容形态里真正不可替代的，是叙事的纵深和角色情感的厚度。这是短视频做不到的，是 AI 角色聊天做不到的，是任何交互游戏都做不到的。</p>
+
+      <div class="quote">观众想要的从来不是“我来决定接下来发生什么”。观众想要的是“我还想再多看看这一桌饭，看看那些镜头没拍到的地方”。</div>
+
+      <p><strong>《好东西 · 水下》是我们对这个问题的回答。</strong>它不试图改造“看视频”这件事本身。它在剧播完之后开辟了一个新的入口：你看完了桌面上的故事，现在可以进来，从任意一个人的位置，看到桌面之下那一整层。</p>
+
+      <div class="callout dark">
+        <div class="ti">FINAL LINE</div>
+        <p style="font-family:'Noto Serif SC',serif; font-size:16pt; line-height:1.8; color:var(--paper); text-align:center;">正片讲完故事，<br /><strong style="color:var(--gold);">水下让用户继续住在故事里。</strong></p>
+        <p style="text-align:center; color:var(--water-2); font-weight:800;">腾讯视频 · 每个 IP 的第二层世界。</p>
+      </div>
+
+      <div class="end-mark">完</div>
+      <div class="colophon">DOCUMENT v1 · 2026-05-26 · HAO DONG XI · UNDERWATER</div>
+
+      <div class="page-number">— 14 —</div>
+    </section>
+  </body>
+</html>

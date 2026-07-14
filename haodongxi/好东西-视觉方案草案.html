@@ -1,0 +1,456 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>《好东西 · 水下》视觉方案草案</title>
+  <style>
+    :root {
+      --ink: #221f20;
+      --paper: #f4efe7;
+      --muted: #7a7169;
+      --red: #d64a3a;
+      --blue: #356a91;
+      --green: #6c8b64;
+      --amber: #d7a445;
+      --night: #15161b;
+      --line: rgba(34, 31, 32, 0.16);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      background:
+        radial-gradient(circle at 14% 6%, rgba(214, 74, 58, 0.18), transparent 28%),
+        radial-gradient(circle at 86% 10%, rgba(53, 106, 145, 0.16), transparent 26%),
+        var(--paper);
+      color: var(--ink);
+      font-family: "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+    }
+
+    .page {
+      min-height: 100vh;
+      padding: 42px;
+    }
+
+    .hero {
+      display: grid;
+      grid-template-columns: minmax(0, 1.1fr) minmax(320px, 0.9fr);
+      gap: 32px;
+      align-items: end;
+      max-width: 1280px;
+      margin: 0 auto 34px;
+    }
+
+    .kicker {
+      color: var(--red);
+      font-size: 13px;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      font-weight: 700;
+    }
+
+    h1 {
+      margin: 12px 0 14px;
+      font-size: clamp(42px, 7vw, 92px);
+      line-height: 0.96;
+      letter-spacing: -0.03em;
+    }
+
+    .intro {
+      max-width: 720px;
+      color: #4c4743;
+      font-size: 18px;
+      line-height: 1.8;
+    }
+
+    .tool-strip {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      align-items: center;
+      padding: 18px;
+      border-top: 1px solid var(--line);
+      border-bottom: 1px solid var(--line);
+      background: rgba(255, 250, 242, 0.58);
+    }
+
+    .tool {
+      padding: 9px 13px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.58);
+      border: 1px solid rgba(34, 31, 32, 0.12);
+      font-size: 14px;
+      color: #3d3937;
+    }
+
+    .tool strong {
+      color: var(--ink);
+    }
+
+    .options {
+      max-width: 1280px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 22px;
+    }
+
+    .option {
+      min-height: 640px;
+      position: relative;
+      overflow: hidden;
+      border-radius: 18px;
+      background: #fff9ef;
+      box-shadow: 0 22px 70px rgba(34, 31, 32, 0.13);
+    }
+
+    .option::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      background-image:
+        linear-gradient(rgba(255, 255, 255, 0.06) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255, 255, 255, 0.06) 1px, transparent 1px);
+      background-size: 18px 18px;
+      mix-blend-mode: overlay;
+      opacity: 0.32;
+    }
+
+    .option-header {
+      position: relative;
+      z-index: 1;
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 22px;
+      font-size: 13px;
+      color: rgba(255, 255, 255, 0.72);
+    }
+
+    .badge {
+      border: 1px solid currentColor;
+      border-radius: 999px;
+      padding: 5px 9px;
+      white-space: nowrap;
+    }
+
+    .scene {
+      position: absolute;
+      inset: 0;
+    }
+
+    .scene-livehouse {
+      background:
+        linear-gradient(to bottom, rgba(12, 10, 12, 0.06), rgba(12, 10, 12, 0.82)),
+        radial-gradient(circle at 22% 15%, rgba(214, 74, 58, 0.64), transparent 28%),
+        radial-gradient(circle at 78% 18%, rgba(53, 106, 145, 0.74), transparent 28%),
+        linear-gradient(140deg, #1b161b, #27212c 42%, #0d1015);
+    }
+
+    .scene-livehouse .stage-line,
+    .scene-livehouse .stage-line::before,
+    .scene-livehouse .stage-line::after {
+      content: "";
+      position: absolute;
+      height: 2px;
+      background: rgba(244, 239, 231, 0.38);
+      transform: rotate(-8deg);
+    }
+
+    .scene-livehouse .stage-line {
+      left: 36px;
+      right: 34px;
+      top: 168px;
+    }
+
+    .scene-livehouse .stage-line::before {
+      left: 20px;
+      right: 80px;
+      top: 76px;
+    }
+
+    .scene-livehouse .stage-line::after {
+      left: 90px;
+      right: 18px;
+      top: 150px;
+    }
+
+    .mic {
+      position: absolute;
+      left: 54%;
+      top: 116px;
+      width: 14px;
+      height: 280px;
+      background: rgba(255, 250, 242, 0.42);
+      transform: rotate(8deg);
+      transform-origin: top;
+    }
+
+    .mic::before {
+      content: "";
+      position: absolute;
+      left: -17px;
+      top: -24px;
+      width: 48px;
+      height: 24px;
+      border-radius: 50%;
+      border: 2px solid rgba(255, 250, 242, 0.62);
+    }
+
+    .poster-stack {
+      position: absolute;
+      left: 30px;
+      bottom: 164px;
+      display: grid;
+      gap: 9px;
+      transform: rotate(-4deg);
+    }
+
+    .poster-stack div {
+      width: 130px;
+      height: 44px;
+      background: rgba(255, 250, 242, 0.12);
+      border: 1px solid rgba(255, 250, 242, 0.2);
+    }
+
+    .scene-apartment {
+      background:
+        linear-gradient(to bottom, rgba(250, 244, 234, 0.14), rgba(250, 244, 234, 0.92)),
+        linear-gradient(90deg, #e5c89f 0 18%, #f4e6cd 18% 19%, transparent 19%),
+        linear-gradient(135deg, #f7e3c8, #d6d7c8 52%, #93a2a3);
+    }
+
+    .window {
+      position: absolute;
+      left: 34px;
+      top: 72px;
+      width: 190px;
+      height: 230px;
+      border: 9px solid rgba(34, 31, 32, 0.72);
+      background:
+        linear-gradient(90deg, transparent 47%, rgba(34, 31, 32, 0.52) 47% 53%, transparent 53%),
+        linear-gradient(0deg, transparent 48%, rgba(34, 31, 32, 0.46) 48% 52%, transparent 52%),
+        #b7c6c9;
+      box-shadow: 18px 18px 0 rgba(255, 255, 255, 0.28);
+    }
+
+    .table {
+      position: absolute;
+      left: 58px;
+      right: 44px;
+      bottom: 184px;
+      height: 84px;
+      border-radius: 100% 100% 8px 8px;
+      background: rgba(34, 31, 32, 0.18);
+    }
+
+    .table::before {
+      content: "";
+      position: absolute;
+      left: 54px;
+      top: -38px;
+      width: 54px;
+      height: 54px;
+      border-radius: 50%;
+      border: 12px solid rgba(214, 74, 58, 0.65);
+    }
+
+    .scene-chat {
+      background:
+        linear-gradient(to bottom, rgba(246, 239, 229, 0.05), rgba(246, 239, 229, 0.86)),
+        radial-gradient(circle at 28% 20%, rgba(109, 139, 100, 0.34), transparent 30%),
+        radial-gradient(circle at 84% 22%, rgba(214, 74, 58, 0.28), transparent 26%),
+        #efe3d1;
+    }
+
+    .message {
+      position: absolute;
+      max-width: 250px;
+      padding: 14px 16px;
+      border-radius: 22px;
+      font-size: 14px;
+      line-height: 1.65;
+      box-shadow: 0 14px 40px rgba(34, 31, 32, 0.12);
+    }
+
+    .m1 {
+      left: 34px;
+      top: 86px;
+      background: #fff8ec;
+    }
+
+    .m2 {
+      right: 30px;
+      top: 184px;
+      background: #dbe8e0;
+    }
+
+    .m3 {
+      left: 52px;
+      top: 306px;
+      background: #f2d7c9;
+    }
+
+    .record {
+      position: absolute;
+      right: 34px;
+      bottom: 180px;
+      width: 168px;
+      height: 168px;
+      border-radius: 50%;
+      background:
+        radial-gradient(circle, #efe3d1 0 12%, #221f20 12% 18%, transparent 18%),
+        repeating-radial-gradient(circle, #221f20 0 8px, #3a3535 8px 11px);
+      opacity: 0.88;
+    }
+
+    .caption {
+      position: absolute;
+      z-index: 2;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      padding: 26px;
+      background: linear-gradient(to top, rgba(0, 0, 0, 0.78), rgba(0, 0, 0, 0));
+      color: #fffaf1;
+    }
+
+    .apartment .caption,
+    .chat .caption {
+      color: var(--ink);
+      background: linear-gradient(to top, rgba(244, 239, 231, 0.96), rgba(244, 239, 231, 0));
+    }
+
+    .caption h2 {
+      margin: 0 0 10px;
+      font-size: 28px;
+      letter-spacing: -0.02em;
+    }
+
+    .caption p {
+      margin: 0;
+      color: currentColor;
+      opacity: 0.78;
+      line-height: 1.75;
+      font-size: 15px;
+    }
+
+    .sample {
+      margin-top: 18px;
+      padding-top: 14px;
+      border-top: 1px solid currentColor;
+      color: currentColor;
+      opacity: 0.8;
+      font-size: 13px;
+      line-height: 1.7;
+    }
+
+    @media (max-width: 980px) {
+      .page {
+        padding: 24px;
+      }
+
+      .hero,
+      .options {
+        grid-template-columns: 1fr;
+      }
+
+      .option {
+        min-height: 560px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="page">
+    <section class="hero">
+      <div>
+        <div class="kicker">Her Story · 水下机制迁移草案</div>
+        <h1>好东西<br />水下</h1>
+        <p class="intro">
+          这版不做“权谋暗线”，而是做日常生活的水下：一句玩笑的防御、一次沉默的靠近、
+          一段关系改变一个人的恋爱观。小叶可以成为第一条线：从 Livehouse、邻里厨房、
+          微信聊天和排练间里，看见电影没展开的生活。
+        </p>
+      </div>
+      <div class="tool-strip">
+        <span class="tool"><strong>观看</strong>：看见动作、房间和人群里的状态</span>
+        <span class="tool"><strong>回忆</strong>：连接旧关系和旧经验</span>
+        <span class="tool"><strong>对话</strong>：把话说出口，或听见别人怎么接住</span>
+        <span class="tool"><strong>靠近</strong>：进入另一个人的处境</span>
+        <span class="tool"><strong>听歌</strong>：从音乐和排练里读情绪</span>
+      </div>
+    </section>
+
+    <section class="options">
+      <article class="option livehouse">
+        <div class="scene scene-livehouse">
+          <div class="stage-line"></div>
+          <div class="mic"></div>
+          <div class="poster-stack"><div></div><div></div><div></div></div>
+        </div>
+        <div class="option-header">
+          <span class="badge">方向 A</span>
+          <span>Livehouse / 夜色 / 声音</span>
+        </div>
+        <div class="caption">
+          <h2>小叶的后台</h2>
+          <p>
+            更酷、更夜、更音乐。适合把小叶的水下放在排练、演出前、散场后的空白里。
+          </p>
+          <div class="sample">
+            水下片段：她唱完最后一句，台下还在鼓掌。她却先回头看了一眼手机，没有新消息。
+          </div>
+        </div>
+      </article>
+
+      <article class="option apartment">
+        <div class="scene scene-apartment">
+          <div class="window"></div>
+          <div class="table"></div>
+        </div>
+        <div class="option-header" style="color: rgba(34,31,32,.66)">
+          <span class="badge">方向 B</span>
+          <span>上海老房子 / 日常 / 暖光</span>
+        </div>
+        <div class="caption">
+          <h2>铁梅家的餐桌</h2>
+          <p>
+            更生活、更近人。适合做女性友谊、母女关系、邻里关系里的水下。
+          </p>
+          <div class="sample">
+            水下片段：小叶说“我随便吃点就行”，铁梅还是多煎了一个蛋，没问她今天怎么了。
+          </div>
+        </div>
+      </article>
+
+      <article class="option chat">
+        <div class="scene scene-chat">
+          <div class="message m1">你今天演出结束了吗？</div>
+          <div class="message m2">结束了。没事。</div>
+          <div class="message m3">“没事”这两个字，她删掉重打了三遍。</div>
+          <div class="record"></div>
+        </div>
+        <div class="option-header" style="color: rgba(34,31,32,.66)">
+          <span class="badge">方向 C</span>
+          <span>聊天记录 / 拼贴 / 关系切片</span>
+        </div>
+        <div class="caption">
+          <h2>没发出去的话</h2>
+          <p>
+            更轻、更聪明。适合表现 situationship、女性之间的互相接住、语言背后的停顿。
+          </p>
+          <div class="sample">
+            水下片段：那个人问“还在生气吗”，她看了很久，最后只回了一个表情。
+          </div>
+        </div>
+      </article>
+    </section>
+  </main>
+</body>
+</html>

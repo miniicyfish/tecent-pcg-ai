@@ -44,7 +44,7 @@ export default function SceneDisplay({
   const isPerception = beat.kind === 'perception';
 
   return (
-    <section className="relative min-h-[calc(100vh-132px)] overflow-hidden border-x border-border bg-bg-deep">
+    <section className="relative h-full min-h-[480px] overflow-hidden border-x border-border bg-bg-deep">
       <div
         className="absolute inset-0 bg-cover bg-center"
         style={{ backgroundImage: `url(${backgroundSrc})` }}
@@ -65,7 +65,7 @@ export default function SceneDisplay({
       </div>
 
       {beat.kind === 'dialogue' && avatar && (
-        <div className="character-standee absolute bottom-32 left-3 h-64 w-48 md:bottom-24 md:h-80 md:w-60">
+        <div className="character-standee absolute bottom-28 left-4 h-56 w-40 md:bottom-24 md:left-8 md:h-[26rem] md:w-72">
           <img
             src={avatar}
             alt={beat.speaker}
@@ -75,16 +75,16 @@ export default function SceneDisplay({
         </div>
       )}
 
-      <div className="absolute bottom-0 left-0 right-0 p-4">
+      <div className="absolute bottom-0 left-0 right-0 p-3 md:p-5">
         <div
-          className={`shadow-2xl backdrop-blur ${
+          className={`shadow-2xl backdrop-blur md:mx-auto md:max-w-5xl ${
             isNarration
-              ? 'mx-auto max-w-xl border-y border-accent-gold/30 bg-bg-deep/70 px-6 py-5 text-center'
+              ? 'mx-auto max-w-2xl border-y border-accent-gold/30 bg-bg-deep/70 px-6 py-4 text-center md:px-8 md:py-5'
               : isEcho
-                ? 'border border-accent-blue/40 bg-accent-blue/10 p-4'
+                ? 'border border-accent-blue/40 bg-accent-blue/10 p-3 md:p-4'
                 : isPerception
-                  ? 'border border-accent-gold/25 bg-bg-deep/82 p-4'
-                  : 'border border-border bg-bg-card/92 p-4'
+                  ? 'border border-accent-gold/25 bg-bg-deep/82 p-3 md:p-4'
+                  : 'border border-border bg-bg-card/92 p-3 md:p-4'
           }`}
         >
           {isNarration ? (
@@ -135,14 +135,14 @@ export default function SceneDisplay({
           )}
 
           <p
-            className={`max-h-36 overflow-y-auto text-sm leading-7 ${
+            className={`overflow-y-auto text-sm leading-7 ${
               isNarration
-                ? 'text-text-secondary'
+                ? 'max-h-28 text-text-secondary md:max-h-32'
                 : isEcho
-                  ? 'text-text-primary'
+                  ? 'max-h-40 text-text-primary md:max-h-48'
                   : isPerception
-                    ? 'text-text-secondary italic'
-                    : 'text-text-primary'
+                    ? 'max-h-28 text-text-secondary italic md:max-h-32'
+                    : 'max-h-28 text-text-primary md:max-h-32'
             }`}
           >
             {beat.kind === 'dialogue' ? `“${beat.text}”` : beat.text}

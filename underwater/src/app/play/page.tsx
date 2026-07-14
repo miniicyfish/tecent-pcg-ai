@@ -16,6 +16,12 @@ interface DepthData {
   hasDepth: boolean;
   content: string;
   depthTag: string | null;
+  beats?: {
+    kind: 'narration' | 'dialogue' | 'perception' | 'thought';
+    speaker?: string;
+    mood?: string;
+    text: string;
+  }[];
   innerThoughts: { character: string; thought: string }[];
 }
 
@@ -23,6 +29,12 @@ interface EpilogueData {
   epilogue: string;
   depthSummary: string;
   shareText: string;
+}
+
+interface DepthResult {
+  depth: DepthData;
+  toolId: string;
+  sceneIndex: number;
 }
 
 const contextualTools: Record<string, string[]> = {
@@ -87,6 +99,90 @@ function buildBeats(node: StoryNode, depthEcho: string | null): SceneBeat[] {
   ];
 }
 
+function summarizeDepth(depth: DepthData, maxLength = 120) {
+  const text =
+    depth.content ||
+    depth.beats
+      ?.map((beat) => {
+        if (beat.kind === 'dialogue' && beat.speaker) {
+          return `${beat.speaker}说：“${beat.text}”`;
+        }
+        return beat.text;
+      })
+      .join(' ');
+
+  if (!text) return '';
+  return `${text.slice(0, maxLength)}${text.length > maxLength ? '……' : ''}`;
+}
+
+function getDepthText(depth: DepthData) {
+  return (
+    depth.content ||
+    depth.beats
+      ?.map((beat) => {
+        if (beat.kind === 'dialogue' && beat.speaker) {
+          return `${beat.speaker}说：“${beat.text}”`;
+        }
+        return beat.text;
+      })
+      .join(' ') ||
+    ''
+  ).replace(/\s+/g, ' ').trim();
+}
+
+function buildEchoSummary(depth: DepthData, maxLength = 180) {
+  const text = getDepthText(depth);
+  if (!text) return '';
+  if (text.length <= maxLength) return text;
+
+  const sentences = text.match(/[^。！？]+[。！？]/g);
+  if (sentences?.length) {
+    let summary = '';
+    for (const sentence of sentences) {
+      if ((summary + sentence).length > maxLength) break;
+      summary += sentence;
+    }
+    if (summary) return summary;
+  }
+
+  const clauses = text.split(/(?<=[，；、])/);
+  let summary = '';
+  for (const clause of clauses) {
+    if (!clause) continue;
+    if ((summary + clause).length > maxLength) break;
+    summary += clause;
+  }
+
+  const fallback = summary || text.slice(0, maxLength - 1);
+  return /[。！？]$/.test(fallback) ? fallback : `${fallback.replace(/[，；、：]$/, '')}。`;
+}
+
+function buildDepthEcho(
+  currentNode: StoryNode,
+  priorDepthResult: DepthResult | undefined
+) {
+  if (!priorDepthResult) return null;
+
+  const { depth, toolId } = priorDepthResult;
+  const tool = tools.find((item) => item.id === toolId);
+  const toolName = tool?.name || '那次探索';
+  const depthTag = depth.depthTag || '水下细节';
+  const summary = buildEchoSummary(depth);
+
+  if (!summary) return null;
+
+  const sceneHook =
+    currentNode.sceneTag === '风暴'
+      ? '眼前的混乱'
+      : currentNode.sceneTag === '余波'
+        ? '此刻的余波'
+        : currentNode.sceneTag === '暗流'
+          ? '眼前的暗流'
+          : '此刻的寻常';
+
+  return `方才「${toolName}」照见的${depthTag}，让${sceneHook}多了一层意味：${summary}`;
+}
+
 function PlayContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
@@ -99,14 +195,13 @@ function PlayContent() {
   const [beatIndex, setBeatIndex] = useState(0);
   const [autoPlay, setAutoPlay] = useState(true);
   const [depthHistory, setDepthHistory] = useState<string[]>([]);
-  const [depthResults, setDepthResults] = useState<
-    { depth: DepthData; toolId: string; sceneIndex: number }[]
-  >([]);
+  const [depthResults, setDepthResults] = useState<DepthResult[]>([]);
   const [activeDepth, setActiveDepth] = useState<{
     depth: DepthData;
     toolId: string;
   } | null>(null);
   const [loading, setLoading] = useState(false);
+  const [loadingElapsedSeconds, setLoadingElapsedSeconds] = useState(0);
   const [activeToolId, setActiveToolId] = useState<string | null>(null);
   const [epilogue, setEpilogue] = useState<EpilogueData | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -114,15 +209,18 @@ function PlayContent() {
   const currentNode = storyNodes[sceneIndex];
 
   const depthEcho = useMemo(() => {
+    const previousSceneIndex = sceneIndex - 1;
+    if (previousSceneIndex < 0) return null;
+
     const priorDepth = [...depthResults]
       .reverse()
-      .find((item) => item.depth.hasDepth && item.sceneIndex < sceneIndex);
+      .find(
+        (item) =>
+          item.depth.hasDepth && item.sceneIndex === previousSceneIndex
+      );
 
-    if (!priorDepth) return null;
-    const tool = tools.find((item) => item.id === priorDepth.toolId);
-    const source = tool ? `方才「${tool.name}」照见的细节` : '方才照见的细节';
-    return `${source}，让此刻多了一层意味：${priorDepth.depth.content.slice(0, 120)}${priorDepth.depth.content.length > 120 ? '……' : ''}`;
-  }, [depthResults, sceneIndex]);
+    return buildDepthEcho(currentNode, priorDepth);
+  }, [currentNode, depthResults, sceneIndex]);
 
   const beats = useMemo(
     () => buildBeats(currentNode, depthEcho),
@@ -137,6 +235,42 @@ function PlayContent() {
     .filter((item) => item.sceneIndex === sceneIndex)
     .map((item) => item.toolId);
   const depthCount = depthResults.filter((item) => item.depth.hasDepth).length;
+
+  const loadingCopy = useMemo(() => {
+    if (loadingElapsedSeconds >= 30) {
+      return {
+        text: '水下仍在回应，快到本次打捞边界',
+        detail: '如果 45 秒内没有浮上来，这次探索会自然回到当前场景。',
+      };
+    }
+
+    if (loadingElapsedSeconds >= 15) {
+      return {
+        text: '线索还在水下，模型正在判断能否看见',
+        detail: '有些场景需要更久，尤其是要分辨“有发现”和“只是寻常”。',
+      };
+    }
+
+    return {
+      text: '你屏住呼吸，等那点声响浮上来',
+      detail: '有些事不会改变，但看见它的角度会变。',
+    };
+  }, [loadingElapsedSeconds]);
+
+  useEffect(() => {
+    if (!loading) {
+      setLoadingElapsedSeconds(0);
+      return;
+    }
+
+    const startedAt = Date.now();
+    setLoadingElapsedSeconds(0);
+    const timer = window.setInterval(() => {
+      setLoadingElapsedSeconds(Math.floor((Date.now() - startedAt) / 1000));
+    }, 1000);
+
+    return () => window.clearInterval(timer);
+  }, [loading]);
 
   const advance = useCallback(() => {
     setActiveDepth(null);
@@ -154,14 +288,15 @@ function PlayContent() {
   }, [beatIndex, beats.length, sceneIndex, storyNodes.length]);
 
   useEffect(() => {
-    if (!autoPlay || loading || epilogue) return;
+    if (!autoPlay || activeDepth || loading || epilogue) return;
     if (isLastScene && isLastBeat) return;
 
-    const delay = activeDepth
-      ? 9000
-      : currentBeat.kind === 'dialogue'
-        ? 5200
-        : 7200;
+    const delay =
+      currentBeat.kind === 'dialogue'
+        ? 3800
+        : currentBeat.kind === 'perception'
+          ? 6200
+          : 7200;
     const timer = window.setTimeout(advance, delay);
     return () => window.clearTimeout(timer);
   }, [
@@ -217,9 +352,10 @@ function PlayContent() {
         setDepthResults((prev) => [...prev, { depth, toolId, sceneIndex }]);
 
         if (depth.hasDepth && depth.depthTag) {
+          const summary = summarizeDepth(depth, 80);
           setDepthHistory((prev) => [
             ...prev,
-            `[${depth.depthTag}] ${depth.content.slice(0, 80)}`,
+            `[${depth.depthTag}] ${summary}`,
           ]);
         }
       } catch (err) {
@@ -277,8 +413,11 @@ function PlayContent() {
       <div className="flex flex-1 flex-col items-center justify-center px-6 py-12">
         <Epilogue
           data={epilogue}
-          identityName={identity.name}
+          identity={identity}
+          identityId={identityId}
           depthCount={depthCount}
+          storyNodes={storyNodes}
+          depthResults={depthResults}
           onRestart={() => router.push('/')}
         />
       </div>
@@ -286,8 +425,8 @@ function PlayContent() {
   }
 
   return (
-    <div className="mx-auto flex min-h-full w-full max-w-3xl flex-1 flex-col">
-      <header className="z-10 flex items-center justify-between border-b border-border bg-bg-deep/95 px-4 py-3">
+    <div className="mx-auto flex h-screen w-full max-w-6xl flex-col overflow-hidden">
+      <header className="z-10 flex h-14 shrink-0 items-center justify-between border-b border-border bg-bg-deep/95 px-4 py-3">
         <div className="flex items-center gap-3">
           <div className="relative h-8 w-8 overflow-hidden border border-border bg-bg-card">
             <Image
@@ -316,7 +455,7 @@ function PlayContent() {
         </button>
       </header>
 
-      <main className="relative flex-1">
+      <main className="relative min-h-0 flex-1">
         <SceneDisplay
           backgroundSrc={getSceneBackground(
             identityId,
@@ -334,11 +473,12 @@ function PlayContent() {
         />
 
         {activeDepth && (
-          <div className="absolute bottom-44 left-4 right-4 z-20">
+          <div className="absolute bottom-32 left-4 right-4 z-20 md:bottom-28">
             <DepthReveal
               depth={activeDepth.depth}
               toolName={tools.find((tool) => tool.id === activeDepth.toolId)?.name || ''}
               toolIcon={tools.find((tool) => tool.id === activeDepth.toolId)?.icon || ''}
+              onClose={() => setActiveDepth(null)}
             />
           </div>
         )}
@@ -346,9 +486,12 @@ function PlayContent() {
         {loading && (
           <div className="absolute inset-0 z-30 flex items-center justify-center bg-bg-deep/45 backdrop-blur-sm">
             <div className="border border-accent-gold/30 bg-bg-card px-6 py-5 text-center shadow-2xl">
-              <LoadingIndicator text="你屏住呼吸，等那点声响浮上来" />
+              <LoadingIndicator text={loadingCopy.text} />
               <p className="mt-1 text-xs text-text-dim">
-                有些事不会改变，但看见它的角度会变。
+                {loadingCopy.detail}
+              </p>
+              <p className="mt-3 text-xs text-accent-blue/70 pixel-text">
+                {Math.min(loadingElapsedSeconds, 45)} / 45 秒
               </p>
             </div>
           </div>
@@ -367,7 +510,7 @@ function PlayContent() {
         )}
       </main>
 
-      <footer className="border-t border-border bg-bg-deep/95 px-4 py-3">
+      <footer className="shrink-0 border-t border-border bg-bg-deep/95 px-4 py-2">
         <ToolBar
           onUseTool={useTool}
           disabled={loading}
@@ -376,20 +519,25 @@ function PlayContent() {
           usedToolIds={usedToolIds}
         />
 
-        <div className="mt-3 flex justify-center">
+        <div className="mt-2 flex justify-center">
           {isLastScene && isLastBeat ? (
-            <button
-              onClick={generateEpilogue}
-              disabled={loading}
-              className="border border-accent-gold bg-accent-gold/20 px-6 py-2 text-sm text-accent-gold transition-colors hover:bg-accent-gold/30 disabled:opacity-50 pixel-text"
-            >
-              结束旅程
-            </button>
+            <div className="space-y-1.5 text-center">
+              <p className="text-xs leading-5 text-accent-gold/80">
+                水下旅程已走到尽头，点击下方生成你的结语和分享卡。
+              </p>
+              <button
+                onClick={generateEpilogue}
+                disabled={loading}
+                className="border border-accent-gold bg-accent-gold/20 px-6 py-1.5 text-sm text-accent-gold transition-colors hover:bg-accent-gold/30 disabled:opacity-50 pixel-text"
+              >
+                结束旅程
+              </button>
+            </div>
           ) : (
             <button
               onClick={advance}
               disabled={loading}
-              className="border border-border px-8 py-2 text-sm text-text-secondary transition-colors hover:border-text-dim hover:text-text-primary disabled:opacity-50 pixel-text"
+              className="border border-border px-8 py-1.5 text-sm text-text-secondary transition-colors hover:border-text-dim hover:text-text-primary disabled:opacity-50 pixel-text"
             >
               继续
             </button>

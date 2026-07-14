@@ -1,0 +1,682 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>好东西 · 水下｜复赛视频 03 入口图谱视角</title>
+    <style>
+      :root {
+        --bg: #050504;
+        --text: #f7efe3;
+        --muted: rgba(247, 239, 227, .62);
+        --dim: rgba(247, 239, 227, .38);
+        --gold: #f2bd59;
+        --gold-2: #9a6f32;
+        --water: #8cc7cf;
+        --panel: rgba(18, 17, 15, .78);
+        --line: rgba(242, 189, 89, .46);
+        --t: 24s;
+      }
+
+      * { box-sizing: border-box; }
+
+      body {
+        margin: 0;
+        min-height: 100vh;
+        overflow: hidden;
+        background:
+          radial-gradient(circle at 16% 18%, rgba(242, 189, 89, .12), transparent 30%),
+          radial-gradient(circle at 84% 74%, rgba(140, 199, 207, .11), transparent 34%),
+          #030303;
+        color: var(--text);
+        font-family: "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", system-ui, sans-serif;
+      }
+
+      .wrap {
+        display: grid;
+        min-height: 100vh;
+        place-items: center;
+        padding: 30px;
+      }
+
+      .stage {
+        position: relative;
+        width: min(100vw - 60px, calc((100vh - 60px) * 16 / 9));
+        max-width: 1920px;
+        aspect-ratio: 16 / 9;
+        overflow: hidden;
+        border: 1px solid rgba(255,255,255,.08);
+        border-radius: 28px;
+        background: #050504;
+        box-shadow: 0 28px 88px rgba(0,0,0,.6);
+        isolation: isolate;
+      }
+
+      .stage::after {
+        content: "";
+        position: absolute;
+        inset: 0;
+        z-index: 90;
+        pointer-events: none;
+        background:
+          linear-gradient(rgba(255,255,255,.032) 1px, transparent 1px) 0 0 / 100% 3px,
+          radial-gradient(circle at 50% 50%, transparent 60%, rgba(0,0,0,.5));
+        opacity: .28;
+        mix-blend-mode: screen;
+      }
+
+      .scene {
+        position: absolute;
+        inset: 0;
+      }
+
+      .topbar {
+        position: absolute;
+        left: 5%;
+        right: 5%;
+        top: 5.2%;
+        z-index: 50;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+      }
+
+      .brand {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        font-size: 23px;
+        font-weight: 950;
+      }
+
+      .play-dot {
+        display: grid;
+        width: 38px;
+        height: 38px;
+        place-items: center;
+        border-radius: 999px;
+        background: var(--gold);
+        color: #0b0803;
+      }
+
+      .play-dot::before {
+        content: "";
+        width: 0;
+        height: 0;
+        margin-left: 3px;
+        border-top: 8px solid transparent;
+        border-bottom: 8px solid transparent;
+        border-left: 12px solid currentColor;
+      }
+
+      .nav {
+        display: flex;
+        gap: 22px;
+        color: rgba(247,239,227,.6);
+        font-size: 16px;
+        font-weight: 800;
+      }
+
+      .nav span:nth-child(2) {
+        color: var(--gold);
+      }
+
+      .entry-scene {
+        z-index: 10;
+        animation: entryScene var(--t) linear both;
+      }
+
+      .player {
+        position: absolute;
+        left: 6%;
+        right: 6%;
+        top: 14%;
+        bottom: 8%;
+        overflow: hidden;
+        border-radius: 28px;
+        background:
+          linear-gradient(90deg, rgba(0,0,0,.78), rgba(0,0,0,.28), rgba(0,0,0,.84)),
+          url("assets/dining-selected.png") center / cover;
+        box-shadow: 0 30px 90px rgba(0,0,0,.56);
+      }
+
+      .player::after {
+        content: "";
+        position: absolute;
+        left: 4%;
+        right: 4%;
+        bottom: 7%;
+        height: 6px;
+        border-radius: 999px;
+        background: linear-gradient(90deg, var(--gold) 96%, rgba(255,255,255,.18) 96%);
+      }
+
+      .ended-copy {
+        position: absolute;
+        left: 5%;
+        top: 24%;
+        z-index: 3;
+      }
+
+      .pill {
+        display: inline-flex;
+        border: 1px solid rgba(242, 189, 89, .42);
+        border-radius: 999px;
+        background: rgba(242, 189, 89, .11);
+        padding: 9px 16px;
+        color: var(--gold);
+        font-size: 14px;
+        font-weight: 900;
+      }
+
+      .ended-copy h1 {
+        margin: 28px 0 0;
+        max-width: 720px;
+        font-size: clamp(46px, 5.4vw, 92px);
+        line-height: 1.02;
+        font-weight: 950;
+      }
+
+      .ended-copy p {
+        margin: 22px 0 0;
+        color: var(--muted);
+        font-size: clamp(17px, 1.45vw, 26px);
+        font-weight: 800;
+      }
+
+      .entry-card {
+        position: absolute;
+        right: 6%;
+        top: 30%;
+        z-index: 5;
+        width: 390px;
+        border: 1px solid rgba(242, 189, 89, .5);
+        border-radius: 26px;
+        background: rgba(20, 17, 12, .82);
+        padding: 28px;
+        box-shadow: 0 24px 80px rgba(0,0,0,.46);
+        backdrop-filter: blur(18px);
+        animation: entryCard var(--t) cubic-bezier(.2,.8,.2,1) both;
+      }
+
+      .entry-card b {
+        color: var(--gold);
+        font-size: 14px;
+        letter-spacing: .08em;
+      }
+
+      .entry-card h2 {
+        margin: 14px 0 0;
+        font-size: 34px;
+        line-height: 1.1;
+      }
+
+      .entry-card p {
+        margin: 14px 0 24px;
+        color: var(--muted);
+        font-size: 16px;
+        line-height: 1.55;
+        font-weight: 700;
+      }
+
+      .cta {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 999px;
+        background: var(--gold);
+        color: #120d05;
+        padding: 13px 20px;
+        font-weight: 950;
+        box-shadow: 0 16px 44px rgba(242,189,89,.22);
+      }
+
+      .atlas-scene {
+        z-index: 20;
+        padding: 13.8% 6% 6%;
+        background:
+          radial-gradient(circle at 50% 54%, rgba(140,199,207,.08), transparent 38%),
+          #050504;
+        animation: atlasScene var(--t) linear both;
+      }
+
+      .section-title {
+        position: relative;
+        z-index: 4;
+        display: grid;
+        gap: 10px;
+        max-width: 820px;
+      }
+
+      .section-title .mini {
+        color: var(--gold);
+        font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+        font-size: 13px;
+        font-weight: 900;
+        letter-spacing: .16em;
+      }
+
+      .section-title h2 {
+        margin: 0;
+        font-size: clamp(42px, 4.4vw, 76px);
+        line-height: 1.04;
+        font-weight: 950;
+      }
+
+      .section-title p {
+        margin: 0;
+        color: var(--muted);
+        font-size: 20px;
+        font-weight: 800;
+      }
+
+      .filters {
+        position: absolute;
+        right: 6%;
+        top: 17%;
+        z-index: 5;
+        display: flex;
+        gap: 10px;
+      }
+
+      .filters span {
+        border: 1px solid rgba(255,255,255,.12);
+        border-radius: 999px;
+        background: rgba(255,255,255,.05);
+        padding: 9px 15px;
+        color: rgba(247,239,227,.62);
+        font-size: 14px;
+        font-weight: 850;
+      }
+
+      .filters span:nth-child(2) {
+        border-color: rgba(242,189,89,.45);
+        color: var(--gold);
+      }
+
+      .timeline {
+        position: absolute;
+        left: 7%;
+        right: 7%;
+        bottom: 19%;
+        z-index: 3;
+        height: 44%;
+      }
+
+      .timeline::before {
+        content: "";
+        position: absolute;
+        left: 0;
+        right: 0;
+        top: 52%;
+        height: 2px;
+        background: linear-gradient(90deg, transparent, rgba(242,189,89,.55), transparent);
+      }
+
+      .node {
+        position: absolute;
+        left: var(--x);
+        top: var(--y);
+        display: grid;
+        gap: 8px;
+        width: 122px;
+        transform: translate(-50%, -50%);
+        text-align: center;
+      }
+
+      .node i {
+        display: block;
+        width: 13px;
+        height: 13px;
+        margin: 0 auto;
+        border-radius: 999px;
+        background: rgba(247,239,227,.42);
+        box-shadow: 0 0 0 8px rgba(255,255,255,.04);
+      }
+
+      .node span {
+        color: rgba(247,239,227,.48);
+        font-size: 12px;
+        font-weight: 800;
+        line-height: 1.25;
+      }
+
+      .node.hot {
+        width: 240px;
+      }
+
+      .node.hot i {
+        width: 22px;
+        height: 22px;
+        background: var(--gold);
+        box-shadow:
+          0 0 0 11px rgba(242,189,89,.13),
+          0 0 34px rgba(242,189,89,.72);
+      }
+
+      .node.hot span {
+        color: var(--text);
+        font-size: 20px;
+        font-weight: 950;
+      }
+
+      .recommend {
+        position: absolute;
+        right: 8%;
+        bottom: 9%;
+        z-index: 8;
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        border: 1px solid rgba(242,189,89,.46);
+        border-radius: 999px;
+        background: rgba(23,18,10,.78);
+        padding: 12px 18px 12px 24px;
+        color: var(--text);
+        font-weight: 900;
+        box-shadow: 0 18px 55px rgba(0,0,0,.36);
+      }
+
+      .view-scene {
+        z-index: 30;
+        padding: 13.6% 6% 5.8%;
+        background:
+          linear-gradient(90deg, rgba(0,0,0,.72), rgba(0,0,0,.34)),
+          url("assets/dining-selected.png") center / cover;
+        animation: viewScene var(--t) linear both;
+      }
+
+      .table-glow {
+        position: absolute;
+        left: 8%;
+        right: 8%;
+        bottom: 13%;
+        height: 26%;
+        border: 1px solid rgba(242,189,89,.22);
+        border-radius: 999px;
+        background: radial-gradient(ellipse at center, rgba(242,189,89,.14), transparent 70%);
+        transform: perspective(760px) rotateX(58deg);
+      }
+
+      .view-grid {
+        position: absolute;
+        left: 7%;
+        right: 7%;
+        bottom: 13%;
+        z-index: 5;
+        display: grid;
+        grid-template-columns: repeat(5, 1fr);
+        gap: 18px;
+      }
+
+      .view-card {
+        position: relative;
+        min-height: 280px;
+        overflow: hidden;
+        border: 1px solid rgba(255,255,255,.12);
+        border-radius: 26px;
+        background: rgba(14, 13, 11, .74);
+        padding: 18px 18px 20px;
+        box-shadow: 0 22px 68px rgba(0,0,0,.42);
+        backdrop-filter: blur(14px);
+      }
+
+      .view-card.active {
+        border-color: rgba(242,189,89,.62);
+        background: rgba(39, 30, 15, .82);
+        box-shadow: 0 24px 78px rgba(242,189,89,.12);
+      }
+
+      .portrait {
+        height: 160px;
+        display: grid;
+        place-items: end center;
+      }
+
+      .portrait img {
+        max-height: 164px;
+        max-width: 96%;
+        object-fit: contain;
+        filter: drop-shadow(0 18px 30px rgba(0,0,0,.5));
+      }
+
+      .view-card h3 {
+        margin: 12px 0 4px;
+        font-size: 24px;
+        line-height: 1.12;
+      }
+
+      .view-card p {
+        margin: 0;
+        color: var(--muted);
+        font-size: 14px;
+        line-height: 1.45;
+        font-weight: 750;
+      }
+
+      .enter-chip {
+        position: absolute;
+        right: 16px;
+        bottom: 16px;
+        border-radius: 999px;
+        background: var(--gold);
+        color: #120d05;
+        padding: 9px 14px;
+        font-size: 13px;
+        font-weight: 950;
+      }
+
+      .final-flash {
+        position: absolute;
+        inset: 0;
+        z-index: 70;
+        display: grid;
+        place-items: center;
+        background: #040404;
+        animation: finalFlash var(--t) linear both;
+      }
+
+      .final-flash h2 {
+        margin: 0;
+        text-align: center;
+        font-size: clamp(42px, 5vw, 88px);
+        line-height: 1.13;
+        font-weight: 950;
+      }
+
+      .final-flash span {
+        color: var(--gold);
+      }
+
+      .controls {
+        position: fixed;
+        right: 22px;
+        bottom: 18px;
+        z-index: 100;
+        display: flex;
+        gap: 10px;
+      }
+
+      .controls button {
+        border: 1px solid rgba(255, 255, 255, .13);
+        border-radius: 999px;
+        background: rgba(12, 12, 11, .78);
+        color: var(--text);
+        cursor: pointer;
+        padding: 10px 14px;
+        font-weight: 800;
+        backdrop-filter: blur(14px);
+      }
+
+      .stage.paused * { animation-play-state: paused !important; }
+      body.clean .controls { display: none; }
+      body.shot * { animation: none !important; }
+      body.shot .entry-scene,
+      body.shot .atlas-scene,
+      body.shot .view-scene,
+      body.shot .final-flash { opacity: 0; }
+      body.shot-entry .entry-scene,
+      body.shot-atlas .atlas-scene,
+      body.shot-viewpoint .view-scene,
+      body.shot-final .final-flash { opacity: 1; }
+      body.shot-entry .entry-card { opacity: 1; transform: translateY(0); }
+      body.shot-final .final-flash { display: grid; }
+
+      @keyframes entryScene {
+        0%, 33% { opacity: 1; transform: scale(1); filter: blur(0); }
+        39%, 100% { opacity: 0; transform: scale(.96); filter: blur(8px); }
+      }
+
+      @keyframes entryCard {
+        0%, 7% { opacity: 0; transform: translateY(16px); }
+        13%, 33% { opacity: 1; transform: translateY(0); }
+        39%, 100% { opacity: 0; transform: translateY(-12px); }
+      }
+
+      @keyframes atlasScene {
+        0%, 32% { opacity: 0; transform: translateY(26px); filter: blur(10px); }
+        39%, 67% { opacity: 1; transform: translateY(0); filter: blur(0); }
+        73%, 100% { opacity: 0; transform: translateY(-22px); filter: blur(8px); }
+      }
+
+      @keyframes viewScene {
+        0%, 66% { opacity: 0; transform: scale(1.04); filter: blur(10px); }
+        73%, 91% { opacity: 1; transform: scale(1); filter: blur(0); }
+        96%, 100% { opacity: 0; transform: scale(.98); filter: blur(8px); }
+      }
+
+      @keyframes finalFlash {
+        0%, 92% { opacity: 0; }
+        97%, 100% { opacity: 1; }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="wrap">
+      <main class="stage" id="stage" aria-label="复赛视频 03 播放后入口到视角选择">
+        <div class="topbar">
+          <div class="brand"><span class="play-dot"></span>腾讯视频</div>
+          <div class="nav"><span>播放后入口</span><span>本集图谱</span><span>视角选择</span></div>
+        </div>
+
+        <section class="scene entry-scene">
+          <div class="player">
+            <div class="ended-copy">
+              <span class="pill">播放结束</span>
+              <h1>《好东西》<br />正片已播完</h1>
+              <p>进度条走到底，但这顿饭还没有被看完。</p>
+            </div>
+            <div class="entry-card">
+              <b>水下模式 · 官方剧后体验</b>
+              <h2>你刚看完的，<br />不止这一层</h2>
+              <p>从本集探索图谱进入，换一个位置再看一次同一场戏。</p>
+              <span class="cta">换个角度再看一遍</span>
+            </div>
+          </div>
+        </section>
+
+        <section class="scene atlas-scene">
+          <div class="section-title">
+            <div class="mini">EPISODE ATLAS / 20 NODES</div>
+            <h2>《好东西》本集探索图谱</h2>
+            <p>一集不是一条线，是一张可探索的暗流图。</p>
+          </div>
+          <div class="filters">
+            <span>全部事件</span><span>饭桌</span><span>小叶</span><span>铁梅</span>
+          </div>
+          <div class="timeline">
+            <div class="node" style="--x: 2%; --y: 34%"><i></i><span>搬家入住</span></div>
+            <div class="node" style="--x: 8%; --y: 65%"><i></i><span>访客登记</span></div>
+            <div class="node" style="--x: 14%; --y: 42%"><i></i><span>第一次饭桌</span></div>
+            <div class="node" style="--x: 20%; --y: 66%"><i></i><span>前夫上门</span></div>
+            <div class="node" style="--x: 27%; --y: 38%"><i></i><span>孩子旁听</span></div>
+            <div class="node" style="--x: 34%; --y: 64%"><i></i><span>礼物入场</span></div>
+            <div class="node hot" style="--x: 46%; --y: 50%"><i></i><span>第二次饭桌</span></div>
+            <div class="node" style="--x: 58%; --y: 32%"><i></i><span>看眼睛</span></div>
+            <div class="node" style="--x: 64%; --y: 69%"><i></i><span>泼水</span></div>
+            <div class="node" style="--x: 71%; --y: 42%"><i></i><span>恋爱脑争辩</span></div>
+            <div class="node" style="--x: 79%; --y: 63%"><i></i><span>三人沉默</span></div>
+            <div class="node" style="--x: 88%; --y: 38%"><i></i><span>结尾舞台</span></div>
+            <div class="node" style="--x: 96%; --y: 62%"><i></i><span>余波</span></div>
+          </div>
+          <div class="recommend">推荐进入：第二次饭桌 <span class="cta">查看观察位</span></div>
+        </section>
+
+        <section class="scene view-scene">
+          <div class="section-title">
+            <div class="mini">VIEWPOINTS / SAME EVENT, DIFFERENT BOUNDARIES</div>
+            <h2>选择饭桌上的信息边界</h2>
+            <p>同一场饭局，不同位置听见的不是同一句话。</p>
+          </div>
+          <div class="table-glow"></div>
+          <div class="view-grid">
+            <article class="view-card active">
+              <div class="portrait"><img src="assets/xiaoye.png" alt="" /></div>
+              <h3>小叶</h3>
+              <p>被贴上标签的人，也把标签推回去的位置。</p>
+              <span class="enter-chip">进入</span>
+            </article>
+            <article class="view-card">
+              <div class="portrait"><img src="assets/wang-tiemei.png" alt="" /></div>
+              <h3>王铁梅</h3>
+              <p>想保护别人，却也被别人刺中的位置。</p>
+            </article>
+            <article class="view-card">
+              <div class="portrait"><img src="assets/wang-moli.png" alt="" /></div>
+              <h3>茉莉</h3>
+              <p>在成人语言里学习判断的位置。</p>
+            </article>
+            <article class="view-card">
+              <div class="portrait"><img src="assets/xiaoma.png" alt="" /></div>
+              <h3>小马</h3>
+              <p>用玩笑参与评价系统的位置。</p>
+            </article>
+            <article class="view-card">
+              <div class="portrait"><img src="assets/ex-husband.png" alt="" /></div>
+              <h3>前夫</h3>
+              <p>试图重新入席、证明自己的位置。</p>
+            </article>
+          </div>
+        </section>
+
+        <section class="final-flash">
+          <h2>先选一段事件，<br />再从一个<span>位置</span>进入。</h2>
+        </section>
+      </main>
+    </div>
+
+    <div class="controls">
+      <button id="pauseBtn" type="button">暂停</button>
+      <button id="replayBtn" type="button">重播</button>
+    </div>
+
+    <script>
+      const params = new URLSearchParams(window.location.search);
+      const shot = params.get('shot');
+      if (params.get('clean') === '1') document.body.classList.add('clean');
+      if (shot) document.body.classList.add('shot', `shot-${shot}`);
+
+      const stage = document.getElementById('stage');
+      const replayBtn = document.getElementById('replayBtn');
+      const pauseBtn = document.getElementById('pauseBtn');
+
+      replayBtn.addEventListener('click', () => {
+        stage.style.animation = 'none';
+        stage.classList.remove('paused');
+        pauseBtn.textContent = '暂停';
+        void stage.offsetWidth;
+        stage.style.animation = '';
+        for (const node of stage.querySelectorAll('*')) {
+          node.style.animation = 'none';
+          void node.offsetWidth;
+          node.style.animation = '';
+        }
+      });
+
+      pauseBtn.addEventListener('click', () => {
+        const paused = stage.classList.toggle('paused');
+        pauseBtn.textContent = paused ? '继续' : '暂停';
+      });
+    </script>
+  </body>
+</html>

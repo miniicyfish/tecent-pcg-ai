@@ -1,0 +1,223 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>好东西 · 水下｜复赛视频 07 结语</title>
+    <style>
+      :root {
+        --bg: #030303;
+        --text: #f7efe3;
+        --muted: rgba(247, 239, 227, .58);
+        --gold: #f2bd59;
+        --water: #8cc7cf;
+        --t: 8s;
+      }
+
+      * { box-sizing: border-box; }
+
+      body {
+        margin: 0;
+        min-height: 100vh;
+        overflow: hidden;
+        background: #030303;
+        color: var(--text);
+        font-family: "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", system-ui, sans-serif;
+      }
+
+      .wrap {
+        display: grid;
+        min-height: 100vh;
+        place-items: center;
+        padding: 30px;
+        background:
+          radial-gradient(circle at 50% 54%, rgba(140, 199, 207, .08), transparent 30%),
+          radial-gradient(circle at 50% 28%, rgba(242, 189, 89, .08), transparent 25%),
+          #030303;
+      }
+
+      .stage {
+        position: relative;
+        width: min(100vw - 60px, calc((100vh - 60px) * 16 / 9));
+        max-width: 1920px;
+        aspect-ratio: 16 / 9;
+        overflow: hidden;
+        border: 1px solid rgba(255,255,255,.08);
+        border-radius: 28px;
+        background:
+          linear-gradient(rgba(255,255,255,.025) 1px, transparent 1px) 0 0 / 100% 3px,
+          #030303;
+        box-shadow: 0 28px 88px rgba(0,0,0,.6);
+      }
+
+      .stage::after {
+        content: "";
+        position: absolute;
+        inset: 0;
+        z-index: 50;
+        pointer-events: none;
+        background: radial-gradient(circle at 50% 52%, transparent 55%, rgba(0,0,0,.46));
+      }
+
+      .line {
+        position: absolute;
+        left: 18%;
+        right: 18%;
+        top: 50%;
+        height: 1px;
+        background: linear-gradient(90deg, transparent, rgba(140,199,207,.7), rgba(242,189,89,.8), transparent);
+        box-shadow: 0 0 30px rgba(140,199,207,.28);
+        transform-origin: center;
+        animation: lineIn var(--t) cubic-bezier(.2,.8,.2,1) both;
+      }
+
+      .copy {
+        position: absolute;
+        left: 50%;
+        top: 48%;
+        z-index: 10;
+        width: min(1220px, 78%);
+        transform: translate(-50%, -50%);
+        text-align: center;
+      }
+
+      .sentence {
+        position: absolute;
+        left: 0;
+        right: 0;
+        top: 50%;
+        transform: translateY(-50%);
+      }
+
+      .sentence h1,
+      .sentence h2 {
+        margin: 0;
+        font-size: clamp(42px, 5.1vw, 88px);
+        line-height: 1.14;
+        font-weight: 950;
+        letter-spacing: 0;
+      }
+
+      .sentence p {
+        margin: 20px 0 0;
+        color: var(--muted);
+        font-size: 18px;
+        font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+        font-weight: 850;
+        letter-spacing: .14em;
+      }
+
+      .sentence span {
+        color: var(--gold);
+      }
+
+      .first {
+        animation: firstLine var(--t) cubic-bezier(.2,.8,.2,1) both;
+      }
+
+      .second {
+        animation: secondLine var(--t) cubic-bezier(.2,.8,.2,1) both;
+      }
+
+      .controls {
+        position: fixed;
+        right: 22px;
+        bottom: 18px;
+        z-index: 100;
+        display: flex;
+        gap: 10px;
+      }
+
+      .controls button {
+        border: 1px solid rgba(255, 255, 255, .13);
+        border-radius: 999px;
+        background: rgba(12, 12, 11, .78);
+        color: var(--text);
+        cursor: pointer;
+        padding: 10px 14px;
+        font-weight: 800;
+        backdrop-filter: blur(14px);
+      }
+
+      .stage.paused * { animation-play-state: paused !important; }
+      body.clean .controls { display: none; }
+      body.shot * { animation: none !important; }
+      body.shot-first .first { opacity: 1; transform: translateY(-50%); }
+      body.shot-first .second { opacity: 0; }
+      body.shot-second .first,
+      body.shot-final .first { opacity: 0; }
+      body.shot-second .second,
+      body.shot-final .second { opacity: 1; transform: translateY(-50%); }
+      body.shot-first .line,
+      body.shot-second .line,
+      body.shot-final .line { opacity: 1; transform: scaleX(1); }
+
+      @keyframes firstLine {
+        0%, 8% { opacity: 0; transform: translateY(-42%); filter: blur(8px); }
+        18%, 54% { opacity: 1; transform: translateY(-50%); filter: blur(0); }
+        66%, 100% { opacity: 0; transform: translateY(-58%); filter: blur(8px); }
+      }
+
+      @keyframes secondLine {
+        0%, 56% { opacity: 0; transform: translateY(-42%); filter: blur(8px); }
+        70%, 100% { opacity: 1; transform: translateY(-50%); filter: blur(0); }
+      }
+
+      @keyframes lineIn {
+        0%, 12% { opacity: 0; transform: scaleX(.18); }
+        24%, 100% { opacity: 1; transform: scaleX(1); }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="wrap">
+      <main class="stage" id="stage" aria-label="复赛视频 07 结语黑场字幕">
+        <div class="line"></div>
+        <section class="copy">
+          <div class="sentence first">
+            <h1>正片讲完故事，<br />水下让用户继续<span>住在故事里</span>。</h1>
+            <p>NARRATIVE AFTERGLOW HELD INSIDE TENCENT VIDEO</p>
+          </div>
+          <div class="sentence second">
+            <h2>腾讯视频 · <span>每个 IP 的第二层世界</span></h2>
+            <p>IP UNDERWATER WORLD</p>
+          </div>
+        </section>
+      </main>
+    </div>
+
+    <div class="controls">
+      <button id="pauseBtn" type="button">暂停</button>
+      <button id="replayBtn" type="button">重播</button>
+    </div>
+
+    <script>
+      const params = new URLSearchParams(window.location.search);
+      const shot = params.get('shot');
+      if (params.get('clean') === '1') document.body.classList.add('clean');
+      if (shot) document.body.classList.add('shot', `shot-${shot}`);
+
+      const stage = document.getElementById('stage');
+      const replayBtn = document.getElementById('replayBtn');
+      const pauseBtn = document.getElementById('pauseBtn');
+
+      replayBtn.addEventListener('click', () => {
+        stage.style.animation = 'none';
+        stage.classList.remove('paused');
+        pauseBtn.textContent = '暂停';
+        void stage.offsetWidth;
+        stage.style.animation = '';
+        for (const node of stage.querySelectorAll('*')) {
+          node.style.animation = 'none';
+          void node.offsetWidth;
+          node.style.animation = '';
+        }
+      });
+
+      pauseBtn.addEventListener('click', () => {
+        const paused = stage.classList.toggle('paused');
+        pauseBtn.textContent = paused ? '继续' : '暂停';
+      });
+    </script>
+  </body>
+</html>

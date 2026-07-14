@@ -1,0 +1,523 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>好东西 · 水下｜复赛视频 06 第二层世界</title>
+    <style>
+      :root {
+        --bg: #050504;
+        --text: #f7efe3;
+        --muted: rgba(247, 239, 227, .62);
+        --dim: rgba(247, 239, 227, .36);
+        --gold: #f2bd59;
+        --water: #8cc7cf;
+        --panel: rgba(17, 16, 14, .78);
+        --stroke: rgba(255, 255, 255, .1);
+        --t: 12s;
+      }
+
+      * { box-sizing: border-box; }
+
+      body {
+        margin: 0;
+        min-height: 100vh;
+        overflow: hidden;
+        background:
+          radial-gradient(circle at 20% 16%, rgba(242, 189, 89, .13), transparent 30%),
+          radial-gradient(circle at 75% 80%, rgba(140, 199, 207, .12), transparent 36%),
+          #030303;
+        color: var(--text);
+        font-family: "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", system-ui, sans-serif;
+      }
+
+      .wrap {
+        display: grid;
+        min-height: 100vh;
+        place-items: center;
+        padding: 30px;
+      }
+
+      .stage {
+        position: relative;
+        width: min(100vw - 60px, calc((100vh - 60px) * 16 / 9));
+        max-width: 1920px;
+        aspect-ratio: 16 / 9;
+        overflow: hidden;
+        border: 1px solid rgba(255,255,255,.08);
+        border-radius: 28px;
+        background: #050504;
+        box-shadow: 0 28px 88px rgba(0,0,0,.6);
+        isolation: isolate;
+      }
+
+      .stage::after {
+        content: "";
+        position: absolute;
+        inset: 0;
+        z-index: 90;
+        pointer-events: none;
+        background:
+          linear-gradient(rgba(255,255,255,.032) 1px, transparent 1px) 0 0 / 100% 3px,
+          radial-gradient(circle at 50% 50%, transparent 60%, rgba(0,0,0,.48));
+        opacity: .28;
+        mix-blend-mode: screen;
+      }
+
+      .grid {
+        position: absolute;
+        inset: 0;
+        background:
+          linear-gradient(90deg, rgba(255,255,255,.03) 1px, transparent 1px) 0 0 / 86px 86px,
+          linear-gradient(rgba(255,255,255,.025) 1px, transparent 1px) 0 0 / 86px 86px;
+        opacity: .24;
+      }
+
+      .header {
+        position: absolute;
+        left: 6%;
+        right: 6%;
+        top: 6%;
+        z-index: 10;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+
+      .kicker {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        color: var(--gold);
+        font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+        font-size: 13px;
+        font-weight: 900;
+        letter-spacing: .16em;
+      }
+
+      .kicker::before {
+        content: "";
+        width: 46px;
+        height: 2px;
+        border-radius: 999px;
+        background: var(--gold);
+      }
+
+      .timecode {
+        border: 1px solid rgba(255,255,255,.12);
+        border-radius: 999px;
+        padding: 9px 15px;
+        color: rgba(247,239,227,.54);
+        font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+        font-size: 13px;
+        font-weight: 800;
+      }
+
+      .title {
+        position: absolute;
+        left: 6%;
+        top: 15%;
+        z-index: 10;
+        width: 720px;
+      }
+
+      .title h1 {
+        margin: 0;
+        font-size: clamp(42px, 4.5vw, 80px);
+        line-height: 1.04;
+        font-weight: 950;
+      }
+
+      .title p {
+        margin: 18px 0 0;
+        color: var(--muted);
+        font-size: 20px;
+        line-height: 1.5;
+        font-weight: 800;
+      }
+
+      .collage {
+        position: absolute;
+        right: 6%;
+        top: 15%;
+        bottom: 14%;
+        z-index: 12;
+        width: 52%;
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 18px;
+        animation: collagePull var(--t) cubic-bezier(.2,.8,.2,1) both;
+      }
+
+      .tile {
+        position: relative;
+        overflow: hidden;
+        border: 1px solid rgba(255,255,255,.1);
+        border-radius: 28px;
+        background: rgba(14, 13, 11, .78);
+        padding: 24px;
+        box-shadow: 0 24px 70px rgba(0,0,0,.42);
+        backdrop-filter: blur(16px);
+        animation: tileIn var(--t) cubic-bezier(.2,.8,.2,1) both;
+      }
+
+      .tile:nth-child(2) { animation-delay: .12s; }
+      .tile:nth-child(3) { animation-delay: .24s; }
+      .tile:nth-child(4) { animation-delay: .36s; }
+
+      .tile::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background: radial-gradient(circle at 20% 10%, rgba(242,189,89,.12), transparent 34%);
+        pointer-events: none;
+      }
+
+      .tile b {
+        position: relative;
+        color: var(--gold);
+        font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+        font-size: 12px;
+        font-weight: 950;
+        letter-spacing: .14em;
+      }
+
+      .tile h2 {
+        position: relative;
+        margin: 14px 0 8px;
+        font-size: 31px;
+        line-height: 1.08;
+      }
+
+      .tile p {
+        position: relative;
+        margin: 0;
+        color: var(--muted);
+        font-size: 15px;
+        line-height: 1.5;
+        font-weight: 760;
+      }
+
+      .mini-atlas {
+        position: absolute;
+        left: 24px;
+        right: 24px;
+        bottom: 24px;
+        height: 54px;
+      }
+
+      .mini-atlas::before {
+        content: "";
+        position: absolute;
+        left: 0;
+        right: 0;
+        top: 27px;
+        height: 2px;
+        background: linear-gradient(90deg, transparent, rgba(242,189,89,.7), transparent);
+      }
+
+      .mini-atlas i {
+        position: absolute;
+        left: var(--x);
+        top: 20px;
+        width: 14px;
+        height: 14px;
+        border-radius: 999px;
+        background: rgba(247,239,227,.4);
+      }
+
+      .mini-atlas i.hot {
+        width: 22px;
+        height: 22px;
+        top: 16px;
+        background: var(--gold);
+        box-shadow: 0 0 24px rgba(242,189,89,.62);
+      }
+
+      .archive-stack {
+        position: absolute;
+        right: 24px;
+        bottom: 22px;
+        display: flex;
+        gap: 10px;
+      }
+
+      .archive-card {
+        width: 76px;
+        height: 96px;
+        border: 1px solid rgba(242,189,89,.28);
+        border-radius: 18px;
+        background: linear-gradient(145deg, rgba(242,189,89,.18), rgba(140,199,207,.08));
+      }
+
+      .compare {
+        position: absolute;
+        left: 24px;
+        right: 24px;
+        bottom: 24px;
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 12px;
+      }
+
+      .compare div {
+        height: 76px;
+        border: 1px solid rgba(255,255,255,.1);
+        border-radius: 18px;
+        background:
+          linear-gradient(rgba(0,0,0,.25), rgba(0,0,0,.55)),
+          url("assets/dining-world.png") center / cover;
+      }
+
+      .friend-map {
+        position: absolute;
+        left: 26px;
+        right: 26px;
+        bottom: 28px;
+        height: 72px;
+      }
+
+      .friend-map i {
+        position: absolute;
+        display: grid;
+        width: 48px;
+        height: 48px;
+        place-items: center;
+        border: 1px solid rgba(242,189,89,.34);
+        border-radius: 999px;
+        background: rgba(242,189,89,.12);
+        color: var(--gold);
+        font-style: normal;
+        font-weight: 950;
+      }
+
+      .friend-map i:nth-child(1) { left: 0; top: 6px; }
+      .friend-map i:nth-child(2) { left: 34%; top: 20px; }
+      .friend-map i:nth-child(3) { right: 0; top: 2px; }
+
+      .friend-map::before {
+        content: "";
+        position: absolute;
+        left: 38px;
+        right: 38px;
+        top: 34px;
+        height: 2px;
+        background: linear-gradient(90deg, rgba(242,189,89,.55), rgba(140,199,207,.55));
+      }
+
+      .emblem-scene {
+        position: absolute;
+        inset: 0;
+        z-index: 40;
+        display: grid;
+        place-items: center;
+        background:
+          radial-gradient(circle at 50% 48%, rgba(140,199,207,.14), transparent 36%),
+          rgba(3,3,3,.94);
+        animation: emblemIn var(--t) cubic-bezier(.2,.8,.2,1) both;
+      }
+
+      .emblem {
+        position: relative;
+        width: 560px;
+        height: 360px;
+      }
+
+      .table {
+        position: absolute;
+        left: 50%;
+        top: 44%;
+        width: 430px;
+        height: 190px;
+        transform: translate(-50%, -50%) perspective(760px) rotateX(58deg);
+        border: 1px solid rgba(242,189,89,.46);
+        border-radius: 50%;
+        background:
+          linear-gradient(rgba(0,0,0,.18), rgba(0,0,0,.58)),
+          url("assets/dining-world.png") center / cover;
+        box-shadow: 0 28px 90px rgba(0,0,0,.5);
+      }
+
+      .under {
+        position: absolute;
+        left: 50%;
+        top: 58%;
+        width: 520px;
+        height: 172px;
+        transform: translateX(-50%);
+        border-radius: 0 0 50% 50%;
+        background: radial-gradient(ellipse at top, rgba(140,199,207,.34), rgba(14,43,49,.16) 62%, transparent 72%);
+        border-bottom: 1px solid rgba(140,199,207,.4);
+      }
+
+      .emblem-copy {
+        position: absolute;
+        left: 50%;
+        bottom: 6%;
+        width: min(1180px, 78%);
+        transform: translateX(-50%);
+        text-align: center;
+      }
+
+      .emblem-copy h2 {
+        margin: 0;
+        font-size: clamp(42px, 5.2vw, 90px);
+        line-height: 1.08;
+        font-weight: 950;
+      }
+
+      .emblem-copy span {
+        color: var(--gold);
+      }
+
+      .emblem-copy p {
+        margin: 18px 0 0;
+        color: var(--muted);
+        font-size: 20px;
+        font-weight: 850;
+      }
+
+      .controls {
+        position: fixed;
+        right: 22px;
+        bottom: 18px;
+        z-index: 100;
+        display: flex;
+        gap: 10px;
+      }
+
+      .controls button {
+        border: 1px solid rgba(255, 255, 255, .13);
+        border-radius: 999px;
+        background: rgba(12, 12, 11, .78);
+        color: var(--text);
+        cursor: pointer;
+        padding: 10px 14px;
+        font-weight: 800;
+        backdrop-filter: blur(14px);
+      }
+
+      .stage.paused * { animation-play-state: paused !important; }
+      body.clean .controls { display: none; }
+      body.shot * { animation: none !important; }
+      body.shot-grid .emblem-scene { opacity: 0; }
+      body.shot-emblem .collage,
+      body.shot-final .collage,
+      body.shot-emblem .title,
+      body.shot-final .title { opacity: 0; }
+      body.shot-emblem .emblem-scene,
+      body.shot-final .emblem-scene { opacity: 1; }
+
+      @keyframes tileIn {
+        0%, 10% { opacity: 0; transform: translateY(24px) scale(.96); filter: blur(10px); }
+        24%, 70% { opacity: 1; transform: translateY(0) scale(1); filter: blur(0); }
+        86%, 100% { opacity: .18; transform: translateY(-10px) scale(.92); filter: blur(8px); }
+      }
+
+      @keyframes collagePull {
+        0%, 70% { opacity: 1; transform: scale(1); }
+        88%, 100% { opacity: 0; transform: scale(.74); }
+      }
+
+      @keyframes emblemIn {
+        0%, 72% { opacity: 0; transform: scale(1.08); filter: blur(12px); }
+        88%, 100% { opacity: 1; transform: scale(1); filter: blur(0); }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="wrap">
+      <main class="stage" id="stage" aria-label="复赛视频 06 IP 第二层世界">
+        <div class="grid"></div>
+        <div class="header">
+          <div class="kicker">06 SECOND WORLD / IP LONG-TAIL SPACE</div>
+          <div class="timecode">02:40 - 02:52</div>
+        </div>
+
+        <section class="title">
+          <h1>水下不是一个功能，<br />是每个 IP 的第二层世界。</h1>
+          <p>本集探索、档案沉淀、跨视角回看、好友分享，都可以继续留在腾讯视频里生长。</p>
+        </section>
+
+        <section class="collage">
+          <article class="tile">
+            <b>EPISODE ATLAS</b>
+            <h2>本集探索图谱</h2>
+            <p>把一集拆成可继续进入的事件节点。</p>
+            <div class="mini-atlas">
+              <i style="--x: 3%"></i><i style="--x: 20%"></i><i class="hot" style="--x: 46%"></i><i style="--x: 72%"></i><i style="--x: 92%"></i>
+            </div>
+          </article>
+
+          <article class="tile">
+            <b>IP ARCHIVE</b>
+            <h2>水下档案馆</h2>
+            <p>用户解锁过的发现，沉淀成这个 IP 的长期资产。</p>
+            <div class="archive-stack">
+              <div class="archive-card"></div><div class="archive-card"></div><div class="archive-card"></div>
+            </div>
+          </article>
+
+          <article class="tile">
+            <b>VIEWPOINT REPLAY</b>
+            <h2>视角对照回放</h2>
+            <p>同一帧剧情，换一个人看，意义就会变厚。</p>
+            <div class="compare"><div></div><div></div></div>
+          </article>
+
+          <article class="tile">
+            <b>SOCIAL PUZZLE</b>
+            <h2>好友视角拼图</h2>
+            <p>不同用户解锁的片刻，可以拼成一张共同理解的故事地图。</p>
+            <div class="friend-map"><i>我</i><i>友</i><i>群</i></div>
+          </article>
+        </section>
+
+        <section class="emblem-scene">
+          <div class="emblem">
+            <div class="under"></div>
+            <div class="table"></div>
+          </div>
+          <div class="emblem-copy">
+            <h2>每张桌子，都有桌面以下的<span>那一层</span>。</h2>
+            <p>每一部腾讯视频做的剧，都可以有自己的水下。</p>
+          </div>
+        </section>
+      </main>
+    </div>
+
+    <div class="controls">
+      <button id="pauseBtn" type="button">暂停</button>
+      <button id="replayBtn" type="button">重播</button>
+    </div>
+
+    <script>
+      const params = new URLSearchParams(window.location.search);
+      const shot = params.get('shot');
+      if (params.get('clean') === '1') document.body.classList.add('clean');
+      if (shot) document.body.classList.add('shot', `shot-${shot}`);
+
+      const stage = document.getElementById('stage');
+      const replayBtn = document.getElementById('replayBtn');
+      const pauseBtn = document.getElementById('pauseBtn');
+
+      replayBtn.addEventListener('click', () => {
+        stage.style.animation = 'none';
+        stage.classList.remove('paused');
+        pauseBtn.textContent = '暂停';
+        void stage.offsetWidth;
+        stage.style.animation = '';
+        for (const node of stage.querySelectorAll('*')) {
+          node.style.animation = 'none';
+          void node.offsetWidth;
+          node.style.animation = '';
+        }
+      });
+
+      pauseBtn.addEventListener('click', () => {
+        const paused = stage.classList.toggle('paused');
+        pauseBtn.textContent = paused ? '继续' : '暂停';
+      });
+    </script>
+  </body>
+</html>
