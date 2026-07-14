@@ -1,32 +1,54 @@
-.DS_Store
-.superpowers/
+# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
 
-# Dependencies
+# dependencies
+/node_modules
 node_modules/
 underwater/node_modules/
+/.pnp
+.pnp.*
+.yarn/*
+!.yarn/patches
+!.yarn/plugins
+!.yarn/releases
+!.yarn/versions
 
-# Next.js build output
-.next/
+# testing
+/coverage
+
+# next.js
+/.next/
+/.next
 underwater/.next/
-out/
+/out/
 underwater/out/
 
-# Local environment
-.env
-.env.local
-.env.*.local
-underwater/.env
-underwater/.env.local
-underwater/.env.*.local
+# production
+/build
 
-# Logs
+# misc
+.DS_Store
+.superpowers/
+*.pem
+
+# debug
 *.log
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+.pnpm-debug.log*
 
-# TypeScript incremental cache
+# env files (can opt-in for committing if needed)
+.env*
+underwater/.env
+underwater/.env.local
+underwater/.env.*.local
+
+# vercel
+.vercel
+
+# typescript
 *.tsbuildinfo
+next-env.d.ts
 
 # Nested repositories and local packaging artifacts.
 haodongxi/app/
